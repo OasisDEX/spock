@@ -1,7 +1,7 @@
 import { migrate } from 'postgres-migrations-oasis';
 
-import { DB, withConnection } from '../spock-core/db/db';
-import { getDefaultConfig, Vulcan2xConfig } from '../spock-core/config';
+import { DB, withConnection } from '../core/db/db';
+import { getDefaultConfig, Vulcan2xConfig } from '../core/config';
 
 export const testConfig: Vulcan2xConfig = {
   ...getDefaultConfig({
