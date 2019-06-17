@@ -1,13 +1,17 @@
 import { Vulcan2xConfig, getDefaultConfig } from '../config';
-import { isAbsolute, join } from 'path';
+import { isAbsolute, join, extname } from 'path';
 
 export function loadConfig(): Vulcan2xConfig {
-  const rawPath = process.argv[2];
+  const rawPath = process.argv[3];
   if (!rawPath) {
     throw new Error('You need to provide config as a first argument!');
   }
   const configPath = parseConfigPath(rawPath);
 
+  if (extname(configPath) === '.ts') {
+    // if we are loading TS file transpile it on the fly
+    require('ts-node').register();
+  }
   const configModule = require(configPath);
 
   if (!configModule.default) {
