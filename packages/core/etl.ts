@@ -6,17 +6,17 @@ import { extract, queueNewBlocksToExtract } from './extractors/extractor';
 import { queueNewBlocksToTransform, transform } from './transformers/transformers';
 import { getLogger } from './utils/logger';
 import { withLock } from './db/locks';
-import { Vulcan2xConfig } from './config';
+import { SpockConfig } from './config';
 
 ethers.errors.setLogLevel('error');
 const logger = getLogger('runner');
 
-function printSystemInfo(config: Vulcan2xConfig): void {
-  logger.info('Starting vulcan2x');
+function printSystemInfo(config: SpockConfig): void {
+  logger.info('Starting Spock ETL...');
   logger.info(`Ethereum node: ${config.chain.host}`);
 }
 
-export async function etl(config: Vulcan2xConfig): Promise<void> {
+export async function etl(config: SpockConfig): Promise<void> {
   const provider = new RetryProvider(config.chain.host, config.chain.retries);
   const db = createDB(config.db);
 

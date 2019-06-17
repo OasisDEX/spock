@@ -1,9 +1,9 @@
 import { migrate } from 'postgres-migrations-oasis';
 
 import { DB, withConnection } from '../core/db/db';
-import { getDefaultConfig, Vulcan2xConfig } from '../core/config';
+import { getDefaultConfig, SpockConfig } from '../core/config';
 
-export const testConfig: Vulcan2xConfig = {
+export const testConfig: SpockConfig = {
   ...getDefaultConfig({
     VL_DB_DATABASE: 'database',
     VL_DB_USER: 'user',
@@ -22,7 +22,7 @@ export const testConfig: Vulcan2xConfig = {
   startingBlock: 0,
 } as any;
 
-export async function prepareDB(db: DB, config: Vulcan2xConfig): Promise<void> {
+export async function prepareDB(db: DB, config: SpockConfig): Promise<void> {
   await withConnection(db, async c => {
     await c.none(`
     DROP SCHEMA IF EXISTS public, api, rest_api, dschief, oasis, oasis_market, vulcan2x, extracted, erc20, proxy CASCADE;

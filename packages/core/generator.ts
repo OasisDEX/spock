@@ -5,7 +5,7 @@ import { compact } from 'lodash';
 import { getLast, getRangeAsString, getRange } from './utils';
 import pgPromise = require('pg-promise');
 import { getLogger } from './utils/logger';
-import { Vulcan2xConfig } from './config';
+import { SpockConfig } from './config';
 
 const logger = getLogger('block-generator');
 
@@ -61,7 +61,7 @@ export interface Services {
   provider: JsonRpcProvider;
   db: DB;
   pg: pgPromise.IMain;
-  config: Vulcan2xConfig;
+  config: SpockConfig;
   columnSets: ColumnSets;
 }
 
