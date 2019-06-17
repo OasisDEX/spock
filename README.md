@@ -8,16 +8,6 @@ Centralized cache for blockchain data
 - easily provide semantic layers on top
 - ensure data consistency
 
-## Ethereum node considerations
-
-spock pulls all the data from ethereum node. Nodes can differ greatly between each other, and some
-are simply not reliable / consistent. Based on our tests:
-
-- Alchemy works
-- Infura DOESN'T WORK. Sometimes it can randomly return empty sets for getLogs calls
-- Self hosted nodes should work (not tested yet) but keep in mind that vulcan can generate quite a
-  lot of network calls (around 500k daily)
-
 ## Installation
 
 ```
@@ -37,6 +27,16 @@ spock-etl etl|migrate|sync yourconfig.js|ts
 - etl - launches ETL process (long running process)
 - migrate — launches database migrations (core and defined in config)
 - sync — synchronizes work after config changes
+
+## Ethereum node considerations
+
+spock pulls all the data from ethereum node. Nodes can differ greatly between each other, and some
+are simply not reliable / consistent. Based on our tests:
+
+- Alchemy works
+- Infura DOESN'T WORK. Sometimes it can randomly return empty sets for getLogs calls
+- Self hosted nodes should work (not tested yet) but keep in mind that vulcan can generate quite a
+  lot of network calls (around 500k daily)
 
 ## Development
 
