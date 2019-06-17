@@ -6,7 +6,7 @@ import { testConfig, prepareDB, dumpDB } from '../../test/common';
 import { extract, queueNewBlocksToExtract, BlockExtractor } from '../extractors/extractor';
 import { makeRawLogExtractors } from '../extractors/instances/rawEventDataExtractor';
 
-describe('Block Generator', () => {
+describe('Whole solution', () => {
   it('should work with reorgs', async () => {
     const dbCtx = createDB(testConfig.db);
     await prepareDB(dbCtx.db, testConfig);
