@@ -8,7 +8,7 @@ const logger = getLogger('migration');
 
 export async function main(): Promise<void> {
   const config = loadConfig();
-  const configPath = parseConfigPath(process.argv[2]);
+  const configPath = parseConfigPath(process.argv[3]);
 
   await migrate(config.db, 'vulcan2x_core', join(__dirname, '../../../migrate'));
 
