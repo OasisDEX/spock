@@ -1,0 +1,13 @@
+version: "3.2"
+services:
+  postgres:
+    image: postgres:10.6
+    container_name: postgres-vulcan2x
+    environment:
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_HOST=localhost
+      - POSTGRES_PORT=5432
+      - POSTGRES_DB=database
+    ports:
+      - "5432:5432"

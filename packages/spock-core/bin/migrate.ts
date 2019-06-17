@@ -1,0 +1,43 @@
+import { migrate as migrateDB } from 'postgres-migrations-oasis';
+import { loadConfig, parseConfigPath } from '../utils/configUtils';
+import { join, dirname } from 'path';
+import { Vulcan2xConfig } from '../config';
+import { getLogger } from '../utils/logger';
+
+const logger = getLogger('migration');
+
+export async function main(): Promise<void> {
+  const config = loadConfig();
+  const configPath = parseConfigPath(process.argv[2]);
+
+  await migrate(config.db, 'vulcan2x_core', join(__dirname, '../../../migrate'));
+
+  const migrationNames = Object.keys(config.migrations);
+
+  for (const migration of migrationNames) {
+    const migrationDirectory = config.migrations[migration];
+    const fullPath = join(dirname(configPath), migrationDirectory);
+
+    await migrate(config.db, migration, fullPath);
+  }
+}
+
+main().catch(e => {
+  logger.error(e);
+  process.exit(1);
+});
+
+async function migrate(
+  dbConfig: Vulcan2xConfig['db'],
+  name: string,
+  dirPath: string,
+): Promise<void> {
+  logger.info(`Migrating ${name}...`);
+  try {
+    await migrateDB({ ...dbConfig, tableName: `migrations_${name}` }, dirPath);
+    logger.info(`Migration for ${name} completed`);
+  } catch (e) {
+    logger.error(`Error while migrating ${name}`);
+    throw e;
+  }
+}

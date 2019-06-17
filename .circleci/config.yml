@@ -1,0 +1,114 @@
+version: 2.1
+orbs:
+  aws-ecr: circleci/aws-ecr@0.0.4
+  aws-ecs: circleci/aws-ecs@0.0.3
+jobs:
+  test:
+    docker:
+      - image: circleci/node:10.13.0
+    working_directory: /home/circleci/app
+    steps:
+      - checkout
+
+      - restore_cache:
+          key: v1-dep-{{ checksum "yarn.lock" }}
+
+      - run:
+          name: Install deps
+          command: yarn install --frozen-lockfile
+
+      - save_cache:
+          paths:
+            - ./node_modules
+            - ~/.cache
+          key: v1-dep-{{ checksum "yarn.lock" }}
+
+      - run:
+          name: Run tests
+          command: yarn test
+
+  test-e2e:
+    machine:
+      enabled: true
+      image: circleci/classic:201710-01
+      docker_layer_caching: true
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - v3-dependencies-{{ checksum "package.json" }}
+      - run: .circleci/install-yarn.sh
+
+      - run:
+          name: 'Run postgres'
+          command: |
+            docker-compose up -d
+            ./.circleci/wait-for-it.sh localhost:5432 -t 10
+            sleep 10
+
+      - run: |
+          source /opt/circleci/.nvm/nvm.sh
+          yarn # @todo: reuse modules from cache
+          yarn test:e2e
+
+  push-image-to-ecr:
+    machine:
+      enabled: true
+      image: circleci/classic:201710-01
+      docker_layer_caching: true
+    steps:
+      - checkout
+      - run: |
+          pip install awscli
+          aws --version
+          aws configure set default.region $AWS_REGION
+          aws configure set default.output json
+          aws configure set aws_access_key_id $AWS_ACCESS_KEY_ID
+          aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY
+          
+          $(aws ecr get-login --no-include-email --region $AWS_REGION)
+          docker build -t vulcan2x .
+          docker tag vulcan2x:latest $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/vulcan2x:latest
+          docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/vulcan2x:latest
+
+  deploy-prod:
+    machine:
+      enabled: true
+      image: circleci/classic:201710-01
+      docker_layer_caching: true
+    steps:
+      - checkout
+      - run: |
+          pip install awscli
+          aws --version
+          aws configure set default.region $AWS_REGION
+          aws configure set default.output json
+          aws configure set aws_access_key_id $AWS_ACCESS_KEY_ID
+          aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY
+
+          aws ecs update-service --cluster vulcan2x-cluster --service vulcan2x-service --force-new-deployment --query 'service.deployments[*]' --endpoint https://ecs.$AWS_REGION.amazonaws.com --region $AWS_REGION
+
+workflows:
+  version: 2
+
+  mainflow:
+    jobs:
+      - test
+
+      - test-e2e:
+          requires:
+            - test
+
+      - push-image-to-ecr:
+          requires:
+            - test-e2e
+          filters:
+            branches:
+              only: master
+
+      - deploy-prod:
+          requires:
+            - push-image-to-ecr
+          filters:
+            branches:
+              only: master

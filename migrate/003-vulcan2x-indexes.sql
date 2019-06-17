@@ -1,0 +1,2 @@
+CREATE INDEX vulcan2x_extracted_block_block_id ON vulcan2x.extracted_block(block_id);
+CREATE INDEX vulcan2x_transformed_block_block_id ON vulcan2x.transformed_block(block_id);

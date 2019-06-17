@@ -1,0 +1,14 @@
+{
+  "extends": "typestrict",
+  "rules": {
+    "no-console": false,
+    "no-debugger": true,
+    "typedef": [true, "call-signature"],
+    "mocha-avoid-only": true,
+    "interface-name": [true, "never-prefix"],
+    "no-commented-code": false,
+    "no-use-before-declare": false,
+    "no-useless-cast": false,
+    "restrict-plus-operands": false
+  }
+}
