@@ -20,5 +20,5 @@
     "resolveJsonModule": true
   },
   "include": ["packages/**/*.ts", "instances/**/*.ts"],
-  "exclude": ["node_modules", "packages/rest-api", "packages/scripts"]
+  "exclude": ["node_modules", "packages/rest-api"]
 }
