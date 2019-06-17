@@ -1,14 +1,14 @@
 import { migrate as migrateDB } from 'postgres-migrations-oasis';
 import { loadConfig, parseConfigPath } from '../utils/configUtils';
 import { join, dirname } from 'path';
-import { Vulcan2xConfig } from '../config';
+import { SpockConfig } from '../config';
 import { getLogger } from '../utils/logger';
 
 const logger = getLogger('migration');
 
 export async function main(): Promise<void> {
   const config = loadConfig();
-  const configPath = parseConfigPath(process.argv[2]);
+  const configPath = parseConfigPath(process.argv[3]);
 
   await migrate(config.db, 'vulcan2x_core', join(__dirname, '../../../migrate'));
 
@@ -27,11 +27,7 @@ main().catch(e => {
   process.exit(1);
 });
 
-async function migrate(
-  dbConfig: Vulcan2xConfig['db'],
-  name: string,
-  dirPath: string,
-): Promise<void> {
+async function migrate(dbConfig: SpockConfig['db'], name: string, dirPath: string): Promise<void> {
   logger.info(`Migrating ${name}...`);
   try {
     await migrateDB({ ...dbConfig, tableName: `migrations_${name}` }, dirPath);

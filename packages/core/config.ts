@@ -2,7 +2,7 @@ import { BlockExtractor } from './extractors/extractor';
 import { BlockTransformer } from './transformers/transformers';
 import { Dictionary, MarkRequired } from 'ts-essentials';
 
-export interface Vulcan2xConfig {
+export interface SpockConfig {
   startingBlock: number;
   extractors: BlockExtractor[];
   transformers: BlockTransformer[];
@@ -34,7 +34,7 @@ export interface Vulcan2xConfig {
 }
 
 export type ExternalVulcan2xConfig = MarkRequired<
-  Partial<Vulcan2xConfig>,
+  Partial<SpockConfig>,
   'startingBlock' | 'extractors' | 'transformers'
 >;
 

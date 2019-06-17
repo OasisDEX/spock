@@ -1,7 +1,7 @@
-import { Vulcan2xConfig, getDefaultConfig } from '../config';
+import { SpockConfig, getDefaultConfig } from '../config';
 import { isAbsolute, join, extname } from 'path';
 
-export function loadConfig(): Vulcan2xConfig {
+export function loadConfig(): SpockConfig {
   const rawPath = process.argv[3];
   if (!rawPath) {
     throw new Error('You need to provide config as a first argument!');
@@ -20,7 +20,7 @@ export function loadConfig(): Vulcan2xConfig {
 
   const externalConfig = configModule.default;
 
-  const config: Vulcan2xConfig = {
+  const config: SpockConfig = {
     ...getDefaultConfig(process.env),
     ...externalConfig,
   } as any;

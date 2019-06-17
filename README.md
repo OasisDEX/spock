@@ -18,6 +18,26 @@ are simply not reliable / consistent. Based on our tests:
 - Self hosted nodes should work (not tested yet) but keep in mind that vulcan can generate quite a
   lot of network calls (around 500k daily)
 
+## Installation
+
+```
+npm install spock-etl
+```
+
+## Usage
+
+Spock exposes CLI interface like:
+
+```
+spock-etl etl|migrate|sync yourconfig.js|ts
+```
+
+### Commands
+
+- etl - launches ETL process (long running process)
+- migrate — launches database migrations (core and defined in config)
+- sync — synchronizes work after config changes
+
 ## Development
 
 ### App start
