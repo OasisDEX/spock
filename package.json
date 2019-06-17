@@ -1,7 +1,6 @@
 {
   "name": "spock-etl",
   "version": "0.0.1",
-  "private": true,
   "license": "MIT",
   "bin": "lib/core/runner.js",
   "scripts": {
