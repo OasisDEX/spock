@@ -1,7 +1,7 @@
 {
   "name": "spock-etl",
   "version": "0.0.1",
-  "license": "MIT",
+  "license": "AGPL-3.0-or-later",
   "bin": "lib/core/runner.js",
   "scripts": {
     "start-etl": "ts-node -r ./loadenv.js ./packages/blockchain-etl/runner.ts",
