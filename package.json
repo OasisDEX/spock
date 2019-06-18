@@ -4,7 +4,8 @@
   "license": "AGPL-3.0-or-later",
   "bin": "lib/core/runner.js",
   "files": [
-    "lib/*"
+    "lib/*",
+    "migrate/*"
   ],
   "scripts": {
     "build": "rm -rf ./lib && tsc && chmod +x lib/core/runner.js",
