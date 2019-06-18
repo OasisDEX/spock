@@ -3,6 +3,9 @@
   "version": "0.0.1",
   "license": "AGPL-3.0-or-later",
   "bin": "lib/core/runner.js",
+  "files": [
+    "lib/*"
+  ],
   "scripts": {
     "build": "rm -rf ./lib && tsc && chmod +x lib/core/runner.js",
     "build:watch": "rm -rf ./lib && tsc --watch",
