@@ -4,10 +4,6 @@
   "license": "AGPL-3.0-or-later",
   "bin": "lib/core/runner.js",
   "scripts": {
-    "start-etl": "ts-node -r ./loadenv.js ./packages/blockchain-etl/runner.ts",
-    "start-api": "ts-node -r ./loadenv.js ./packages/api/index.ts",
-    "start-validate-gbq": "ts-node -r ./loadenv.js ./packages/scripts/verify-data-integrity/google-big-query-dataset-check.ts",
-    "start-rest-api": "cd packages/rest-api && yarn start",
     "build": "rm -rf ./lib && tsc && chmod +x lib/core/runner.js",
     "build:watch": "rm -rf ./lib && tsc --watch",
     "format": "prettier --list-different '**/*.{ts,json,md,gql}'",
@@ -20,8 +16,7 @@
     "test:unit": "jest unit",
     "test:e2e": "jest --forceExit --runInBand e2e",
     "test": "yarn lint && yarn test:unit",
-    "test:fix": "yarn lint:fix && yarn test:unit",
-    "migrate": "ts-node -r ./loadenv.js packages/blockchain-etl/migrate.ts"
+    "test:fix": "yarn lint:fix && yarn test:unit"
   },
   "devDependencies": {
     "@types/bignumber.js": "^5.0.0",
