@@ -140,6 +140,7 @@ async function getNextBlocks(
       FROM vulcan2x.block b
       JOIN vulcan2x.extracted_block eb ON b.id=eb.block_id 
       WHERE eb.extractor_name=\${processorName} AND eb.status = 'new'
+      ORDER BY b.number
       LIMIT \${batch};
       `,
         { processorName, batch: config.extractorWorker.batch },

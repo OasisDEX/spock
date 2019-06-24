@@ -152,6 +152,7 @@ async function getNextBlocks(
         ${transformer.dependencies
           .map((t, i) => `AND eb${i}.extractor_name='${t}' AND eb${i}.status = 'done'`)
           .join('\n')}
+      ORDER BY b.number
       LIMIT \${batch};
     `,
       {
