@@ -28,6 +28,15 @@ export function loadConfig(): SpockConfig {
   return config;
 }
 
+export function mergeConfig(externalConfig: any): SpockConfig {
+  const config: SpockConfig = {
+    ...getDefaultConfig(process.env),
+    ...externalConfig,
+  } as any;
+
+  return config;
+}
+
 export function parseConfigPath(rawPath: string): string {
   if (isAbsolute(rawPath)) {
     return rawPath;

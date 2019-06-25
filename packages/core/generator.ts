@@ -1,11 +1,11 @@
 import { Block, JsonRpcProvider } from 'ethers/providers';
-import { DB, withConnection, makeNullUndefined, DbTransactedConnection, ColumnSets } from './db/db';
+import { withConnection, makeNullUndefined, DbTransactedConnection } from './db/db';
 import { Omit } from 'ts-essentials';
 import { compact } from 'lodash';
 import { getLast, getRangeAsString, getRange } from './utils';
-import pgPromise = require('pg-promise');
 import { getLogger } from './utils/logger';
 import { SpockConfig } from './config';
+import { Services } from './types';
 
 const logger = getLogger('block-generator');
 
@@ -55,14 +55,6 @@ export interface PersistedBlock {
   number: number;
   hash: string;
   timestamp: string;
-}
-
-export interface Services {
-  provider: JsonRpcProvider;
-  db: DB;
-  pg: pgPromise.IMain;
-  config: SpockConfig;
-  columnSets: ColumnSets;
 }
 
 export interface TransactionalServices extends Omit<Services, 'db'> {

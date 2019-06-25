@@ -1,12 +1,11 @@
 import * as ethers from 'ethers';
-import { createDB } from './db/db';
-import { Services, blockGenerator } from './generator';
-import { RetryProvider } from './ethereum/RetryProvider';
+import { blockGenerator } from './generator';
 import { extract, queueNewBlocksToExtract } from './extractors/extractor';
 import { queueNewBlocksToTransform, transform } from './transformers/transformers';
 import { getLogger } from './utils/logger';
 import { withLock } from './db/locks';
 import { SpockConfig } from './config';
+import { createServices } from './startup';
 
 ethers.errors.setLogLevel('error');
 const logger = getLogger('runner');
@@ -17,14 +16,7 @@ function printSystemInfo(config: SpockConfig): void {
 }
 
 export async function etl(config: SpockConfig): Promise<void> {
-  const provider = new RetryProvider(config.chain.host, config.chain.retries);
-  const db = createDB(config.db);
-
-  const services: Services = {
-    provider,
-    ...db,
-    config,
-  };
+  const services = createServices(config);
 
   printSystemInfo(config);
 

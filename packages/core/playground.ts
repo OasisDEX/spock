@@ -4,8 +4,9 @@
 import * as ethers from 'ethers';
 import { getDefaultConfig } from './config';
 import { createDB } from './db/db';
-import { Services, TransactionalServices } from './generator';
+import { TransactionalServices } from './generator';
 import { RetryProvider } from './ethereum/RetryProvider';
+import { Services } from './types';
 
 ethers.errors.setLogLevel('error');
 

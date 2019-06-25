@@ -1,10 +1,11 @@
-import { blockGenerator, Services } from '../generator';
+import { blockGenerator } from '../generator';
 import { createDB } from '../db/db';
 import { ethers } from 'ethers';
 import { Block } from 'ethers/providers';
 import { testConfig, prepareDB, dumpDB } from '../../test/common';
 import { extract, queueNewBlocksToExtract, BlockExtractor } from '../extractors/extractor';
 import { makeRawLogExtractors } from '../extractors/instances/rawEventDataExtractor';
+import { Services } from '../types';
 
 describe('Whole solution', () => {
   it('should work with reorgs', async () => {

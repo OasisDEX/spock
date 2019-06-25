@@ -1,10 +1,11 @@
-import { TransactionalServices, Services, PersistedBlock } from '../generator';
+import { TransactionalServices, PersistedBlock } from '../generator';
 import { findConsecutiveSubsets, delay } from '../utils';
 import { withConnection, DbTransactedConnection } from '../db/db';
 import { BlockExtractor } from '../extractors/extractor';
 import { flatten } from 'lodash';
 import { getLogger } from '../utils/logger';
 import { RetryableError, matchMissingForeignKeyError } from '../extractors/common';
+import { Services } from '../types';
 
 const logger = getLogger('transformers/transformers');
 
