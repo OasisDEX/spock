@@ -66,15 +66,24 @@ export async function extract(services: Services, extractors: BlockExtractor[]):
 
 async function extractBlocks(services: Services, extractor: BlockExtractor): Promise<void> {
   const blocks = await getNextBlocks(services, extractor.name);
-  logger.debug(`Processing ${blocks.length} blocks with ${extractor.name}`);
 
-  // consecutive blocks enable querying blockchain more efficient
-  const consecutiveBlocks = findConsecutiveSubsets(blocks, 'number');
+  // If whole batch was filled (we process old blocks) we try to speed up sync process by processing events together.
+  // Otherwise we process blocks separately to avoid problems with reorgs while processing tip of the blockchain.
+  const needsPerfBoost = blocks.length === services.config.extractorWorker.batch;
+  let consecutiveBlocks: PersistedBlockWithExtractedBlockId[][];
+  if (needsPerfBoost) {
+    consecutiveBlocks = findConsecutiveSubsets(blocks, 'number');
+  } else {
+    consecutiveBlocks = blocks.map(b => [b]);
+  }
+
+  logger.debug(
+    `Processing ${blocks.length} blocks with ${extractor.name}. Perf boost: ${needsPerfBoost}`,
+  );
+
   await Promise.all(
     consecutiveBlocks.map(async blocks => {
-      logger.debug(
-        `Extracting block from ${blocks[0].number} to ${blocks[0].number + blocks.length}`,
-      );
+      logger.debug(`Extracting blocks: ${blocks.map(b => b.number).join(', ')}`);
 
       try {
         await services.db.tx(async tx => {

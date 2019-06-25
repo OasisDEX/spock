@@ -1,13 +1,9 @@
 import { TransactionalServices, PersistedBlock } from '../../generator';
-import { getLast, splitArrayInHalf } from '../../utils';
+import { getLast } from '../../utils';
 import { getOrCreateTx, getBlock } from '../common';
 import { BlockExtractor } from '../extractor';
 import { min, max } from 'lodash';
 import { Log } from 'ethers/providers';
-import { BlockRangeTooWideInfuraError } from '../../ethereum/RetryProvider';
-import { getLogger } from '../../utils/logger';
-
-const logger = getLogger('extractors/instances/rawEventDataExtractor');
 
 export function makeRawLogExtractors(addresses: string[]): BlockExtractor[] {
   return addresses.map(address => ({
@@ -26,28 +22,11 @@ export function makeRawLogExtractors(addresses: string[]): BlockExtractor[] {
         const fromBlock = blocks[0].number;
         const toBlock = getLast(blocks)!.number;
 
-        try {
-          logs = await services.provider.getLogs({
-            address,
-            fromBlock,
-            toBlock,
-          });
-        } catch (e) {
-          if (e instanceof BlockRangeTooWideInfuraError) {
-            logger.warn(
-              'Detected call that queried too many blocks at one time. Retrying with smaller set.',
-            );
-            const [firstHalf, secondHalf] = splitArrayInHalf(blocks);
-
-            // tslint:disable-next-line
-            await this.extract(services, firstHalf);
-            // tslint:disable-next-line
-            await this.extract(services, secondHalf);
-            return;
-          } else {
-            throw e;
-          }
-        }
+        logs = await services.provider.getLogs({
+          address,
+          fromBlock,
+          toBlock,
+        });
       }
 
       const logsToInsert = (await Promise.all(

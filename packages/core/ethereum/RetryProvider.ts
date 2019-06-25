@@ -41,10 +41,7 @@ export class RetryProvider extends JsonRpcProvider {
   }
 
   private async handleError(attempt: number, error: any): Promise<void> {
-    if (error.code === -32005) {
-      logger.debug('Got block too wide range error, failing...', JSON.stringify(error));
-      throw new BlockRangeTooWideInfuraError();
-    } else if (attempt >= this.maxAttempts) {
+    if (attempt >= this.maxAttempts) {
       logger.debug('Got error, failing...', JSON.stringify(error));
       throw error;
     } else {
@@ -54,8 +51,6 @@ export class RetryProvider extends JsonRpcProvider {
     }
   }
 }
-
-export class BlockRangeTooWideInfuraError extends Error {}
 
 // Some of the errors that might occur:
 
