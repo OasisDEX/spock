@@ -54,7 +54,7 @@ export const getDefaultConfig = (env: Env) => {
     chain: {
       host: getRequiredString(env, 'VL_CHAIN_HOST'),
       name: getRequiredString(env, 'VL_CHAIN_NAME'),
-      retries: 50, // retry for ~50 seconds
+      retries: 15, // retry for ~1 block time ~15 seconds
     },
     db: {
       database: getRequiredString(env, 'VL_DB_DATABASE'),
