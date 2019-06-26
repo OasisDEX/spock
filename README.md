@@ -19,7 +19,7 @@ npm install spock-etl
 Spock exposes CLI interface like:
 
 ```
-spock-etl etl|migrate|sync yourconfig.js|ts
+spock-etl etl|migrate|sync|api yourconfig.js|ts
 ```
 
 ### Commands
@@ -27,6 +27,7 @@ spock-etl etl|migrate|sync yourconfig.js|ts
 - etl - launches ETL process (long running process)
 - migrate — launches database migrations (core and defined in config)
 - sync — synchronizes work after config changes
+- api — run general GrahpQL api exposing database schema `api`
 
 ## Ethereum node considerations
 

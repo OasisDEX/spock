@@ -1,6 +1,7 @@
 import { BlockExtractor } from './extractors/extractor';
 import { BlockTransformer } from './transformers/transformers';
 import { Dictionary, MarkRequired } from 'ts-essentials';
+import { Env, getRequiredString, getRequiredNumber } from './utils/configUtils';
 
 export interface SpockConfig {
   startingBlock: number;
@@ -38,8 +39,6 @@ export type ExternalVulcan2xConfig = MarkRequired<
   'startingBlock' | 'extractors' | 'transformers'
 >;
 
-export type Env = Dictionary<string | undefined>;
-
 export const getDefaultConfig = (env: Env) => {
   return {
     processDbLock: 0x1337, // unique number that will be used to acquire lock on database
@@ -66,22 +65,3 @@ export const getDefaultConfig = (env: Env) => {
     },
   };
 };
-
-export function getRequiredString(env: Env, name: string): string {
-  const value = env[name];
-  if (value === undefined) {
-    throw new Error(`Required env var ${name} missing`);
-  }
-
-  return value;
-}
-
-export function getRequiredNumber(env: Env, name: string): number {
-  const string = getRequiredString(env, name);
-  const number = parseInt(string);
-  if (isNaN(number)) {
-    throw new Error(`Couldn't parse ${name} as number`);
-  }
-
-  return number;
-}
