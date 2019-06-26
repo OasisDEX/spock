@@ -41,18 +41,11 @@ are simply not reliable / consistent. Based on our tests:
 
 ## Development
 
-### App start
+- `yarn build` — build everything
+- `yarn build:watch` - build and watch
+- `yarn test:fix` - run tests, auto fix all errors
 
-```
-yarn migrate         # to apply new migrations
-yarn start-etl       # to start blockchain ETL process
-yarn start-api       # to start graphql api
-yarn start-rest-api  # to start REST api
-```
-
-Application assumes all env variables being loaded before it starts. We utilize .env files which are
-automatically loaded by `dotenv-flow`. If you wish to override these settings create .env.local
-(gitignored).
+Tip: Use `yarn link` to link packages locally.
 
 ### PostgreSQL for development
 
