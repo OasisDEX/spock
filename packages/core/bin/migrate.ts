@@ -16,9 +16,8 @@ export async function main(): Promise<void> {
 
   for (const migration of migrationNames) {
     const migrationDirectory = config.migrations[migration];
-    const fullPath = join(dirname(configPath), migrationDirectory);
 
-    await migrate(config.db, migration, fullPath);
+    await migrate(config.db, migration, migrationDirectory);
   }
 }
 

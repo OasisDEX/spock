@@ -1,7 +1,8 @@
-import { isAbsolute, join, extname } from 'path';
+import { isAbsolute, join, extname, dirname } from 'path';
 import { Dictionary } from 'ts-essentials';
 
 import { SpockConfig, getDefaultConfig } from '../config';
+import { mapValues, get } from 'lodash';
 
 export function loadConfig(): SpockConfig {
   const rawPath = process.argv[3];
@@ -27,7 +28,32 @@ export function loadExternalConfig(path: string): any {
     throw new Error('Couldnt find default export!');
   }
 
-  return configModule.default;
+  return fixConfigPaths(path, configModule.default);
+}
+
+/**
+ * Turn any relative paths in the config to absolute ones
+ */
+function fixConfigPaths(configPath: string, config: any) {
+  const newMigrations = mapValues(config.migrations, migrationRelativePath => {
+    return join(dirname(configPath), migrationRelativePath);
+  });
+
+  const whitelistedQueriesDir = get(config, 'api.whitelisting.whitelistedQueriesDir');
+  const newWhitelistedQueriesDir =
+    whitelistedQueriesDir && join(dirname(configPath), whitelistedQueriesDir);
+
+  config.migrations = newMigrations;
+  if (!config.api) {
+    config.api = {};
+  }
+  if (!config.api.whitelisting) {
+    config.api.whitelisting = {};
+  }
+  debugger;
+  config.api.whitelisting.whitelistedQueriesDir = newWhitelistedQueriesDir;
+
+  return config;
 }
 
 export function mergeConfig(externalConfig: any): SpockConfig {

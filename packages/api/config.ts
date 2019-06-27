@@ -5,9 +5,25 @@ import {
   loadExternalConfig,
 } from '../core/utils/configUtils';
 
-export type ApiConfig = ReturnType<typeof getApiConfig>;
+export interface ApiConfig {
+  api: {
+    whitelisting: {
+      enabled: boolean;
+      whitelistedQueriesDir: string;
+      bypassSecret: string;
+    };
+    port: number;
+  };
+  db: {
+    database: string;
+    user: string;
+    password: string;
+    host: string;
+    port: number;
+  };
+}
 
-export const getApiConfig = (env: Env, configPath: string) => {
+export function getApiConfig(env: Env, configPath: string): ApiConfig {
   const externalConfig = loadExternalConfig(configPath);
 
   return {
@@ -21,6 +37,10 @@ export const getApiConfig = (env: Env, configPath: string) => {
     api: {
       port: 3001,
       ...externalConfig.api,
+      whitelisting: {
+        enabled: !!process.env.VL_GRAPHQL_WHITELISTING_ENABLED,
+        ...externalConfig.api.whitelisting,
+      },
     },
   };
-};
+}

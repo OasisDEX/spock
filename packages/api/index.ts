@@ -5,6 +5,7 @@ import * as helmet from 'helmet';
 import { join } from 'path';
 import { getApiConfig, ApiConfig } from './config';
 import { getLogger } from '../core/utils/logger';
+import { whitelisting } from './whitelisting';
 
 const ejs = require('ejs');
 const { postgraphile } = require('postgraphile');
@@ -35,20 +36,21 @@ export function startAPI(config: ApiConfig): void {
 
   const schemas = ['api'];
 
-  // const readEntities = (dirPath: string, ext: string) => {
-  //   return fromPairs(
-  //     fs
-  //       .readdirSync(dirPath)
-  //       .filter(file => file.endsWith(ext))
-  //       .map(file => file.substr(0, file.length - ext.length))
-  //       .map(file => [file, fs.readFileSync(`${dirPath}/${file}${ext}`, 'utf-8')]),
-  //   );
-  // };
+  if (config.api.whitelisting.enabled) {
+    logger.info('Whitelisting enabled.');
 
-  // const allowedQueries = readEntities(join(__dirname, './queries'), '.graphql');
-  // console.log(`allowed queries: ${Object.keys(allowedQueries).join(', ')}`);
-  // const devMode = process.env.GRAPHQL_DEV;
-  // console.log(`dev mode: ${devMode ? 'enabled' : 'disabled'}`);
+    debugger;
+
+    app.use(
+      graphqlConfig.graphqlRoute,
+      whitelisting(
+        config.api.whitelisting.whitelistedQueriesDir,
+        config.api.whitelisting.bypassSecret,
+      ),
+    );
+  } else {
+    logger.info('Whitelisting disabled.');
+  }
 
   app.use(postgraphile(config.db, schemas, graphqlConfig));
 
