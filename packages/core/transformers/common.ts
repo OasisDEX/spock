@@ -2,7 +2,7 @@ import { PersistedLog } from '../extractors/instances/rawEventDataExtractor';
 import { Dictionary, ValueOf } from 'ts-essentials';
 import { zip } from 'lodash';
 import BigNumber from 'bignumber.js';
-import { TransactionalServices, LocalServices } from '../types';
+import { LocalServices } from '../types';
 
 const abiDecoder = require('abi-decoder');
 
