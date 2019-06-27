@@ -1,10 +1,9 @@
-import { PersistedBlock, TransactionalServices } from '../generator';
 import { withConnection, DbTransactedConnection } from '../db/db';
 import { findConsecutiveSubsets, delay } from '../utils';
 import { matchMissingForeignKeyError, RetryableError } from './common';
 import { flatten } from 'lodash';
 import { getLogger } from '../utils/logger';
-import { Services } from '../types';
+import { Services, TransactionalServices, PersistedBlock, LocalServices } from '../types';
 
 const logger = getLogger('extractor/index');
 
@@ -15,7 +14,7 @@ export interface BlockExtractor {
   extract: (services: TransactionalServices, blocks: PersistedBlock[]) => Promise<void>;
 
   // get data from database
-  getData(services: TransactionalServices, blocks: PersistedBlock[]): Promise<any>;
+  getData(services: LocalServices, blocks: PersistedBlock[]): Promise<any>;
 }
 
 type PersistedBlockWithExtractedBlockId = PersistedBlock & {

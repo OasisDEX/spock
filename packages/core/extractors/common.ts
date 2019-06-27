@@ -1,8 +1,8 @@
 export const DEFAULT_ADDRESS = '0x0000000000000000000000000000000000000000';
 
-import { TransactionalServices, PersistedBlock } from '../generator';
 import { Transaction } from 'ethers/utils';
 import { makeNullUndefined } from '../db/db';
+import { TransactionalServices, PersistedBlock } from '../types';
 
 export async function getOrCreateTx(
   services: TransactionalServices,

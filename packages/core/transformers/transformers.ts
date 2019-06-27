@@ -1,18 +1,17 @@
-import { TransactionalServices, PersistedBlock } from '../generator';
 import { findConsecutiveSubsets, delay } from '../utils';
 import { withConnection, DbTransactedConnection } from '../db/db';
 import { BlockExtractor } from '../extractors/extractor';
 import { flatten } from 'lodash';
 import { getLogger } from '../utils/logger';
 import { RetryableError, matchMissingForeignKeyError } from '../extractors/common';
-import { Services } from '../types';
+import { Services, PersistedBlock, LocalServices } from '../types';
 
 const logger = getLogger('transformers/transformers');
 
 export interface BlockTransformer {
   name: string;
   dependencies: string[];
-  transform(service: TransactionalServices, data: any[]): Promise<void>;
+  transform(service: LocalServices, data: any[]): Promise<void>;
 }
 
 type PersistedBlockWithTransformedBlockId = PersistedBlock & {
@@ -89,8 +88,10 @@ async function transformBlocks(
 
       try {
         await services.db.tx(async tx => {
-          const processorServices: TransactionalServices = {
-            ...services,
+          const processorServices: LocalServices = {
+            columnSets: services.columnSets,
+            config: services.config,
+            pg: services.pg,
             tx,
           };
 

@@ -1,11 +1,10 @@
 import { Block, JsonRpcProvider } from 'ethers/providers';
 import { withConnection, makeNullUndefined, DbTransactedConnection } from './db/db';
-import { Omit } from 'ts-essentials';
 import { compact } from 'lodash';
 import { getLast, getRangeAsString, getRange } from './utils';
 import { getLogger } from './utils/logger';
 import { SpockConfig } from './config';
-import { Services } from './types';
+import { Services, PersistedBlock } from './types';
 
 const logger = getLogger('block-generator');
 
@@ -48,17 +47,6 @@ export async function blockGenerator(
 
     currentBlockNo = getLast(blocks)!.number + 1;
   }
-}
-
-export interface PersistedBlock {
-  id: number;
-  number: number;
-  hash: string;
-  timestamp: string;
-}
-
-export interface TransactionalServices extends Omit<Services, 'db'> {
-  tx: DbTransactedConnection;
 }
 
 async function addBlocks(

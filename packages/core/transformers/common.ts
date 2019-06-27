@@ -1,8 +1,8 @@
 import { PersistedLog } from '../extractors/instances/rawEventDataExtractor';
 import { Dictionary, ValueOf } from 'ts-essentials';
-import { TransactionalServices } from '../generator';
 import { zip } from 'lodash';
 import BigNumber from 'bignumber.js';
+import { TransactionalServices } from '../types';
 
 const abiDecoder = require('abi-decoder');
 

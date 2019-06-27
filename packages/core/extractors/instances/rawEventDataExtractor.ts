@@ -1,9 +1,9 @@
-import { TransactionalServices, PersistedBlock } from '../../generator';
 import { getLast } from '../../utils';
 import { getOrCreateTx, getBlock } from '../common';
 import { BlockExtractor } from '../extractor';
 import { min, max } from 'lodash';
 import { Log } from 'ethers/providers';
+import { TransactionalServices, PersistedBlock, LocalServices } from '../../types';
 
 export function makeRawLogExtractors(addresses: string[]): BlockExtractor[] {
   return addresses.map(address => ({
@@ -55,7 +55,7 @@ export function makeRawLogExtractors(addresses: string[]): BlockExtractor[] {
       await services.tx.none(query);
     },
 
-    async getData(services: TransactionalServices, blocks: PersistedBlock[]): Promise<any> {
+    async getData(services: LocalServices, blocks: PersistedBlock[]): Promise<any> {
       const blocksIds = blocks.map(b => b.id);
       const minId = min(blocksIds);
       const maxId = max(blocksIds);

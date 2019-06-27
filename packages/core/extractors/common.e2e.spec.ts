@@ -1,8 +1,8 @@
 import { addTx, matchMissingForeignKeyError, matchUniqueKeyError } from './common';
-import { TransactionalServices, PersistedBlock } from '../generator';
 import { createDB, withConnection } from '../db/db';
 import { prepareDB, testConfig } from '../../test/common';
 import { ethers } from 'ethers';
+import { PersistedBlock, TransactionalServices } from '../types';
 
 describe('extractors/common matchMissingForeignKeyError', () => {
   it('should work', async () => {
