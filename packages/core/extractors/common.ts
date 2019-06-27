@@ -2,7 +2,7 @@ export const DEFAULT_ADDRESS = '0x0000000000000000000000000000000000000000';
 
 import { Transaction } from 'ethers/utils';
 import { makeNullUndefined } from '../db/db';
-import { TransactionalServices, PersistedBlock } from '../types';
+import { TransactionalServices, PersistedBlock, LocalServices } from '../types';
 
 export async function getOrCreateTx(
   services: TransactionalServices,
@@ -24,7 +24,7 @@ export async function getOrCreateTx(
 }
 
 export async function getTx(
-  { tx }: TransactionalServices,
+  { tx }: LocalServices,
   txHash: string,
 ): Promise<PersistedTransaction | undefined> {
   return tx
@@ -39,7 +39,7 @@ export async function getTx(
 }
 
 export async function getTxByIdOrDie(
-  { tx }: TransactionalServices,
+  { tx }: LocalServices,
   txId: number,
 ): Promise<PersistedTransaction> {
   return tx
@@ -60,7 +60,7 @@ export async function getTxByIdOrDie(
 }
 
 export async function addTx(
-  services: TransactionalServices,
+  services: LocalServices,
   transaction: Transaction,
   block: PersistedBlock,
 ): Promise<PersistedTransaction> {
@@ -124,7 +124,7 @@ export const silenceError = (...matchers: Array<(e: any) => boolean>) => (e: any
 };
 
 export async function getBlock(
-  { tx }: TransactionalServices,
+  { tx }: LocalServices,
   blockHash: string,
 ): Promise<PersistedBlock | undefined> {
   return tx
@@ -133,7 +133,7 @@ export async function getBlock(
 }
 
 export async function getBlockByIdOrDie(
-  { tx }: TransactionalServices,
+  { tx }: LocalServices,
   id: number,
 ): Promise<PersistedBlock> {
   return tx

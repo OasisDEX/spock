@@ -2,12 +2,12 @@ import { PersistedLog } from '../extractors/instances/rawEventDataExtractor';
 import { Dictionary, ValueOf } from 'ts-essentials';
 import { zip } from 'lodash';
 import BigNumber from 'bignumber.js';
-import { TransactionalServices } from '../types';
+import { TransactionalServices, LocalServices } from '../types';
 
 const abiDecoder = require('abi-decoder');
 
 export async function handleEvents(
-  services: TransactionalServices,
+  services: LocalServices,
   abi: any,
   logs: PersistedLog[],
   handlers: EventHandlers,
@@ -45,7 +45,7 @@ export async function handleEvents(
 }
 
 export async function handleDsNoteEvents(
-  services: TransactionalServices,
+  services: LocalServices,
   abi: any,
   logs: PersistedLog[],
   handlers: DsNoteHandlers,
@@ -160,8 +160,8 @@ export interface FullNoteEventInfoUnfiltered {
   log: PersistedLog;
 }
 
-type Handler = (services: TransactionalServices, info: FullEventInfo) => Promise<void>;
+type Handler = (services: LocalServices, info: FullEventInfo) => Promise<void>;
 export type EventHandlers = Dictionary<Handler>;
 
-type DsNoteHandler = (services: TransactionalServices, info: FullNoteEventInfo) => Promise<void>;
+type DsNoteHandler = (services: LocalServices, info: FullNoteEventInfo) => Promise<void>;
 export type DsNoteHandlers = Dictionary<DsNoteHandler>;
