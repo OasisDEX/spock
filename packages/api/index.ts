@@ -39,8 +39,6 @@ export function startAPI(config: ApiConfig): void {
   if (config.api.whitelisting.enabled) {
     logger.info('Whitelisting enabled.');
 
-    debugger;
-
     app.use(
       graphqlConfig.graphqlRoute,
       whitelisting(

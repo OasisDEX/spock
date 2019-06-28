@@ -34,7 +34,7 @@ export function loadExternalConfig(path: string): any {
 /**
  * Turn any relative paths in the config to absolute ones
  */
-function fixConfigPaths(configPath: string, config: any) {
+function fixConfigPaths(configPath: string, config: any): any {
   const newMigrations = mapValues(config.migrations, migrationRelativePath => {
     return join(dirname(configPath), migrationRelativePath);
   });
@@ -50,7 +50,6 @@ function fixConfigPaths(configPath: string, config: any) {
   if (!config.api.whitelisting) {
     config.api.whitelisting = {};
   }
-  debugger;
   config.api.whitelisting.whitelistedQueriesDir = newWhitelistedQueriesDir;
 
   return config;

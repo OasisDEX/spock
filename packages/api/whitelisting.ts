@@ -2,7 +2,7 @@ import * as fs from 'fs';
 import { fromPairs } from 'lodash';
 import { Dictionary } from 'ts-essentials';
 import { getLogger } from '../core/utils/logger';
-import { Request, NextFunction, Response, response } from 'express';
+import { Request, NextFunction, Response, response, RequestHandler } from 'express';
 
 const logger = getLogger('whitelisting');
 
@@ -16,10 +16,12 @@ function readEntities(dirPath: string, ext: string): Dictionary<string> {
   );
 }
 
-export function whitelisting(absPathToQueryDefs: string, bypassSecret: string) {
+export function whitelisting(absPathToQueryDefs: string, bypassSecret: string): RequestHandler {
   const allowedQueries = readEntities(absPathToQueryDefs, '.graphql');
   logger.info(
-    `Allowed queries (${Object.keys(allowedQueries).length}): ${Object.keys(allowedQueries).join(', ')}`,
+    `Allowed queries (${Object.keys(allowedQueries).length}): ${Object.keys(allowedQueries).join(
+      ', ',
+    )}`,
   );
 
   return (req: Request, _resp: Response, next: NextFunction) => {
