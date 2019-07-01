@@ -11,8 +11,12 @@ ethers.errors.setLogLevel('error');
 const logger = getLogger('runner');
 
 function printSystemInfo(config: SpockConfig): void {
-  logger.info('Starting Spock ETL...');
+  logger.info(`Starting Spock ETL ver.${getVersion()}`);
   logger.info(`Ethereum node: ${config.chain.host}`);
+}
+
+function getVersion(): string {
+  return (require('../../package.json') || {}).version;
 }
 
 export async function etl(config: SpockConfig): Promise<void> {
