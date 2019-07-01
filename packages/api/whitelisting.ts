@@ -46,7 +46,9 @@ export function whitelisting(absPathToQueryDefs: string, bypassSecret: string): 
     if (allowedQueries.hasOwnProperty(req.body.operationName)) {
       req.body.query = allowedQueries[req.body.operationName];
     } else {
-      logger.warn(`Query not allowed: ${JSON.stringify(req.body)}`);
+      logger.warn(`Query not allowed: 
+      query: ${req.body.query}
+      operationName: ${req.body.operationName}`);
       req.body.query = null;
     }
 
