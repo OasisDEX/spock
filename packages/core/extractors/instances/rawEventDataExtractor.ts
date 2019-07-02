@@ -79,7 +79,7 @@ WHERE logs.block_id >= \${id_min} AND logs.block_id <= \${id_max} AND address=\$
   }));
 }
 
-export function getExtractorName(address: string) {
+export function getExtractorName(address: string): string {
   return `raw_log_${address.toLowerCase()}_extractor`;
 }
 
