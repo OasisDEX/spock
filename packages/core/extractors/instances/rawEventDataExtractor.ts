@@ -5,9 +5,11 @@ import { min, max } from 'lodash';
 import { Log } from 'ethers/providers';
 import { TransactionalServices, PersistedBlock, LocalServices } from '../../types';
 
-export function makeRawLogExtractors(addresses: string[]): BlockExtractor[] {
+export function makeRawLogExtractors(_addresses: string[]): BlockExtractor[] {
+  const addresses = _addresses.map(a => a.toLowerCase());
+
   return addresses.map(address => ({
-    name: `raw_log_${address}_extractor`,
+    name: getExtractorName(address),
     address,
     async extract(services: TransactionalServices, blocks: PersistedBlock[]): Promise<void> {
       let logs: Log[];
@@ -75,6 +77,10 @@ WHERE logs.block_id >= \${id_min} AND logs.block_id <= \${id_max} AND address=\$
       );
     },
   }));
+}
+
+export function getExtractorName(address: string) {
+  return `raw_log_${address.toLowerCase()}_extractor`;
 }
 
 export interface PersistedLog {
