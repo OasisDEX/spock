@@ -1,5 +1,5 @@
-import { createDB, DB } from '../db/db';
-import { prepareDB, testConfig } from '../../test/common';
+import { createDB } from '../db/db';
+import { prepareDB, testConfig, executeSQL } from '../../test/common';
 import { Services } from '../types';
 import { getNextBlocks, BlockExtractor } from './extractor';
 
@@ -105,7 +105,3 @@ Array [
 `);
   });
 });
-
-async function executeSQL(db: DB, sql: string): Promise<void> {
-  await db.none(sql);
-}
