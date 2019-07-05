@@ -10,6 +10,7 @@ const logger = getLogger('extractor/index');
 export interface BlockExtractor {
   name: string;
   extractorDependencies?: string[];
+  disablePerfBoost?: boolean;
 
   // @note: blocks are always consecutive
   // get data from node to database
@@ -71,7 +72,8 @@ async function extractBlocks(services: Services, extractor: BlockExtractor): Pro
 
   // If whole batch was filled (we process old blocks) we try to speed up sync process by processing events together.
   // Otherwise we process blocks separately to avoid problems with reorgs while processing tip of the blockchain.
-  const needsPerfBoost = blocks.length === services.config.extractorWorker.batch;
+  const needsPerfBoost =
+    blocks.length === services.config.extractorWorker.batch || extractor.disablePerfBoost || false;
   let consecutiveBlocks: PersistedBlockWithExtractedBlockId[][];
   if (needsPerfBoost) {
     consecutiveBlocks = findConsecutiveSubsets(blocks, 'number');
@@ -93,7 +95,6 @@ async function extractBlocks(services: Services, extractor: BlockExtractor): Pro
             ...services,
             tx,
           };
-
           await extractor.extract(txServices, blocks);
 
           logger.debug(
