@@ -6,6 +6,7 @@ import { getLogger } from './utils/logger';
 import { withLock } from './db/locks';
 import { SpockConfig } from './config';
 import { createServices } from './startup';
+import { statsWorker } from './stats/stats';
 
 ethers.errors.setLogLevel('error');
 const logger = getLogger('runner');
@@ -36,6 +37,7 @@ export async function etl(config: SpockConfig): Promise<void> {
       }),
       extract(services, config.extractors),
       transform(services, config.transformers, config.extractors),
+      statsWorker(services),
     ]);
   });
 }
