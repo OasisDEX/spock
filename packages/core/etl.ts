@@ -13,6 +13,8 @@ const logger = getLogger('runner');
 function printSystemInfo(config: SpockConfig): void {
   logger.info(`Starting Spock ETL ver.${getVersion()}`);
   logger.info(`Ethereum node: ${config.chain.host}`);
+  logger.info('Extractor worker config:', config.extractorWorker);
+  logger.info('Transformer worker config:', config.transformerWorker);
 }
 
 function getVersion(): string {

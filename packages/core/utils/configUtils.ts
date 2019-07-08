@@ -55,10 +55,15 @@ function fixConfigPaths(configPath: string, config: any): any {
   return config;
 }
 
-export function mergeConfig(externalConfig: any): SpockConfig {
+export function mergeConfig(externalCfg: any): SpockConfig {
+  const defaultCfg = getDefaultConfig(process.env);
   const config: SpockConfig = {
-    ...getDefaultConfig(process.env),
-    ...externalConfig,
+    ...defaultCfg,
+    ...externalCfg,
+    extractorWorker: {
+      ...defaultCfg.extractorWorker,
+      ...externalCfg.extractorWorker,
+    },
   } as any;
 
   return config;
