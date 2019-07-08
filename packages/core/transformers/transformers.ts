@@ -11,6 +11,7 @@ const logger = getLogger('transformers/transformers');
 export interface BlockTransformer {
   name: string;
   dependencies: string[];
+  transformerDependencies?: string[];
   transform(service: LocalServices, data: any[]): Promise<void>;
 }
 
@@ -131,7 +132,7 @@ async function transformBlocks(
   );
 }
 
-async function getNextBlocks(
+export async function getNextBlocks(
   services: Services,
   transformer: BlockTransformer,
 ): Promise<PersistedBlockWithTransformedBlockId[]> {
@@ -149,10 +150,16 @@ async function getNextBlocks(
       ${transformer.dependencies
         .map((_, i) => `JOIN vulcan2x.extracted_block eb${i} ON b.id = eb${i}.block_id`)
         .join('\n')}
+      ${(transformer.transformerDependencies || [])
+        .map((_, i) => `JOIN vulcan2x.transformed_block tb${i} ON b.id = tb${i}.block_id`)
+        .join('\n')}
       WHERE 
         tb.transformer_name='${transformer.name}' AND tb.status = 'new'
         ${transformer.dependencies
           .map((t, i) => `AND eb${i}.extractor_name='${t}' AND eb${i}.status = 'done'`)
+          .join('\n')}
+        ${(transformer.transformerDependencies || [])
+          .map((t, i) => `AND tb${i}.transformer_name='${t}' AND tb${i}.status = 'done'`)
           .join('\n')}
       ORDER BY b.number
       LIMIT \${batch};

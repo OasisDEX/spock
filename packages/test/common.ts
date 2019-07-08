@@ -46,3 +46,7 @@ export async function dumpDB(db: DB): Promise<any> {
     };
   });
 }
+
+export async function executeSQL(db: DB, sql: string): Promise<void> {
+  await db.none(sql);
+}

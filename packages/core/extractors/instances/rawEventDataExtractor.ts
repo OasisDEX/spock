@@ -58,25 +58,33 @@ export function makeRawLogExtractors(_addresses: string[]): BlockExtractor[] {
     },
 
     async getData(services: LocalServices, blocks: PersistedBlock[]): Promise<any> {
-      const blocksIds = blocks.map(b => b.id);
-      const minId = min(blocksIds);
-      const maxId = max(blocksIds);
+      return await getRawLogs(services, address, blocks);
+    },
+  }));
+}
 
-      return (
-        services.tx.manyOrNone(
-          `
+export async function getRawLogs(
+  services: LocalServices,
+  address: string,
+  blocks: PersistedBlock[],
+): Promise<any[]> {
+  const blocksIds = blocks.map(b => b.id);
+  const minId = min(blocksIds);
+  const maxId = max(blocksIds);
+
+  return (
+    (await services.tx.manyOrNone(
+      `
 SELECT * FROM extracted.logs 
 WHERE logs.block_id >= \${id_min} AND logs.block_id <= \${id_max} AND address=\${address};
   `,
-          {
-            address,
-            id_min: minId,
-            id_max: maxId,
-          },
-        ) || []
-      );
-    },
-  }));
+      {
+        address,
+        id_min: minId,
+        id_max: maxId,
+      },
+    )) || []
+  );
 }
 
 export function getExtractorName(address: string): string {

@@ -9,6 +9,9 @@ const logger = getLogger('extractor/index');
 
 export interface BlockExtractor {
   name: string;
+  extractorDependencies?: string[];
+  disablePerfBoost?: boolean;
+
   // @note: blocks are always consecutive
   // get data from node to database
   extract: (services: TransactionalServices, blocks: PersistedBlock[]) => Promise<void>;
@@ -65,11 +68,12 @@ export async function extract(services: Services, extractors: BlockExtractor[]):
 }
 
 async function extractBlocks(services: Services, extractor: BlockExtractor): Promise<void> {
-  const blocks = await getNextBlocks(services, extractor.name);
+  const blocks = await getNextBlocks(services, extractor);
 
   // If whole batch was filled (we process old blocks) we try to speed up sync process by processing events together.
   // Otherwise we process blocks separately to avoid problems with reorgs while processing tip of the blockchain.
-  const needsPerfBoost = blocks.length === services.config.extractorWorker.batch;
+  const needsPerfBoost =
+    blocks.length === services.config.extractorWorker.batch || extractor.disablePerfBoost || false;
   let consecutiveBlocks: PersistedBlockWithExtractedBlockId[][];
   if (needsPerfBoost) {
     consecutiveBlocks = findConsecutiveSubsets(blocks, 'number');
@@ -91,7 +95,6 @@ async function extractBlocks(services: Services, extractor: BlockExtractor): Pro
             ...services,
             tx,
           };
-
           await extractor.extract(txServices, blocks);
 
           logger.debug(
@@ -133,9 +136,9 @@ async function extractBlocks(services: Services, extractor: BlockExtractor): Pro
   );
 }
 
-async function getNextBlocks(
+export async function getNextBlocks(
   services: Services,
-  processorName: string,
+  extractor: BlockExtractor,
 ): Promise<PersistedBlockWithExtractedBlockId[]> {
   const { db, config } = services;
 
@@ -148,11 +151,18 @@ async function getNextBlocks(
       SELECT b.*, eb.id as extracted_block_id
       FROM vulcan2x.block b
       JOIN vulcan2x.extracted_block eb ON b.id=eb.block_id 
-      WHERE eb.extractor_name=\${processorName} AND eb.status = 'new'
+      ${(extractor.extractorDependencies || [])
+        .map((_, i) => `JOIN vulcan2x.extracted_block eb${i} ON b.id = eb${i}.block_id`)
+        .join('\n')}
+      WHERE 
+        eb.extractor_name=\${extractorName} AND eb.status = 'new'
+        ${(extractor.extractorDependencies || [])
+          .map((t, i) => `AND eb${i}.extractor_name='${t}' AND eb${i}.status = 'done'`)
+          .join('\n')}
       ORDER BY b.number
       LIMIT \${batch};
       `,
-        { processorName, batch: config.extractorWorker.batch },
+        { extractorName: extractor.name, batch: config.extractorWorker.batch },
       );
 
       if (nextBlocks && nextBlocks.length > 0) {

@@ -6,11 +6,11 @@ import { LocalServices } from '../types';
 
 const abiDecoder = require('abi-decoder');
 
-export async function handleEvents(
-  services: LocalServices,
+export async function handleEvents<TServices>(
+  services: TServices,
   abi: any,
   logs: PersistedLog[],
-  handlers: EventHandlers,
+  handlers: EventHandlers<TServices>,
 ): Promise<void> {
   abiDecoder.addABI(abi);
   // @todo sanity check for handlers is to check if event names exist in ABI
@@ -160,8 +160,8 @@ export interface FullNoteEventInfoUnfiltered {
   log: PersistedLog;
 }
 
-type Handler = (services: LocalServices, info: FullEventInfo) => Promise<void>;
-export type EventHandlers = Dictionary<Handler>;
+type Handler<TServices> = (services: TServices, info: FullEventInfo) => Promise<void>;
+export type EventHandlers<TServices> = Dictionary<Handler<TServices>>;
 
 type DsNoteHandler = (services: LocalServices, info: FullNoteEventInfo) => Promise<void>;
 export type DsNoteHandlers = Dictionary<DsNoteHandler>;
