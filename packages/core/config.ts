@@ -20,6 +20,9 @@ export interface SpockConfig {
   transformerWorker: {
     batch: number;
   };
+  statsWorker: {
+    interval: number; // in minutes
+  };
   chain: {
     host: string;
     name: string;
@@ -50,6 +53,9 @@ export const getDefaultConfig = (env: Env) => {
     },
     transformerWorker: {
       batch: 1000,
+    },
+    statsWorker: {
+      interval: 10, // get stats every 10 minutes
     },
     chain: {
       host: getRequiredString(env, 'VL_CHAIN_HOST'),
