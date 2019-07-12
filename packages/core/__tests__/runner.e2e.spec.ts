@@ -6,6 +6,7 @@ import { testConfig, prepareDB, dumpDB } from '../../test/common';
 import { extract, queueNewBlocksToExtract, BlockExtractor } from '../extractors/extractor';
 import { makeRawLogExtractors } from '../extractors/instances/rawEventDataExtractor';
 import { Services } from '../types';
+import { omit } from 'lodash';
 
 describe('Whole solution', () => {
   it('should work with reorgs', async () => {
@@ -77,7 +78,7 @@ describe('Whole solution', () => {
 
     await Promise.all([runBlockGenerator(services, extractors), runWorkers(services, extractors)]);
 
-    expect(await dumpDB(dbCtx.db)).toMatchInlineSnapshot(`
+    expect(omit(await dumpDB(dbCtx.db), 'done_extracted_blocks')).toMatchInlineSnapshot(`
 Object {
   "blocks": Array [
     Object {
