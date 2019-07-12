@@ -20,6 +20,9 @@ export interface SpockConfig {
   transformerWorker: {
     batch: number;
   };
+  archiverWorker: {
+    batch: number;
+  };
   statsWorker: {
     interval: number; // in minutes
   };
@@ -52,6 +55,9 @@ export const getDefaultConfig = (env: Env) => {
       batch: 100,
     },
     transformerWorker: {
+      batch: 1000,
+    },
+    archiverWorker: {
       batch: 1000,
     },
     statsWorker: {
