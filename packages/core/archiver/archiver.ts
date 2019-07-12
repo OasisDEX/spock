@@ -1,6 +1,10 @@
 import { Services, TransactionalServices } from '../types';
 import { findConsecutiveSubsets, getLast, delay } from '../utils';
-import { saveDoneExtractedBlock } from '../db/models/DoneExtractedBlock';
+import {
+  saveDoneExtractedBlock,
+  selectDoneExtractedBlock,
+  updateDoneExtractedBlock,
+} from '../db/models/DoneExtractedBlock';
 import { ExtractedBlock } from '../db/models/ExtractedBlock';
 import { getLogger } from '../utils/logger';
 
@@ -40,11 +44,23 @@ export async function archiveExtractor(
     const first = consecutiveBlock[0];
     const last = getLast(consecutiveBlock)!;
 
-    await saveDoneExtractedBlock(services, {
-      start_block_id: first.block_id,
-      end_block_id: last.block_id,
-      extractor_name: extractorName,
+    const rangeAlreadyExists = await selectDoneExtractedBlock(services, {
+      end_block_id: first.block_id - 1,
+      extractor_name: first.extractor_name,
     });
+
+    if (!!rangeAlreadyExists) {
+      await updateDoneExtractedBlock(services, rangeAlreadyExists.id, {
+        end_block_id: last.block_id,
+      });
+    } else {
+      await saveDoneExtractedBlock(services, {
+        start_block_id: first.block_id,
+        end_block_id: last.block_id,
+        extractor_name: extractorName,
+      });
+    }
+
     await deleteRangeExtractedBlock(services, first.block_id, last.block_id, extractorName);
   }
 }
