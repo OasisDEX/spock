@@ -50,7 +50,7 @@ export const getDefaultConfig = (env: Env) => {
   return {
     processDbLock: 0x1337, // unique number that will be used to acquire lock on database
     blockGenerator: {
-      batch: 50,
+      batch: 40,
     },
     extractorWorker: {
       batch: 1000,

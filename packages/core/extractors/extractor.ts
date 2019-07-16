@@ -1,7 +1,6 @@
 import { withConnection, DbTransactedConnection } from '../db/db';
 import { findConsecutiveSubsets, delay } from '../utils';
 import { matchMissingForeignKeyError, RetryableError } from './common';
-import { flatten } from 'lodash';
 import { getLogger } from '../utils/logger';
 import { Services, TransactionalServices, PersistedBlock, LocalServices } from '../types';
 
@@ -29,28 +28,16 @@ export async function queueNewBlocksToExtract(
   extractors: BlockExtractor[],
   blocks: PersistedBlock[],
 ): Promise<any> {
-  return Promise.all(
-    flatten(
-      blocks.map(b => {
-        return extractors.map(e => {
-          const values = {
-            block_id: b.id,
-            extractor_name: e.name,
-            status: 'new',
-          };
-          return tx.none(
-            `
-        INSERT INTO vulcan2x.extracted_block (
-            block_id, extractor_name, status
-       ) VALUES (
-         \${block_id}, \${extractor_name}, \${status}
-       ) ON CONFLICT(block_id, extractor_name) DO NOTHING;`,
-            values,
-          );
-        });
-      }),
-    ),
-  );
+  const sql = `
+  INSERT INTO vulcan2x.extracted_block (
+    block_id, extractor_name, status
+) VALUES 
+  ${blocks.map(b => extractors.map(e => `(${b.id}, '${e.name}', 'new') `)).join(',')}
+
+ON CONFLICT(block_id, extractor_name) DO NOTHING;
+  `;
+
+  return tx.none(sql);
 }
 
 export async function extract(services: Services, extractors: BlockExtractor[]): Promise<void> {

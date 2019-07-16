@@ -1,7 +1,7 @@
 import { Block, JsonRpcProvider } from 'ethers/providers';
 import { withConnection, makeNullUndefined, DbTransactedConnection } from './db/db';
 import { compact } from 'lodash';
-import { getLast, getRangeAsString, getRange } from './utils';
+import { getLast, getRangeAsString } from './utils';
 import { getLogger } from './utils/logger';
 import { SpockConfig } from './config';
 import { Services, PersistedBlock } from './types';
@@ -61,33 +61,22 @@ async function addBlocks(
   }));
   logger.info(`Adding blocks ${getRangeAsString(blocks, b => b.number)}`);
 
-  const persistedBlocks = await withConnection(db, async c => {
+  const persistedBlocks = await db.tx(async tx => {
     const addBlocksQuery =
-      pg.helpers.insert(values, columnSets['block']) + 'ON CONFLICT(hash) DO NOTHING';
+      pg.helpers.insert(values, columnSets['block']) + 'ON CONFLICT(hash) DO NOTHING RETURNING *';
 
-    await c.none(addBlocksQuery);
+    const persistedBlocks = await tx.manyOrNone(addBlocksQuery);
 
-    const range = getRange(values, v => v.number);
-    if (!range) {
-      return;
+    if (!persistedBlocks || persistedBlocks.length === 0) {
+      return [];
     }
 
-    const res = await c.many<PersistedBlock>(
-      'SELECT * FROM vulcan2x.block WHERE number >= ${first} AND number <= ${last}',
-      { first: range.first, last: range.last },
-    );
-
-    return res;
-  });
-
-  if (!persistedBlocks) {
-    return [];
-  }
-
-  return await db.tx(async tx => {
     await onNewBlocks(tx, persistedBlocks);
+
     return persistedBlocks;
   });
+
+  return persistedBlocks || [];
 }
 
 async function getLastBlockNo({ db }: Services): Promise<number> {
@@ -144,6 +133,7 @@ async function getRealBlocksStartingFrom(
       ),
     ),
   );
+  logger.info(`Got ${blocks.length} external blocks`);
 
   if (blocks.length !== 0) {
     return blocks;

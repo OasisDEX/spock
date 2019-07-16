@@ -1,7 +1,6 @@
 import { findConsecutiveSubsets, delay } from '../utils';
 import { withConnection, DbTransactedConnection } from '../db/db';
 import { BlockExtractor } from '../extractors/extractor';
-import { flatten } from 'lodash';
 import { getLogger } from '../utils/logger';
 import { RetryableError, matchMissingForeignKeyError } from '../extractors/common';
 import { Services, PersistedBlock, LocalServices } from '../types';
@@ -24,28 +23,16 @@ export async function queueNewBlocksToTransform(
   transformers: BlockTransformer[],
   blocks: PersistedBlock[],
 ): Promise<any> {
-  return Promise.all(
-    flatten(
-      blocks.map(b => {
-        return transformers.map(t => {
-          const values = {
-            block_id: b.id,
-            transformer_name: t.name,
-            status: 'new',
-          };
-          return tx.none(
-            `
-        INSERT INTO vulcan2x.transformed_block ( 
-            block_id, transformer_name, status
-       ) VALUES (
-         \${block_id}, \${transformer_name}, \${status}
-       ) ON CONFLICT(block_id, transformer_name) DO NOTHING;`,
-            values,
-          );
-        });
-      }),
-    ),
-  );
+  const sql = `
+  INSERT INTO vulcan2x.transformed_block ( 
+    block_id, transformer_name, status
+    ) VALUES 
+  ${blocks.map(b => transformers.map(t => `(${b.id}, '${t.name}', 'new') `)).join(',')}
+
+ON CONFLICT(block_id, transformer_name) DO NOTHING;
+  `;
+
+  return tx.none(sql);
 }
 
 export async function transform(

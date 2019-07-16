@@ -31,6 +31,8 @@ synced: ${(blocksSyncedDelta / timeDeltaSec).toFixed(2)} blocks/sec
 extracted: ${(blocksExtractedDelta / timeDeltaSec).toFixed(2)} tasks/sec
 transformed: ${(blocksTransformedDelta / timeDeltaSec).toFixed(2)} tasks/sec
       `);
+    } else {
+      logger.info('Missing baseline');
     }
 
     lastStat = stats;
