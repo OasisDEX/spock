@@ -132,6 +132,15 @@ export async function getBlock(
     .then(makeNullUndefined);
 }
 
+export async function getBlockById(
+  { tx }: LocalServices,
+  id: number,
+): Promise<PersistedBlock | undefined> {
+  return tx
+    .oneOrNone<PersistedBlock>('SELECT * FROM vulcan2x.block WHERE id=$1;', id)
+    .then(makeNullUndefined);
+}
+
 export async function getBlockByIdOrDie(
   { tx }: LocalServices,
   id: number,

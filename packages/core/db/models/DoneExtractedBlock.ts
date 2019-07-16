@@ -1,4 +1,4 @@
-import { Omit } from 'ts-essentials';
+import { StrictOmit } from 'ts-essentials';
 import { TransactionalServices } from '../../types';
 import { makeNullUndefined } from '../db';
 
@@ -11,7 +11,7 @@ export interface DoneExtractedBlock {
 
 export async function saveDoneExtractedBlock(
   services: TransactionalServices,
-  block: Omit<DoneExtractedBlock, 'id'>,
+  block: StrictOmit<DoneExtractedBlock, 'id'>,
 ): Promise<void> {
   const sql = `INSERT INTO vulcan2x.done_extracted_block(start_block_id, end_block_id, extractor_name) VALUES (
     ${block.start_block_id},

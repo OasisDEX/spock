@@ -1,6 +1,6 @@
 import { DB, ColumnSets, DbTransactedConnection } from './db/db';
 import { JsonRpcProvider } from 'ethers/providers';
-import { Omit } from 'ts-essentials';
+import { StrictOmit } from 'ts-essentials';
 import pgPromise = require('pg-promise');
 import { SpockConfig } from './config';
 
@@ -12,7 +12,7 @@ export interface Services {
   columnSets: ColumnSets;
 }
 
-export interface TransactionalServices extends Omit<Services, 'db'> {
+export interface TransactionalServices extends StrictOmit<Services, 'db'> {
   tx: DbTransactedConnection;
 }
 
