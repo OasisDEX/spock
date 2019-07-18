@@ -17,6 +17,9 @@ const services: Services = {
   provider,
   ...db,
   config,
+  networkState: {
+    latestEthereumBlockOnStart: 0,
+  },
 };
 
 const transformer = null as any;

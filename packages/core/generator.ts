@@ -4,7 +4,8 @@ import { compact } from 'lodash';
 import { getLast, getRangeAsString } from './utils';
 import { getLogger } from './utils/logger';
 import { SpockConfig } from './config';
-import { Services, PersistedBlock } from './types';
+import { Services } from './types';
+import { PersistedBlock } from './db/models/Block';
 
 const logger = getLogger('block-generator');
 

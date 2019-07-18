@@ -24,7 +24,7 @@ function getVersion(): string {
 }
 
 export async function etl(config: SpockConfig): Promise<void> {
-  const services = createServices(config);
+  const services = await createServices(config);
 
   printSystemInfo(config);
 

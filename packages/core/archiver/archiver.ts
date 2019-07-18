@@ -8,7 +8,7 @@ import {
 import { ExtractedBlock } from '../db/models/ExtractedBlock';
 import { getLogger } from '../utils/logger';
 import { makeNullUndefined } from '../db/db';
-import { getBlockById } from '../extractors/common';
+import { getBlockById } from '../db/models/Block';
 
 const logger = getLogger('archiver');
 

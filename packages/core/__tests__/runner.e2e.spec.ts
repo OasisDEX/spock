@@ -68,10 +68,13 @@ describe('Whole solution', () => {
       return block as any;
     };
 
-    const services = {
+    const services: Services = {
       config: testConfig,
       provider: provider as any,
       ...dbCtx,
+      networkState: {
+        latestEthereumBlockOnStart: 1,
+      },
     };
 
     const extractors = [...makeRawLogExtractors(['0x0'])];

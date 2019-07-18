@@ -37,6 +37,9 @@ describe('transformers > getNextBlocks', () => {
       config: testConfig,
       columnSets: undefined as any,
       provider: undefined as any,
+      networkState: {
+        latestEthereumBlockOnStart: 0,
+      },
     };
 
     const actual = await getNextBlocks(services, blockTransformer);
@@ -91,6 +94,9 @@ Array [
       config: testConfig,
       columnSets: undefined as any,
       provider: undefined as any,
+      networkState: {
+        latestEthereumBlockOnStart: 0,
+      },
     };
 
     const actual = await getNextBlocks(services, blockTransformer);

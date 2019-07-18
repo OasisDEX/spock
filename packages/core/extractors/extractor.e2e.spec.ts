@@ -33,6 +33,9 @@ describe('extractors > getNextBlocks', () => {
       config: testConfig,
       columnSets: undefined as any,
       provider: undefined as any,
+      networkState: {
+        latestEthereumBlockOnStart: 0,
+      },
     };
 
     const actual = await getNextBlocks(services, blockExtractor);
@@ -88,6 +91,9 @@ Array [
       config: testConfig,
       columnSets: undefined as any,
       provider: undefined as any,
+      networkState: {
+        latestEthereumBlockOnStart: 0,
+      },
     };
 
     const actual = await getNextBlocks(services, blockExtractor);

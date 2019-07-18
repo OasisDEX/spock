@@ -53,7 +53,7 @@ export const getDefaultConfig = (env: Env) => {
       batch: 40,
     },
     extractorWorker: {
-      batch: 1000,
+      batch: 500,
     },
     transformerWorker: {
       batch: 1000,
@@ -63,7 +63,7 @@ export const getDefaultConfig = (env: Env) => {
       delay: 1, // in minutes
     },
     statsWorker: {
-      interval: 10, // get stats every 10 minutes
+      interval: 0.5, // get stats every 10 minutes
     },
     chain: {
       host: getRequiredString(env, 'VL_CHAIN_HOST'),

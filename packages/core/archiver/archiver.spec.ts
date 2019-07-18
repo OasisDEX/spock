@@ -36,6 +36,9 @@ describe('archiver', () => {
       config: testConfig,
       columnSets: undefined as any,
       provider: undefined as any,
+      networkState: {
+        latestEthereumBlockOnStart: 0,
+      },
     };
 
     await archive(services, 'test-extractor');
@@ -102,6 +105,9 @@ Object {
       config: testConfig,
       columnSets: undefined as any,
       provider: undefined as any,
+      networkState: {
+        latestEthereumBlockOnStart: 0,
+      },
     };
 
     await archive(services, 'test-extractor');
@@ -189,6 +195,9 @@ Object {
       config: testConfig,
       columnSets: undefined as any,
       provider: undefined as any,
+      networkState: {
+        latestEthereumBlockOnStart: 0,
+      },
     };
 
     await archive(services, 'test-extractor');

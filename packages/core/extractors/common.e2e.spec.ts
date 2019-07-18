@@ -2,7 +2,8 @@ import { addTx, matchMissingForeignKeyError, matchUniqueKeyError } from './commo
 import { createDB, withConnection } from '../db/db';
 import { prepareDB, testConfig } from '../../test/common';
 import { ethers } from 'ethers';
-import { PersistedBlock, TransactionalServices } from '../types';
+import { TransactionalServices } from '../types';
+import { PersistedBlock } from '../db/models/Block';
 
 describe('extractors/common matchMissingForeignKeyError', () => {
   it('should work', async () => {
@@ -31,6 +32,9 @@ describe('extractors/common matchMissingForeignKeyError', () => {
         pg: dbCtx.pg,
         config: testConfig,
         provider: undefined as any,
+        networkState: {
+          latestEthereumBlockOnStart: 0,
+        },
       };
 
       try {

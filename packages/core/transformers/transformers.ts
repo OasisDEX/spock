@@ -3,7 +3,8 @@ import { withConnection, DbTransactedConnection } from '../db/db';
 import { BlockExtractor } from '../extractors/extractor';
 import { getLogger } from '../utils/logger';
 import { RetryableError, matchMissingForeignKeyError } from '../extractors/common';
-import { Services, PersistedBlock, LocalServices } from '../types';
+import { Services, LocalServices } from '../types';
+import { PersistedBlock } from '../db/models/Block';
 
 const logger = getLogger('transformers/transformers');
 
@@ -81,6 +82,9 @@ async function transformBlocks(
             config: services.config,
             pg: services.pg,
             tx,
+            networkState: {
+              latestEthereumBlockOnStart: 0,
+            },
           };
 
           const data = await Promise.all(

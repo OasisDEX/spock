@@ -2,7 +2,9 @@ import { withConnection, DbTransactedConnection } from '../db/db';
 import { findConsecutiveSubsets, delay } from '../utils';
 import { matchMissingForeignKeyError, RetryableError } from './common';
 import { getLogger } from '../utils/logger';
-import { Services, TransactionalServices, PersistedBlock, LocalServices } from '../types';
+import { Services, TransactionalServices, LocalServices } from '../types';
+import { get } from 'lodash';
+import { PersistedBlock } from '../db/models/Block';
 
 const logger = getLogger('extractor/index');
 
@@ -57,19 +59,25 @@ export async function extract(services: Services, extractors: BlockExtractor[]):
 async function extractBlocks(services: Services, extractor: BlockExtractor): Promise<void> {
   const blocks = await getNextBlocks(services, extractor);
 
-  // If whole batch was filled (we process old blocks) we try to speed up sync process by processing events together.
+  // We can speed up whole process (process blocks in batches) if we don't have a risk of reorg.
   // Otherwise we process blocks separately to avoid problems with reorgs while processing tip of the blockchain.
-  const needsPerfBoost =
-    blocks.length === services.config.extractorWorker.batch || extractor.disablePerfBoost || false;
+  const closeToTheTipOfBlockchain =
+    ((get(blocks, '[0].number') as number) || 0) +
+      services.config.extractorWorker.batch -
+      services.networkState.latestEthereumBlockOnStart +
+      1000 >
+    0;
+
+  const processInBatch = !closeToTheTipOfBlockchain || extractor.disablePerfBoost || false;
   let consecutiveBlocks: PersistedBlockWithExtractedBlockId[][];
-  if (needsPerfBoost) {
+  if (processInBatch) {
     consecutiveBlocks = findConsecutiveSubsets(blocks, 'number');
   } else {
     consecutiveBlocks = blocks.map(b => [b]);
   }
 
   logger.debug(
-    `Processing ${blocks.length} blocks with ${extractor.name}. Perf boost: ${needsPerfBoost}`,
+    `Processing ${blocks.length} blocks with ${extractor.name}. ProcessInBatch: ${processInBatch}`,
   );
 
   await Promise.all(
