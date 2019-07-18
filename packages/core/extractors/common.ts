@@ -10,6 +10,7 @@ export async function getOrCreateTx(
   transaction: Transaction,
   block: PersistedBlock,
 ): Promise<PersistedTransaction> {
+  // this means that reorg is happening or ethereum node is not consistent
   if (!transaction) {
     throw new RetryableError(`Tx is not defined!`);
   }
