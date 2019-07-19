@@ -2,7 +2,7 @@ import * as ethers from 'ethers';
 import { getLogger } from './utils/logger';
 import { withLock } from './db/locks';
 import { SpockConfig } from './config';
-import { createServices } from './startup';
+import { createServices } from './services';
 import { archiver } from './archiver/archiver';
 import { blockGenerator } from './generator';
 import { queueNewBlocksToExtract, extract } from './extractors/extractor';

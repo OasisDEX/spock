@@ -40,3 +40,16 @@ export async function getBlockByIdOrDie(
       return r;
     });
 }
+
+export async function getBlockRange(
+  { tx }: LocalServices,
+  start: number,
+  end: number,
+): Promise<PersistedBlock[]> {
+  const sql = `
+SELECT * FROM vulcan2x.block 
+WHERE id >= ${start} AND id <= ${end}
+  `;
+
+  return await tx.manyOrNone<PersistedBlock>(sql);
+}

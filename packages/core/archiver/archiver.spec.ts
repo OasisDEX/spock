@@ -17,7 +17,7 @@ describe('archiver', () => {
       INSERT INTO vulcan2x.block(number, hash, timestamp) VALUES(1, '0x01', '2019-07-02 11:18:01+00');
       INSERT INTO vulcan2x.block(number, hash, timestamp) VALUES(2, '0x02', '2019-07-02 11:18:02+00');
       INSERT INTO vulcan2x.block(number, hash, timestamp) VALUES(3, '0x03', '2019-07-02 11:18:03+00');
-      INSERT INTO vulcan2x.block(number, hash, timestamp) VALUES(3, '0x04', '2019-07-02 11:18:04+00');
+      INSERT INTO vulcan2x.block(number, hash, timestamp) VALUES(4, '0x04', '2019-07-02 11:18:04+00');
 
       -- add tasks for extraction
       INSERT INTO vulcan2x.extracted_block(block_id, extractor_name, status) VALUES(1, 'test-extractor', 'done');

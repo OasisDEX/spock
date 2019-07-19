@@ -1,5 +1,6 @@
 CREATE TABLE vulcan2x.done_extracted_block (
   id             serial primary key,
+  -- ranges are inclusive
   start_block_id integer not null,
   end_block_id   integer not null,
   extractor_name character varying(100) not null,
