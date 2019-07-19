@@ -20,3 +20,5 @@ export interface TransactionalServices extends StrictOmit<Services, 'db'> {
 
 // No external data sources like blockchain
 export type LocalServices = Omit<TransactionalServices, 'provider'>;
+
+export type JobType = 'extract' | 'transform';

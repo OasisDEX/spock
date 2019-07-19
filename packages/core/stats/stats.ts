@@ -1,7 +1,8 @@
-import { Services } from '../types';
+import { Services, JobType } from '../types';
 import { delay } from '../utils';
 import { getLogger } from '../utils/logger';
 import { Stats } from './types';
+import { DoneExtractedBlock } from '../db/models/DoneExtractedBlock';
 
 const logger = getLogger('stats');
 
@@ -45,12 +46,7 @@ export async function getStats(services: Services): Promise<Stats> {
       (await services.db.oneOrNone(`SELECT id FROM vulcan2x.block ORDER BY number DESC LIMIT 1;
   `)) || {}
     ).id || 0;
-  const blocksExtracted =
-    (
-      (await services.db.oneOrNone(
-        `SELECT id FROM vulcan2x.extracted_block WHERE status='done' ORDER BY block_id DESC LIMIT 1;`,
-      )) || {}
-    ).id || 0;
+  const blocksExtracted = await countJobsDone(services, 'extract');
   const blocksTransformed =
     (
       (await services.db.oneOrNone(
@@ -63,4 +59,23 @@ export async function getStats(services: Services): Promise<Stats> {
     blocksExtracted,
     blocksTransformed,
   };
+}
+
+async function countJobsDone(services: Services, _type: JobType): Promise<number> {
+  const countJobsDoneSQL = `
+  SELECT id FROM vulcan2x.extracted_block 
+  WHERE status='done' 
+  ORDER BY block_id DESC 
+  LIMIT 1;
+  `;
+  const countJobsDone: number = ((await services.db.oneOrNone(countJobsDoneSQL)) || {}).id || 0;
+
+  const countArchivedJobsDoneSQL = `SELECT * FROM vulcan2x.done_extracted_block;`;
+  const archivedRanges = await services.db.manyOrNone<DoneExtractedBlock>(countArchivedJobsDoneSQL);
+  const countedArchivedJobs = archivedRanges.reduce(
+    (acc, val) => acc + val.end_block_id - val.start_block_id + 1,
+    0,
+  );
+
+  return countJobsDone + countedArchivedJobs;
 }
