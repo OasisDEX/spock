@@ -42,10 +42,7 @@ async function main(): Promise<void> {
   process.exit(0);
 }
 
-async function getAllDoneJobs(
-  services: Services,
-  extractorName: string,
-): Promise<DoneJob[]> {
+async function getAllDoneJobs(services: Services, extractorName: string): Promise<DoneJob[]> {
   const sql = `SELECT * FROM vulcan2x.done_job dj 
   WHERE dj.name='${extractorName}';`;
 

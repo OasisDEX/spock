@@ -1,10 +1,6 @@
 import { Services, TransactionalServices } from '../types';
 import { findConsecutiveSubsets, getLast, delay } from '../utils';
-import {
-  saveDoneJob,
-  updateDoneJob,
-  DoneJob,
-} from '../db/models/DoneJob';
+import { saveDoneJob, updateDoneJob, DoneJob } from '../db/models/DoneJob';
 import { ExtractedBlock } from '../db/models/ExtractedBlock';
 import { getLogger } from '../utils/logger';
 import { getBlockRange } from '../db/models/Block';
@@ -27,7 +23,7 @@ export async function archiveOnce(_services: Services): Promise<void> {
       logger.info(`Archiving ${extractor.name}`);
 
       await withTx(_services, async services => {
-        const processed = await archiveExtractor(services, extractor.name);
+        const processed = await archiveTask(services, 'extract', extractor.name);
 
         done = processed < services.config.archiverWorker.batch;
       });
@@ -37,20 +33,59 @@ export async function archiveOnce(_services: Services): Promise<void> {
       await mergeRanges(services, extractor.name);
     });
   }
+
+  // this loop could be merged to upper one and we could merge transformer together with extractors if we would have an easy way to differentiate between them (ex. instanceof check)
+  for (const transformer of _services.config.transformers) {
+    let done = false;
+    while (!done) {
+      logger.info(`Archiving ${transformer.name}`);
+
+      await withTx(_services, async services => {
+        const processed = await archiveTask(services, 'transform', transformer.name);
+
+        done = processed < services.config.archiverWorker.batch;
+      });
+    }
+
+    await withTx(_services, async services => {
+      await mergeRanges(services, transformer.name);
+    });
+  }
 }
 
-export async function archiveExtractor(
+export type TaskType = 'extract' | 'transform';
+
+function getTableNameForTask(task: TaskType): string {
+  if (task === 'extract') {
+    return 'vulcan2x.extracted_block';
+  } else {
+    return 'vulcan2x.transformed_block';
+  }
+}
+
+function getNameFieldForTask(task: TaskType): string {
+  if (task === 'extract') {
+    return 'extractor_name';
+  } else {
+    return 'transformer_name';
+  }
+}
+
+export async function archiveTask(
   services: TransactionalServices,
-  extractorName: string,
+  type: TaskType,
+  name: string,
 ): Promise<number> {
+  const table = getTableNameForTask(type);
+  const nameField = getNameFieldForTask(type);
   const sql = `
-  SELECT * FROM vulcan2x.extracted_block eb 
-  WHERE eb.extractor_name='${extractorName}' AND status='done' 
+  SELECT * FROM ${table} eb 
+  WHERE eb.${nameField}='${name}' AND status='done' 
   ORDER BY eb.block_id LIMIT ${services.config.archiverWorker.batch};
   `;
 
   const blocksToAchieve = (await services.tx.manyOrNone<ExtractedBlock>(sql)) || [];
-  logger.info({ toArchive: blocksToAchieve.length, extractorName });
+  logger.info({ toArchive: blocksToAchieve.length, extractorName: name });
   const consecutiveBlocks = findConsecutiveSubsets(blocksToAchieve, 'block_id');
 
   for (const consecutiveBlock of consecutiveBlocks) {
@@ -63,20 +98,17 @@ export async function archiveExtractor(
     await saveDoneJob(services, {
       start_block_id: first.block_id,
       end_block_id: last.block_id,
-      name: extractorName,
+      name: name,
     });
 
-    await deleteRangeExtractedBlock(services, first.block_id, last.block_id, extractorName);
+    await deleteRangeExtractedBlock(services, type, first.block_id, last.block_id, name);
   }
 
   return blocksToAchieve.length;
 }
 
-export async function mergeRanges(
-  services: TransactionalServices,
-  extractorName: string,
-): Promise<void> {
-  const [firstRange, ...ranges] = await selectDoneExtractedBlocks(services, extractorName);
+export async function mergeRanges(services: TransactionalServices, name: string): Promise<void> {
+  const [firstRange, ...ranges] = await selectDoneExtractedBlocks(services, name);
 
   const rangesToDrop: DoneJob[] = [];
   let lastRange = firstRange;
@@ -113,11 +145,14 @@ export async function mergeRanges(
 
 export async function deleteRangeExtractedBlock(
   services: TransactionalServices,
+  type: TaskType,
   fromId: number,
   toId: number,
-  extractorName: string,
+  name: string,
 ): Promise<void> {
-  const sql = `DELETE FROM vulcan2x.extracted_block WHERE block_id >= ${fromId} AND block_id <= ${toId} AND extractor_name='${extractorName}';`;
+  const table = getTableNameForTask(type);
+  const nameField = getNameFieldForTask(type);
+  const sql = `DELETE FROM ${table} WHERE block_id >= ${fromId} AND block_id <= ${toId} AND ${nameField}='${name}';`;
 
   await services.tx.none(sql);
 }

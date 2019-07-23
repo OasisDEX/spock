@@ -2,7 +2,7 @@ import { createDB } from '../db/db';
 import { prepareDB, testConfig, executeSQL, dumpDB } from '../../test/common';
 import { Services } from '../types';
 
-import { archiveExtractor } from './archiver';
+import { archiveTask } from './archiver';
 import { pick } from 'lodash';
 
 describe('archiver', () => {
@@ -268,6 +268,6 @@ async function archive(_services: Services, extractorName: string): Promise<void
       tx,
     };
 
-    await archiveExtractor(services, extractorName);
+    await archiveTask(services, 'extract', extractorName);
   });
 }
