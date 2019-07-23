@@ -1,7 +1,12 @@
 import { Services, TransactionalServices } from '../types';
 import { findConsecutiveSubsets, getLast, delay } from '../utils';
 import { saveDoneJob, updateDoneJob, DoneJob } from '../db/models/DoneJob';
-import { ExtractedBlock } from '../db/models/ExtractedBlock';
+import {
+  ExtractedBlock,
+  TaskType,
+  getTableNameForTask,
+  getNameFieldForTask,
+} from '../db/models/extracted';
 import { getLogger } from '../utils/logger';
 import { getBlockRange } from '../db/models/Block';
 import { withTx } from '../services';
@@ -50,24 +55,6 @@ export async function archiveOnce(_services: Services): Promise<void> {
     await withTx(_services, async services => {
       await mergeRanges(services, transformer.name);
     });
-  }
-}
-
-export type TaskType = 'extract' | 'transform';
-
-function getTableNameForTask(task: TaskType): string {
-  if (task === 'extract') {
-    return 'vulcan2x.extracted_block';
-  } else {
-    return 'vulcan2x.transformed_block';
-  }
-}
-
-function getNameFieldForTask(task: TaskType): string {
-  if (task === 'extract') {
-    return 'extractor_name';
-  } else {
-    return 'transformer_name';
   }
 }
 
