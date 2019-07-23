@@ -1,10 +1,10 @@
 import { Services, TransactionalServices } from '../types';
 import { findConsecutiveSubsets, getLast, delay } from '../utils';
 import {
-  saveDoneExtractedBlock,
-  updateDoneExtractedBlock,
-  DoneExtractedBlock,
-} from '../db/models/DoneExtractedBlock';
+  saveDoneJob,
+  updateDoneJob,
+  DoneJob,
+} from '../db/models/DoneJob';
 import { ExtractedBlock } from '../db/models/ExtractedBlock';
 import { getLogger } from '../utils/logger';
 import { getBlockRange } from '../db/models/Block';
@@ -60,10 +60,10 @@ export async function archiveExtractor(
 
     logger.log(`Creating new range <${first.block_id}, ${last.block_id}>`);
 
-    await saveDoneExtractedBlock(services, {
+    await saveDoneJob(services, {
       start_block_id: first.block_id,
       end_block_id: last.block_id,
-      extractor_name: extractorName,
+      name: extractorName,
     });
 
     await deleteRangeExtractedBlock(services, first.block_id, last.block_id, extractorName);
@@ -78,7 +78,7 @@ export async function mergeRanges(
 ): Promise<void> {
   const [firstRange, ...ranges] = await selectDoneExtractedBlocks(services, extractorName);
 
-  const rangesToDrop: DoneExtractedBlock[] = [];
+  const rangesToDrop: DoneJob[] = [];
   let lastRange = firstRange;
   for (const range of ranges) {
     const existingBlocks = await getBlockRange(
@@ -101,7 +101,7 @@ export async function mergeRanges(
       } gap`,
     );
 
-    await updateDoneExtractedBlock(services, lastRange.id, {
+    await updateDoneJob(services, lastRange.id, {
       end_block_id: range.end_block_id,
     });
     rangesToDrop.push(range);
@@ -125,13 +125,13 @@ export async function deleteRangeExtractedBlock(
 export async function selectDoneExtractedBlocks(
   services: TransactionalServices,
   extractorName: string,
-): Promise<DoneExtractedBlock[]> {
+): Promise<DoneJob[]> {
   const sql = `
-  SELECT * FROM vulcan2x.done_extracted_block deb 
-  WHERE deb.extractor_name='${extractorName}'
+  SELECT * FROM vulcan2x.done_job deb 
+  WHERE deb.name='${extractorName}'
   ORDER BY deb.start_block_id;`;
 
-  return await services.tx.manyOrNone<DoneExtractedBlock>(sql);
+  return await services.tx.manyOrNone<DoneJob>(sql);
 }
 
 export async function deleteRanges(services: TransactionalServices, ids: number[]): Promise<void> {
@@ -140,7 +140,7 @@ export async function deleteRanges(services: TransactionalServices, ids: number[
   }
 
   const sql = `
-DELETE FROM vulcan2x.done_extracted_block
+DELETE FROM vulcan2x.done_job
 WHERE id IN (${ids.join(',')});
   `;
   await services.tx.none(sql);

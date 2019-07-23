@@ -11,7 +11,7 @@ import { withLock } from '../db/locks';
 import { archiveOnce } from '../archiver/archiver';
 import { createServices } from '../services';
 import { Services } from '../types';
-import { DoneExtractedBlock } from '../db/models/DoneExtractedBlock';
+import { DoneJob } from '../db/models/DoneJob';
 
 async function main(): Promise<void> {
   const config = loadConfig();
@@ -42,15 +42,15 @@ async function main(): Promise<void> {
   process.exit(0);
 }
 
-async function getAllDoneExtractedBlocks(
+async function getAllDoneJobs(
   services: Services,
   extractorName: string,
-): Promise<DoneExtractedBlock[]> {
-  const sql = `SELECT * FROM vulcan2x.done_extracted_block deb 
-  WHERE deb.extractor_name='${extractorName}';`;
+): Promise<DoneJob[]> {
+  const sql = `SELECT * FROM vulcan2x.done_job dj 
+  WHERE dj.name='${extractorName}';`;
 
   return await withConnection(services.db, async c => {
-    return c.manyOrNone<DoneExtractedBlock>(sql);
+    return c.manyOrNone<DoneJob>(sql);
   });
 }
 
@@ -58,7 +58,7 @@ async function produceMissingExtractorJobs(
   services: Services,
   extractor: BlockExtractor,
 ): Promise<number> {
-  const extractedRanges = await getAllDoneExtractedBlocks(services, extractor.name);
+  const extractedRanges = await getAllDoneJobs(services, extractor.name);
 
   return await withConnection(services.db, async c => {
     const missing = await c.manyOrNone(

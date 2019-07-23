@@ -81,7 +81,7 @@ describe('Whole solution', () => {
 
     await Promise.all([runBlockGenerator(services, extractors), runWorkers(services, extractors)]);
 
-    expect(omit(await dumpDB(dbCtx.db), 'done_extracted_blocks')).toMatchInlineSnapshot(`
+    expect(omit(await dumpDB(dbCtx.db), 'done_job')).toMatchInlineSnapshot(`
 Object {
   "blocks": Array [
     Object {

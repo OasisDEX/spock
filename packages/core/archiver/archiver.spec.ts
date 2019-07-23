@@ -45,17 +45,17 @@ describe('archiver', () => {
     await archive(services, 'test-extractor-2');
 
     const actual = await dumpDB(dbCtx.db);
-    expect(pick(actual, ['done_extracted_blocks', 'extracted_blocks'])).toMatchInlineSnapshot(`
+    expect(pick(actual, ['done_job', 'extracted_blocks'])).toMatchInlineSnapshot(`
 Object {
-  "done_extracted_blocks": Array [
+  "done_job": Array [
     Object {
       "end_block_id": 3,
-      "extractor_name": "test-extractor",
+      "name": "test-extractor",
       "start_block_id": 1,
     },
     Object {
       "end_block_id": 2,
-      "extractor_name": "test-extractor-2",
+      "name": "test-extractor-2",
       "start_block_id": 1,
     },
   ],
@@ -134,17 +134,17 @@ Object {
     await archive(services, 'test-extractor-2');
 
     const actual = await dumpDB(dbCtx.db);
-    expect(pick(actual, ['done_extracted_blocks', 'extracted_blocks'])).toMatchInlineSnapshot(`
+    expect(pick(actual, ['done_job', 'extracted_blocks'])).toMatchInlineSnapshot(`
 Object {
-  "done_extracted_blocks": Array [
+  "done_job": Array [
     Object {
       "end_block_id": 7,
-      "extractor_name": "test-extractor",
+      "name": "test-extractor",
       "start_block_id": 1,
     },
     Object {
       "end_block_id": 2,
-      "extractor_name": "test-extractor-2",
+      "name": "test-extractor-2",
       "start_block_id": 1,
     },
   ],
@@ -225,22 +225,22 @@ Object {
     await archive(services, 'test-extractor-2');
 
     const actual = await dumpDB(dbCtx.db);
-    expect(pick(actual, ['done_extracted_blocks', 'extracted_blocks'])).toMatchInlineSnapshot(`
+    expect(pick(actual, ['done_job', 'extracted_blocks'])).toMatchInlineSnapshot(`
 Object {
-  "done_extracted_blocks": Array [
+  "done_job": Array [
     Object {
       "end_block_id": 7,
-      "extractor_name": "test-extractor",
+      "name": "test-extractor",
       "start_block_id": 1,
     },
     Object {
       "end_block_id": 9,
-      "extractor_name": "test-extractor",
+      "name": "test-extractor",
       "start_block_id": 9,
     },
     Object {
       "end_block_id": 2,
-      "extractor_name": "test-extractor-2",
+      "name": "test-extractor-2",
       "start_block_id": 1,
     },
   ],

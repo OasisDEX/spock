@@ -42,8 +42,8 @@ export const dumpDB = async (db: DB) => {
       extracted_blocks: await c.manyOrNone(
         `SELECT block_id, extractor_name, status FROM vulcan2x.extracted_block ORDER BY block_id`,
       ),
-      done_extracted_blocks: await c.manyOrNone(
-        `SELECT start_block_id, end_block_id, extractor_name FROM vulcan2x.done_extracted_block ORDER BY extractor_name, start_block_id`,
+      done_job: await c.manyOrNone(
+        `SELECT start_block_id, end_block_id, name FROM vulcan2x.done_job ORDER BY name, start_block_id`,
       ),
       transaction: await c.manyOrNone(`SELECT * FROM vulcan2x.transaction`),
     };
