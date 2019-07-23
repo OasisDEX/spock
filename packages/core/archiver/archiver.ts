@@ -14,24 +14,28 @@ const logger = getLogger('archiver');
 
 export async function archiver(_services: Services): Promise<void> {
   while (true) {
-    for (const extractor of _services.config.extractors) {
-      let done = false;
-      while (!done) {
-        logger.info(`Archiving ${extractor.name}`);
+    await archiveOnce(_services);
 
-        await withTx(_services, async services => {
-          const processed = await archiveExtractor(services, extractor.name);
+    await delay(_services.config.archiverWorker.delay * 1000 * 60);
+  }
+}
 
-          done = processed < services.config.archiverWorker.batch;
-        });
-      }
+export async function archiveOnce(_services: Services): Promise<void> {
+  for (const extractor of _services.config.extractors) {
+    let done = false;
+    while (!done) {
+      logger.info(`Archiving ${extractor.name}`);
 
       await withTx(_services, async services => {
-        await mergeRanges(services, extractor.name);
+        const processed = await archiveExtractor(services, extractor.name);
+
+        done = processed < services.config.archiverWorker.batch;
       });
     }
 
-    await delay(_services.config.archiverWorker.delay * 1000 * 60);
+    await withTx(_services, async services => {
+      await mergeRanges(services, extractor.name);
+    });
   }
 }
 

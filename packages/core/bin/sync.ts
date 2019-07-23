@@ -2,75 +2,100 @@
  * Produces jobs (extracted_block, transformed block rows) for all defined extractors and transformers. It is safe to run this multiple times, in fact it's required to run this script after adding new extractor/block to process past blocks.
  */
 
-import { createDB, withConnection, DbConnection } from '../db/db';
+import { withConnection, DbConnection } from '../db/db';
 import { BlockExtractor } from '../extractors/extractor';
 import { BlockTransformer } from '../transformers/transformers';
 import { chunk } from 'lodash';
 import { loadConfig } from '../utils/configUtils';
+import { withLock } from '../db/locks';
+import { archiveOnce } from '../archiver/archiver';
+import { createServices } from '../services';
+import { Services } from '../types';
+import { DoneExtractedBlock } from '../db/models/DoneExtractedBlock';
 
 async function main(): Promise<void> {
   const config = loadConfig();
-  const db = createDB(config.db);
+  const services = await createServices(config);
   const { extractors, transformers } = config;
 
-  await withConnection(db.db, async c => {
-    for (const extractor of extractors) {
-      let res = 0;
-      do {
-        res = await produceMissingExtractorJobs(c, extractor);
-      } while (res !== 0);
-    }
+  await withConnection(services.db, async c => {
+    await withLock(services.db, config.processDbLock, async () => {
+      await archiveOnce(services);
 
-    for (const transformer of transformers) {
-      let res = 0;
-      do {
-        res = await produceMissingTransformerJobs(c, transformer);
-      } while (res !== 0);
-    }
+      for (const extractor of extractors) {
+        let res = 0;
+        do {
+          res = await produceMissingExtractorJobs(services, extractor);
+        } while (res !== 0);
+      }
+
+      for (const transformer of transformers) {
+        let res = 0;
+        do {
+          res = await produceMissingTransformerJobs(c, transformer);
+        } while (res !== 0);
+      }
+    });
   });
 
   console.log('DONE!');
+  process.exit(0);
+}
+
+async function getAllDoneExtractedBlocks(
+  services: Services,
+  extractorName: string,
+): Promise<DoneExtractedBlock[]> {
+  const sql = `SELECT * FROM vulcan2x.done_extracted_block deb 
+  WHERE deb.extractor_name='${extractorName}';`;
+
+  return await withConnection(services.db, async c => {
+    return c.manyOrNone<DoneExtractedBlock>(sql);
+  });
 }
 
 async function produceMissingExtractorJobs(
-  c: DbConnection,
+  services: Services,
   extractor: BlockExtractor,
 ): Promise<number> {
-  const missing = await c.manyOrNone(
-    `
-SELECT b.* 
-FROM vulcan2x.block b
-LEFT OUTER JOIN vulcan2x.extracted_block eb ON b.id=eb.block_id AND eb.extractor_name=\${extractor_name}
-WHERE eb.id IS NULL 
-ORDER BY b.number 
-LIMIT 50000
-`,
-    { extractor_name: extractor.name },
-  );
+  const extractedRanges = await getAllDoneExtractedBlocks(services, extractor.name);
 
-  console.log(`Missing ${extractor.name} extractors: ${missing.length}`);
+  return await withConnection(services.db, async c => {
+    const missing = await c.manyOrNone(
+      `
+  SELECT b.* 
+  FROM (
+    SELECT * FROM vulcan2x.block b
+    ${
+      extractedRanges.length > 0
+        ? `WHERE ${extractedRanges
+            .map(er => `(b.id < ${er.start_block_id} OR b.id > ${er.end_block_id})`)
+            .join(' AND ')}`
+        : ''
+    }
+  ) b
+  LEFT OUTER JOIN vulcan2x.extracted_block eb ON b.id=eb.block_id AND eb.extractor_name=\${extractor_name}
+  WHERE eb.id IS NULL 
+  ORDER BY b.number 
+  LIMIT 50000
+  `,
+      { extractor_name: extractor.name },
+    );
 
-  await Promise.all(
-    missing.map(m => {
-      const values = {
-        block_id: m.id,
-        extractor_name: extractor.name,
-        status: 'new',
-      };
+    console.log(`Missing ${extractor.name} extractors: ${missing.length}`);
 
+    const jobs = chunk(missing, 1000).map(missingChunk => {
       return c.none(
         `
-INSERT INTO vulcan2x.extracted_block (
-  block_id, extractor_name, status
-) VALUES (
-  \${block_id}, \${extractor_name}, \${status}
-);`,
-        values,
+INSERT INTO vulcan2x.extracted_block (block_id, extractor_name, status) 
+VALUES ${missingChunk.map(m => `(${m.id}, '${extractor.name}', 'new')`).join(',')};`,
       );
-    }),
-  );
+    });
 
-  return missing.length;
+    await Promise.all(jobs);
+
+    return missing.length;
+  });
 }
 
 async function produceMissingTransformerJobs(
