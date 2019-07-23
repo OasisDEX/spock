@@ -103,7 +103,7 @@ async function extractBlocks(services: Services, extractor: BlockExtractor): Pro
         });
       } catch (e) {
         logger.error(
-          `Error occured while processing: ${blocks[0].number} - ${blocks[0].number +
+          `ERROR[]: Error occured while processing: ${blocks[0].number} - ${blocks[0].number +
             blocks.length}`,
           e,
         );
