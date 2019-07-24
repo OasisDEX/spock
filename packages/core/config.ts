@@ -60,10 +60,10 @@ export const getDefaultConfig = (env: Env) => {
     },
     archiverWorker: {
       batch: 10000,
-      delay: 1, // in minutes
+      delay: 5, // in minutes
     },
     statsWorker: {
-      interval: 0.5, // get stats every 10 minutes
+      interval: 10, // get stats every 10 minutes
     },
     chain: {
       host: getRequiredString(env, 'VL_CHAIN_HOST'),
