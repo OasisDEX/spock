@@ -5051,10 +5051,10 @@ trim-right@^1.0.1:
   resolved "https://registry.yarnpkg.com/trim-right/-/trim-right-1.0.1.tgz#cb2e1203067e0c8de1f614094b9fe45704ea6003"
   integrity sha1-yy4SAwZ+DI3h9hQJS5/kVwTqYAM=
 
-ts-essentials@^2.0.11:
-  version "2.0.11"
-  resolved "https://registry.yarnpkg.com/ts-essentials/-/ts-essentials-2.0.11.tgz#dc4d5f7c81785d3f624311c70927a9ee128cc385"
-  integrity sha512-614uBuD5StmKpJFDio+v3JhGELXMk1TrOJYuP/16q8haNUBsDmG0dI7+sN5Qhukwi2drbvUqdIOlrMKeBpdjwQ==
+ts-essentials@^3.0.0:
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/ts-essentials/-/ts-essentials-3.0.0.tgz#301890fd7011dd19611aa54f4b9efc2d7ecbd955"
+  integrity sha512-9fOlNAH2MbPbSNaCKEj4K/SQcWaeQpn+3DWE20q642c1bieUGLY0uEZnh9xcMkfnzV5AW+/b2aw+Jq3ABTAOkA==
 
 ts-jest@^24.0.0:
   version "24.0.0"
@@ -5177,10 +5177,10 @@ type-is@~1.6.16:
     media-typer "0.3.0"
     mime-types "~2.1.18"
 
-typescript@^3.2.2:
-  version "3.2.2"
-  resolved "https://registry.yarnpkg.com/typescript/-/typescript-3.2.2.tgz#fe8101c46aa123f8353523ebdcf5730c2ae493e5"
-  integrity sha512-VCj5UiSyHBjwfYacmDuc/NOk4QQixbE+Wn7MFJuS0nRuPQbof132Pw4u53dm264O8LPc2MVsc7RJNml5szurkg==
+typescript@^3.5.3:
+  version "3.5.3"
+  resolved "https://registry.yarnpkg.com/typescript/-/typescript-3.5.3.tgz#c830f657f93f1ea846819e929092f5fe5983e977"
+  integrity sha512-ACzBtm/PhXBDId6a6sDJfroT2pOWt/oOnk4/dElG5G33ZL776N3Y6/6bKZJBFpd+b05F3Ct9qDjMeJmRWtE2/g==
 
 typestrict@^1.0.2:
   version "1.0.2"

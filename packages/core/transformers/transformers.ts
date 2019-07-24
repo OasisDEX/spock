@@ -1,10 +1,10 @@
 import { findConsecutiveSubsets, delay } from '../utils';
 import { withConnection, DbTransactedConnection } from '../db/db';
 import { BlockExtractor } from '../extractors/extractor';
-import { flatten } from 'lodash';
 import { getLogger } from '../utils/logger';
 import { RetryableError, matchMissingForeignKeyError } from '../extractors/common';
-import { Services, PersistedBlock, LocalServices } from '../types';
+import { Services, LocalServices } from '../types';
+import { PersistedBlock } from '../db/models/Block';
 
 const logger = getLogger('transformers/transformers');
 
@@ -24,28 +24,16 @@ export async function queueNewBlocksToTransform(
   transformers: BlockTransformer[],
   blocks: PersistedBlock[],
 ): Promise<any> {
-  return Promise.all(
-    flatten(
-      blocks.map(b => {
-        return transformers.map(t => {
-          const values = {
-            block_id: b.id,
-            transformer_name: t.name,
-            status: 'new',
-          };
-          return tx.none(
-            `
-        INSERT INTO vulcan2x.transformed_block ( 
-            block_id, transformer_name, status
-       ) VALUES (
-         \${block_id}, \${transformer_name}, \${status}
-       ) ON CONFLICT(block_id, transformer_name) DO NOTHING;`,
-            values,
-          );
-        });
-      }),
-    ),
-  );
+  const sql = `
+  INSERT INTO vulcan2x.transformed_block ( 
+    block_id, transformer_name, status
+    ) VALUES 
+  ${blocks.map(b => transformers.map(t => `(${b.id}, '${t.name}', 'new') `)).join(',')}
+
+ON CONFLICT(block_id, transformer_name) DO NOTHING;
+  `;
+
+  return tx.none(sql);
 }
 
 export async function transform(
@@ -78,6 +66,9 @@ async function transformBlocks(
   depExtractors: BlockExtractor[],
 ): Promise<void> {
   const blocks = await getNextBlocks(services, transformer);
+  if (blocks.length === 0) {
+    return;
+  }
   logger.debug(`Transforming ${blocks.length} blocks with ${transformer.name}`);
 
   const consecutiveBlocks = findConsecutiveSubsets(blocks, 'number');
@@ -94,6 +85,9 @@ async function transformBlocks(
             config: services.config,
             pg: services.pg,
             tx,
+            networkState: {
+              latestEthereumBlockOnStart: 0,
+            },
           };
 
           const data = await Promise.all(
@@ -139,28 +133,38 @@ export async function getNextBlocks(
   const { db, config } = services;
 
   return withConnection(db, async c => {
-    // TODO: SQL injection here
     const nextBlocks: PersistedBlockWithTransformedBlockId[] | null = await c.manyOrNone<
       PersistedBlockWithTransformedBlockId
     >(
+      // this is the most complicated query in the whole base i think. But really it's not that complicated:
+      // - take all extractor dependencies and check if they are part of extracted_block table with status done or they were archived already and are part of done_job table
+      // - do the same for transformer dependencies
+      // prettier-ignore
       `
       SELECT b.*, tb.id as transformed_block_id
       FROM vulcan2x.block b
       JOIN vulcan2x.transformed_block tb ON b.id = tb.block_id 
       ${transformer.dependencies
-        .map((_, i) => `JOIN vulcan2x.extracted_block eb${i} ON b.id = eb${i}.block_id`)
+        .map((t, i) => `LEFT JOIN vulcan2x.extracted_block eb${i} ON b.id = eb${i}.block_id AND eb${i}.extractor_name='${t}' AND eb${i}.status = 'done'`)
         .join('\n')}
+      ${transformer.dependencies
+          .map((t, i) => `LEFT JOIN vulcan2x.done_job dj${i} ON b.id >= dj${i}.start_block_id AND b.id <= dj${i}.end_block_id AND dj${i}.name='${t}'`)
+          .join('\n')}
       ${(transformer.transformerDependencies || [])
-        .map((_, i) => `JOIN vulcan2x.transformed_block tb${i} ON b.id = tb${i}.block_id`)
+        .map((t, i) => `JOIN vulcan2x.transformed_block tb${i} ON b.id = tb${i}.block_id AND tb${i}.transformer_name='${t}' AND tb${i}.status = 'done'`)
         .join('\n')}
-      WHERE 
-        tb.transformer_name='${transformer.name}' AND tb.status = 'new'
-        ${transformer.dependencies
-          .map((t, i) => `AND eb${i}.extractor_name='${t}' AND eb${i}.status = 'done'`)
-          .join('\n')}
         ${(transformer.transformerDependencies || [])
-          .map((t, i) => `AND tb${i}.transformer_name='${t}' AND tb${i}.status = 'done'`)
+          .map((t, i) => `LEFT JOIN vulcan2x.done_job djt${i} ON b.id >= djt${i}.start_block_id AND b.id <= djt${i}.end_block_id AND djt${i}.name='${t}'`)
           .join('\n')}
+      WHERE 
+        tb.transformer_name='${transformer.name}' AND tb.status = 'new' AND
+        ${transformer.dependencies
+          .map((_, i) => `( eb${i}.extractor_name IS NOT NULL or dj${i}.name IS NOT NULL )`)
+          .join('AND\n')}
+        ${transformer.transformerDependencies ? " AND " : ""}
+        ${(transformer.transformerDependencies || [])
+          .map((_, i) => `( tb${i}.transformer_name IS NOT NULL or djt${i}.name IS NOT NULL )`)
+          .join('AND\n')}
       ORDER BY b.number
       LIMIT \${batch};
     `,

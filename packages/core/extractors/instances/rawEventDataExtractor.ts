@@ -1,9 +1,10 @@
 import { getLast } from '../../utils';
-import { getOrCreateTx, getBlock } from '../common';
+import { getOrCreateTx } from '../common';
 import { BlockExtractor } from '../extractor';
 import { min, max } from 'lodash';
 import { Log } from 'ethers/providers';
-import { TransactionalServices, PersistedBlock, LocalServices } from '../../types';
+import { TransactionalServices, LocalServices } from '../../types';
+import { PersistedBlock, getBlock } from '../../db/models/Block';
 
 export function makeRawLogExtractors(_addresses: string[]): BlockExtractor[] {
   const addresses = _addresses.map(a => a.toLowerCase());

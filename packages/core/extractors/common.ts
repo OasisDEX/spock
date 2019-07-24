@@ -2,13 +2,15 @@ export const DEFAULT_ADDRESS = '0x0000000000000000000000000000000000000000';
 
 import { Transaction } from 'ethers/utils';
 import { makeNullUndefined } from '../db/db';
-import { TransactionalServices, PersistedBlock, LocalServices } from '../types';
+import { TransactionalServices, LocalServices } from '../types';
+import { PersistedBlock } from '../db/models/Block';
 
 export async function getOrCreateTx(
   services: TransactionalServices,
   transaction: Transaction,
   block: PersistedBlock,
 ): Promise<PersistedTransaction> {
+  // this means that reorg is happening or ethereum node is not consistent
   if (!transaction) {
     throw new RetryableError(`Tx is not defined!`);
   }
@@ -122,29 +124,5 @@ export const silenceError = (...matchers: Array<(e: any) => boolean>) => (e: any
     throw e;
   }
 };
-
-export async function getBlock(
-  { tx }: LocalServices,
-  blockHash: string,
-): Promise<PersistedBlock | undefined> {
-  return tx
-    .oneOrNone<PersistedBlock>('SELECT * FROM vulcan2x.block WHERE hash=$1;', blockHash)
-    .then(makeNullUndefined);
-}
-
-export async function getBlockByIdOrDie(
-  { tx }: LocalServices,
-  id: number,
-): Promise<PersistedBlock> {
-  return tx
-    .oneOrNone<PersistedBlock>('SELECT * FROM vulcan2x.block WHERE id=$1;', id)
-    .then(makeNullUndefined)
-    .then(r => {
-      if (!r) {
-        throw new Error(`Block(id=${id}) is missing`);
-      }
-      return r;
-    });
-}
 
 export class RetryableError extends Error {}
