@@ -20,7 +20,7 @@ async function main(): Promise<void> {
   const { extractors, transformers } = config;
 
   await withLock(services.db, config.processDbLock, async () => {
-    await archiveOnce(services);
+    await archiveOnce(services, false);
 
     for (const extractor of extractors) {
       let res = 0;

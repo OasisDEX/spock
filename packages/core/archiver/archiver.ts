@@ -21,14 +21,14 @@ export async function archiver(_services: Services): Promise<void> {
   }
 }
 
-export async function archiveOnce(_services: Services): Promise<void> {
+export async function archiveOnce(_services: Services, sort: boolean = true): Promise<void> {
   for (const extractor of _services.config.extractors) {
     let done = false;
     while (!done) {
       logger.info(`Archiving ${extractor.name}`);
 
       await withTx(_services, async services => {
-        const processed = await archiveTask(services, 'extract', extractor.name);
+        const processed = await archiveTask(services, 'extract', extractor.name, sort);
 
         done = processed < services.config.archiverWorker.batch;
       });
@@ -46,7 +46,7 @@ export async function archiveOnce(_services: Services): Promise<void> {
       logger.info(`Archiving ${transformer.name}`);
 
       await withTx(_services, async services => {
-        const processed = await archiveTask(services, 'transform', transformer.name);
+        const processed = await archiveTask(services, 'transform', transformer.name, sort);
 
         done = processed < services.config.archiverWorker.batch;
       });
@@ -62,13 +62,15 @@ export async function archiveTask(
   services: TransactionalServices,
   type: TaskType,
   name: string,
+  sort: boolean = true,
 ): Promise<number> {
   const table = getTableNameForTask(type);
   const nameField = getNameFieldForTask(type);
   const sql = `
   SELECT * FROM ${table} eb 
   WHERE eb.${nameField}='${name}' AND status='done' 
-  ORDER BY eb.block_id LIMIT ${services.config.archiverWorker.batch};
+  ${sort ? 'ORDER BY eb.block_id ' : ''}
+  LIMIT ${services.config.archiverWorker.batch};
   `;
 
   const blocksToAchieve = (await services.tx.manyOrNone<ExtractedBlock>(sql)) || [];

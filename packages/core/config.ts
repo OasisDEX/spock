@@ -59,7 +59,7 @@ export const getDefaultConfig = (env: Env) => {
       batch: 1000,
     },
     archiverWorker: {
-      batch: 10000,
+      batch: 50000,
       delay: 5, // in minutes
     },
     statsWorker: {
