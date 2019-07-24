@@ -58,6 +58,9 @@ export async function extract(services: Services, extractors: BlockExtractor[]):
 
 async function extractBlocks(services: Services, extractor: BlockExtractor): Promise<void> {
   const blocks = await getNextBlocks(services, extractor);
+  if (blocks.length === 0) {
+    return;
+  }
 
   // We can speed up whole process (process blocks in batches) if we don't have a risk of reorg.
   // Otherwise we process blocks separately to avoid problems with reorgs while processing tip of the blockchain.

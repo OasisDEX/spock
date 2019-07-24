@@ -66,6 +66,9 @@ async function transformBlocks(
   depExtractors: BlockExtractor[],
 ): Promise<void> {
   const blocks = await getNextBlocks(services, transformer);
+  if (blocks.length === 0) {
+    return;
+  }
   logger.debug(`Transforming ${blocks.length} blocks with ${transformer.name}`);
 
   const consecutiveBlocks = findConsecutiveSubsets(blocks, 'number');
