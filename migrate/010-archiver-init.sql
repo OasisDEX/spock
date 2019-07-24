@@ -9,3 +9,7 @@ CREATE TABLE vulcan2x.done_job (
   unique (start_block_id, end_block_id, name)
 );
 CREATE INDEX vulcan2x_done_job_extractor_name ON vulcan2x.done_job(name);
+
+
+-- missing index for block hash
+CREATE INDEX vulcan2x_block_hash_index ON vulcan2x.block(hash);
