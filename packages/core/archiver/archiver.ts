@@ -10,6 +10,7 @@ import {
 import { getLogger } from '../utils/logger';
 import { getBlockRange } from '../db/models/Block';
 import { withTx } from '../services';
+import { sortBy } from 'lodash';
 
 const logger = getLogger('archiver');
 
@@ -73,7 +74,11 @@ export async function archiveTask(
   LIMIT ${services.config.archiverWorker.batch};
   `;
 
-  const blocksToAchieve = (await services.tx.manyOrNone<ExtractedBlock>(sql)) || [];
+  let blocksToAchieve = (await services.tx.manyOrNone<ExtractedBlock>(sql)) || [];
+  // sort in memory
+  if (!sort) {
+    blocksToAchieve = sortBy(blocksToAchieve, 'block_id');
+  }
   logger.info({ toArchive: blocksToAchieve.length, extractorName: name });
   const consecutiveBlocks = findConsecutiveSubsets(blocksToAchieve, 'block_id');
 
