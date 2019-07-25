@@ -1,4 +1,4 @@
-import { Block, JsonRpcProvider } from 'ethers/providers';
+import { Block } from 'ethers/providers';
 import { withConnection, makeNullUndefined } from './db/db';
 import { compact } from 'lodash';
 import { getLast, getRangeAsString } from './utils';
@@ -6,6 +6,7 @@ import { getLogger } from './utils/logger';
 import { SpockConfig } from './config';
 import { Services } from './types';
 import { BlockModel } from './db/models/Block';
+import { getRandomProvider } from './services';
 
 const logger = getLogger('block-generator');
 
@@ -111,10 +112,8 @@ export async function getBlock({ db }: Services, blockNo: number): Promise<Block
   });
 }
 
-async function getRealBlocksStartingFrom(
-  { provider, config }: Services,
-  blockNo: number,
-): Promise<Block[]> {
+async function getRealBlocksStartingFrom({ config }: Services, blockNo: number): Promise<Block[]> {
+  const provider = getRandomProvider();
   logger.info(
     `Looking for ${config.blockGenerator.batch} external blocks starting from: ${blockNo}`,
   );

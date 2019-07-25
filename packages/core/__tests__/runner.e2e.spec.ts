@@ -5,6 +5,8 @@ import { Block } from 'ethers/providers';
 import { testConfig, prepareDB, dumpDB } from '../../test/common';
 import { Services } from '../types';
 import { pick } from 'lodash';
+import { createProviders, getRandomProvider } from '../services';
+import { delay } from '../utils';
 
 describe('Whole solution', () => {
   it('should work with reorgs', async () => {
@@ -57,7 +59,15 @@ describe('Whole solution', () => {
     ];
     let blockPointer = 0;
 
-    const provider = new ethers.providers.JsonRpcProvider('http://localhost/not-existing');
+    createProviders({
+      chain: {
+        host: 'http://localhost/not-existing',
+        name: 'mainnet',
+        retries: 0,
+      },
+    } as any);
+    const provider = getRandomProvider();
+
     provider.getBlock = async (blockNumber: number): Promise<Block> => {
       const block = blocks[blockPointer++];
       if (block && block.number !== blockNumber) {
@@ -68,14 +78,15 @@ describe('Whole solution', () => {
 
     const services: Services = {
       config: testConfig,
-      provider: provider as any,
+      provider: provider,
       ...dbCtx,
       networkState: {
         latestEthereumBlockOnStart: 1,
       },
     };
 
-    await Promise.all([runBlockGenerator(services)]);
+    runBlockGenerator(services);
+    await delay(4000);
 
     expect(pick(await dumpDB(dbCtx.db), 'blocks')).toMatchInlineSnapshot(`
 Object {
@@ -130,6 +141,7 @@ async function runBlockGenerator(service: Services): Promise<void> {
 
       await blockGenerator(services, 0);
     } catch (e) {
+      process.exit(1);
       reject(e);
     }
   });

@@ -37,6 +37,5 @@ export async function etl(config: SpockConfig): Promise<void> {
       process(services, config.transformers),
       statsWorker(services),
     ]);
-
   });
 }

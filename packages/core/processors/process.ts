@@ -7,6 +7,7 @@ import { BlockModel } from '../db/models/Block';
 import { getJob } from '../db/models/Job';
 import { matchMissingForeignKeyError, RetryableError } from './extractors/common';
 import { Processor, isExtractor, BlockExtractor } from './types';
+import { getRandomProvider } from '../services';
 
 const logger = getLogger('extractor/index');
 
@@ -57,6 +58,7 @@ async function processBlocks(services: Services, processor: Processor): Promise<
       await services.db.tx(async tx => {
         const txServices: TransactionalServices = {
           ...services,
+          provider: getRandomProvider(),
           tx,
         };
         if (isExtractor(processor)) {
