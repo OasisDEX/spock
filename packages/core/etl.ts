@@ -4,7 +4,7 @@ import { withLock } from './db/locks';
 import { SpockConfig } from './config';
 import { createServices } from './services';
 import { archiver } from './archiver/archiver';
-import { blockGenerator } from './generator';
+import { blockGenerator } from './blockGenerator';
 import { queueNewBlocksToExtract, extract } from './extractors/extractor';
 import { queueNewBlocksToTransform, transform } from './transformers/transformers';
 import { statsWorker } from './stats/stats';
@@ -31,12 +31,17 @@ export async function etl(config: SpockConfig): Promise<void> {
   await withLock(services.db, services.config.processDbLock, async () => {
     await Promise.all([
       archiver(services),
-      blockGenerator(services, config.startingBlock, (tx, blocks) => {
-        return Promise.all([
-          queueNewBlocksToExtract(tx, config.extractors, blocks),
-          queueNewBlocksToTransform(tx, config.transformers, blocks),
-        ]);
-      }),
+      blockGenerator(
+        services,
+        config.startingBlock,
+        (tx, blocks) => {
+          return Promise.all([
+            queueNewBlocksToExtract(tx, config.extractors, blocks),
+            queueNewBlocksToTransform(tx, config.transformers, blocks),
+          ]);
+        },
+        config.lastBlock,
+      ),
       extract(services, config.extractors),
       transform(services, config.transformers, config.extractors),
       statsWorker(services),

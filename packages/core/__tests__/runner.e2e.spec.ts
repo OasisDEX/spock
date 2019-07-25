@@ -1,4 +1,4 @@
-import { blockGenerator } from '../generator';
+import { blockGenerator } from '../blockGenerator';
 import { createDB } from '../db/db';
 import { ethers } from 'ethers';
 import { Block } from 'ethers/providers';
@@ -6,7 +6,7 @@ import { testConfig, prepareDB, dumpDB } from '../../test/common';
 import { extract, queueNewBlocksToExtract, BlockExtractor } from '../extractors/extractor';
 import { makeRawLogExtractors } from '../extractors/instances/rawEventDataExtractor';
 import { Services } from '../types';
-import { omit } from 'lodash';
+import { pick } from 'lodash';
 
 describe('Whole solution', () => {
   it('should work with reorgs', async () => {
@@ -81,7 +81,8 @@ describe('Whole solution', () => {
 
     await Promise.all([runBlockGenerator(services, extractors), runWorkers(services, extractors)]);
 
-    expect(omit(await dumpDB(dbCtx.db), 'done_job')).toMatchInlineSnapshot(`
+    expect(pick(await dumpDB(dbCtx.db), 'blocks', 'extracted_blocks', 'transaction'))
+      .toMatchInlineSnapshot(`
 Object {
   "blocks": Array [
     Object {
