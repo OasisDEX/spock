@@ -1,5 +1,5 @@
 import { etl } from '../../etl';
-import { makeRawLogExtractors } from '../../extractors/instances/rawEventDataExtractor';
+import { makeRawLogExtractors } from '../../processors/extractors/instances/rawEventDataExtractor';
 import { dumpDB, testConfig, prepareDB } from '../../../test/common';
 import { createDB } from '../../db/db';
 import { mergeConfig } from '../../utils/configUtils';

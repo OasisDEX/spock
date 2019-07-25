@@ -1,8 +1,9 @@
 import { createDB } from '../db/db';
 import { prepareDB, testConfig, executeSQL } from '../../test/common';
 import { Services } from '../types';
-import { getNextBlocks, BlockTransformer } from './transformers';
 import { archiveOnce } from '../archiver/archiver';
+import { BlockTransformer } from './types';
+import { getNextBlocks } from './process';
 
 describe('transformers > getNextBlocks', () => {
   it('should work with transformers with extractor dependencies', async () => {

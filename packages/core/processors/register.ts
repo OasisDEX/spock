@@ -1,14 +1,14 @@
 import { Services } from '../types';
-import { BlockExtractor } from './extractor';
 import { getJob, saveJob, WritableJobModel } from '../db/models/Job';
 import { withConnection } from '../db/db';
 import { getLogger } from '../utils/logger';
+import { Processor } from './types';
 
 const logger = getLogger('register');
 
 export async function registerProcessors(
   services: Services,
-  processors: BlockExtractor[],
+  processors: Processor[],
 ): Promise<void> {
   await withConnection(services.db, async c => {
     for (const processor of processors) {

@@ -1,43 +1,31 @@
 import { withConnection } from '../db/db';
 import { delay, getLast, findConsecutiveSubsets } from '../utils';
-import { matchMissingForeignKeyError, RetryableError } from './common';
 import { getLogger } from '../utils/logger';
-import { Services, TransactionalServices, LocalServices } from '../types';
+import { Services, TransactionalServices } from '../types';
 import { get, sortBy } from 'lodash';
 import { BlockModel } from '../db/models/Block';
 import { getJob } from '../db/models/Job';
+import { matchMissingForeignKeyError, RetryableError } from './extractors/common';
+import { Processor, isExtractor } from './types';
 
 const logger = getLogger('extractor/index');
 
-export interface BlockExtractor {
-  name: string;
-  extractorDependencies?: string[];
-  disablePerfBoost?: boolean;
+export async function process(services: Services, processors: Processor[]): Promise<void> {
+  logger.debug('Spawning extractors: ', processors.length);
 
-  // @note: blocks are always consecutive
-  // get data from node to database
-  extract: (services: TransactionalServices, blocks: BlockModel[]) => Promise<void>;
-
-  // get data from database
-  getData(services: LocalServices, blocks: BlockModel[]): Promise<any>;
-}
-
-export async function extract(services: Services, extractors: BlockExtractor[]): Promise<void> {
-  logger.debug('Spawning extractors: ', extractors.length);
-
-  while (extractors.length > 0) {
-    // NOTE: no two extractors extract at the same
-    for (const extractor of extractors) {
-      await extractBlocks(services, extractor);
+  while (processors.length > 0) {
+    // NOTE: no two processors extract at the same
+    for (const p of processors) {
+      await processBlocks(services, p);
     }
 
     await delay(1000);
   }
-  logger.warn('Extracting done');
+  logger.warn('Processing done');
 }
 
-async function extractBlocks(services: Services, extractor: BlockExtractor): Promise<void> {
-  const blocks = await getNextBlocks(services, extractor);
+async function processBlocks(services: Services, processor: Processor): Promise<void> {
+  const blocks = await getNextBlocks(services, processor);
   if (blocks.length === 0) {
     return;
   }
@@ -51,13 +39,14 @@ async function extractBlocks(services: Services, extractor: BlockExtractor): Pro
       1000 >
     0;
 
-  const batchProcessing = !closeToTheTipOfBlockchain || extractor.disablePerfBoost || false;
+  const batchProcessing =
+    !closeToTheTipOfBlockchain || (processor as any).disablePerfBoost || false;
   const blocksInBatches = !batchProcessing
     ? blocks.map(b => [b])
     : findConsecutiveSubsets(blocks, 'number');
   logger.debug(
     `Processing ${blocks.length} blocks with ${
-      extractor.name
+      processor.name
     }. Process in batch: ${batchProcessing}`,
   );
 
@@ -70,13 +59,17 @@ async function extractBlocks(services: Services, extractor: BlockExtractor): Pro
           ...services,
           tx,
         };
-        await extractor.extract(txServices, blocks);
+        if (isExtractor(processor)) {
+          await processor.extract(txServices, blocks);
+        } else {
+          await processor.transform(txServices, blocks);
+        }
 
         logger.debug(
           `Marking blocks as processed from ${blocks[0].number} to ${blocks[0].number +
             blocks.length}`,
         );
-        await markBlocksProcessed(tx, blocks, extractor);
+        await markBlocksProcessed(tx, blocks, processor);
         logger.debug(
           `Closing db transaction for ${blocks[0].number} to ${blocks[0].number + blocks.length}`,
         );
@@ -95,7 +88,7 @@ async function extractBlocks(services: Services, extractor: BlockExtractor): Pro
       } else {
         // MARK IT AS ERRORED!!!
         console.log('CATASTROFIC ERROR: ', e);
-        process.exit(1);
+        global.process.exit(1);
       }
     }
   }
@@ -103,16 +96,16 @@ async function extractBlocks(services: Services, extractor: BlockExtractor): Pro
 
 export async function getNextBlocks(
   services: Services,
-  extractor: BlockExtractor,
+  processor: Processor,
 ): Promise<BlockModel[]> {
   const { db, config } = services;
 
   return withConnection(db, async c => {
     const batchSize = config.extractorWorker.batch;
 
-    const lastProcessed = await getJob(c, extractor.name);
+    const lastProcessed = await getJob(c, processor.name);
     if (!lastProcessed) {
-      throw new Error(`Missing processor: ${extractor.name}`);
+      throw new Error(`Missing processor: ${processor.name}`);
     }
 
     // note that dependencies could be also done in memory but doing this in one concurrent environment
@@ -123,7 +116,7 @@ export async function getNextBlocks(
         `
         SELECT b.* 
         FROM vulcan2x.block b 
-        ${(extractor.extractorDependencies || [])
+        ${getAllDependencies(processor)
           .map((d, i) => `JOIN vulcan2x.job j${i} ON j${i}.name='${d}' AND b.id <= j${i}.last_block_id`)
           .join('\n')}
         WHERE 
@@ -139,7 +132,7 @@ export async function getNextBlocks(
 async function markBlocksProcessed(
   connection: any,
   blocks: BlockModel[],
-  processor: BlockExtractor,
+  processor: Processor,
 ): Promise<void> {
   const lastId = getLast(blocks)!.id;
 
@@ -150,4 +143,12 @@ async function markBlocksProcessed(
   `;
 
   await connection.none(updateJobSQL);
+}
+
+export function getAllDependencies(p: Processor): string[] {
+  if (isExtractor(p)) {
+    return p.extractorDependencies || [];
+  } else {
+    return [...(p.dependencies || []), ...(p.transformerDependencies || [])];
+  }
 }

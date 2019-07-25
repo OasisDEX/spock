@@ -1,7 +1,6 @@
-import { BlockExtractor } from './extractors/extractor';
-import { BlockTransformer } from './transformers/transformers';
 import { Dictionary, MarkRequired } from 'ts-essentials';
 import { Env, getRequiredString, getRequiredNumber } from './utils/configUtils';
+import { BlockExtractor, BlockTransformer } from './processors/types';
 
 export interface SpockConfig {
   startingBlock: number;

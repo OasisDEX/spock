@@ -4,8 +4,8 @@ import { withLock } from './db/locks';
 import { SpockConfig } from './config';
 import { createServices } from './services';
 import { blockGenerator } from './blockGenerator';
-import { extract } from './extractors/extractor';
-import { registerProcessors } from './extractors/register';
+import { process } from './processors/process';
+import { registerProcessors } from './processors/register';
 
 ethers.errors.setLogLevel('error');
 const logger = getLogger('runner');
@@ -31,7 +31,7 @@ export async function etl(config: SpockConfig): Promise<void> {
 
     await Promise.all([
       blockGenerator(services, config.startingBlock, config.lastBlock),
-      extract(services, config.extractors),
+      process(services, config.extractors),
     ]);
   });
 }

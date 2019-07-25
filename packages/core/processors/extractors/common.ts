@@ -1,9 +1,9 @@
 export const DEFAULT_ADDRESS = '0x0000000000000000000000000000000000000000';
 
 import { Transaction } from 'ethers/utils';
-import { makeNullUndefined } from '../db/db';
-import { TransactionalServices, LocalServices } from '../types';
-import { BlockModel } from '../db/models/Block';
+import { TransactionalServices, LocalServices } from '../../types';
+import { BlockModel } from '../../db/models/Block';
+import { makeNullUndefined } from '../../db/db';
 
 export async function getOrCreateTx(
   services: TransactionalServices,
