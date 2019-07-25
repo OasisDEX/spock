@@ -4,7 +4,7 @@ import { BlockExtractor } from '../extractors/extractor';
 import { getLogger } from '../utils/logger';
 import { RetryableError, matchMissingForeignKeyError } from '../extractors/common';
 import { Services, LocalServices } from '../types';
-import { PersistedBlock } from '../db/models/Block';
+import { BlockModel } from '../db/models/Block';
 
 const logger = getLogger('transformers/transformers');
 
@@ -15,14 +15,14 @@ export interface BlockTransformer {
   transform(service: LocalServices, data: any[]): Promise<void>;
 }
 
-type PersistedBlockWithTransformedBlockId = PersistedBlock & {
+type PersistedBlockWithTransformedBlockId = BlockModel & {
   transformed_block_id: number;
 };
 
 export async function queueNewBlocksToTransform(
   tx: DbTransactedConnection,
   transformers: BlockTransformer[],
-  blocks: PersistedBlock[],
+  blocks: BlockModel[],
 ): Promise<any> {
   if (transformers.length === 0) {
     return;

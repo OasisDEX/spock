@@ -3,7 +3,7 @@ import { createDB, withConnection } from '../db/db';
 import { prepareDB, testConfig } from '../../test/common';
 import { ethers } from 'ethers';
 import { TransactionalServices } from '../types';
-import { PersistedBlock } from '../db/models/Block';
+import { BlockModel } from '../db/models/Block';
 
 describe('extractors/common matchMissingForeignKeyError', () => {
   it('should work', async () => {
@@ -18,7 +18,7 @@ describe('extractors/common matchMissingForeignKeyError', () => {
       gasLimit: 1 as any,
       gasPrice: 1 as any,
     };
-    const block: Partial<PersistedBlock> = {
+    const block: Partial<BlockModel> = {
       id: 1,
     };
 

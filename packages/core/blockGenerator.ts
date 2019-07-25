@@ -1,18 +1,17 @@
 import { Block, JsonRpcProvider } from 'ethers/providers';
-import { withConnection, makeNullUndefined, DbTransactedConnection } from './db/db';
+import { withConnection, makeNullUndefined } from './db/db';
 import { compact } from 'lodash';
 import { getLast, getRangeAsString } from './utils';
 import { getLogger } from './utils/logger';
 import { SpockConfig } from './config';
 import { Services } from './types';
-import { PersistedBlock } from './db/models/Block';
+import { BlockModel } from './db/models/Block';
 
 const logger = getLogger('block-generator');
 
 export async function blockGenerator(
   services: Services,
   fromBlockNo: number,
-  onNewBlocks: NewBlockHandler = async () => {},
   toBlockNo?: number,
 ): Promise<void> {
   let currentBlockNo: number;
@@ -21,7 +20,7 @@ export async function blockGenerator(
   if (isFromBlockMissing) {
     logger.warn(`Initial block is missing. Starting from ${fromBlockNo}`);
     const blocks = await getRealBlocksStartingFrom(services, fromBlockNo);
-    await addBlocks(services, blocks, onNewBlocks);
+    await addBlocks(services, blocks);
   }
 
   currentBlockNo = (await getLastBlockNo(services)) + 1;
@@ -45,17 +44,13 @@ export async function blockGenerator(
       continue;
     }
     logger.info(`Adding ${blocks.length} new blocks.`);
-    await addBlocks(services, blocks, onNewBlocks);
+    await addBlocks(services, blocks);
 
     currentBlockNo = getLast(blocks)!.number + 1;
   }
 }
 
-async function addBlocks(
-  { db, pg, columnSets }: Services,
-  blocks: Block[],
-  onNewBlocks: NewBlockHandler,
-): Promise<PersistedBlock[]> {
+async function addBlocks({ db, pg, columnSets }: Services, blocks: Block[]): Promise<BlockModel[]> {
   const values = blocks.map(block => ({
     number: block.number,
     hash: block.hash,
@@ -72,8 +67,6 @@ async function addBlocks(
     if (!persistedBlocks || persistedBlocks.length === 0) {
       return [];
     }
-
-    await onNewBlocks(tx, persistedBlocks);
 
     return persistedBlocks;
   });
@@ -110,13 +103,10 @@ async function removeBlock(services: Services, blockHash: string): Promise<void>
   });
 }
 
-export async function getBlock(
-  { db }: Services,
-  blockNo: number,
-): Promise<PersistedBlock | undefined> {
+export async function getBlock({ db }: Services, blockNo: number): Promise<BlockModel | undefined> {
   return withConnection(db, connection => {
     return connection
-      .oneOrNone<PersistedBlock>('SELECT * FROM vulcan2x.block WHERE number=$1;', blockNo)
+      .oneOrNone<BlockModel>('SELECT * FROM vulcan2x.block WHERE number=$1;', blockNo)
       .then(makeNullUndefined);
   });
 }
@@ -161,9 +151,7 @@ async function getRealBlocksStartingFrom(
   });
 }
 
-type NewBlockHandler = (tx: DbTransactedConnection, blocks: PersistedBlock[]) => Promise<any>;
-
-function verifyBlocksConsistency(previousBlock: PersistedBlock, newBlocks: Block[]): boolean {
+function verifyBlocksConsistency(previousBlock: BlockModel, newBlocks: Block[]): boolean {
   let parentHash = previousBlock.hash;
 
   for (const block of newBlocks) {
