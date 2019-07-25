@@ -6,6 +6,7 @@ import { createServices } from './services';
 import { blockGenerator } from './blockGenerator';
 import { process } from './processors/process';
 import { registerProcessors } from './processors/register';
+import { statsWorker } from './stats/stats';
 
 ethers.errors.setLogLevel('error');
 const logger = getLogger('runner');
@@ -33,5 +34,7 @@ export async function etl(config: SpockConfig): Promise<void> {
       blockGenerator(services, config.startingBlock, config.lastBlock),
       process(services, config.extractors),
     ]);
+
+    await statsWorker(services);
   });
 }
