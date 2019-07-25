@@ -29,12 +29,14 @@ export async function etl(config: SpockConfig): Promise<void> {
 
   await withLock(services.db, services.config.processDbLock, async () => {
     await registerProcessors(services, config.extractors);
+    await registerProcessors(services, config.transformers);
 
     await Promise.all([
       blockGenerator(services, config.startingBlock, config.lastBlock),
       process(services, config.extractors),
+      process(services, config.transformers),
+      statsWorker(services),
     ]);
 
-    await statsWorker(services);
   });
 }

@@ -2,11 +2,11 @@ import { withConnection } from '../db/db';
 import { delay, getLast, findConsecutiveSubsets } from '../utils';
 import { getLogger } from '../utils/logger';
 import { Services, TransactionalServices } from '../types';
-import { get, sortBy } from 'lodash';
+import { get, sortBy, groupBy } from 'lodash';
 import { BlockModel } from '../db/models/Block';
 import { getJob } from '../db/models/Job';
 import { matchMissingForeignKeyError, RetryableError } from './extractors/common';
-import { Processor, isExtractor } from './types';
+import { Processor, isExtractor, BlockExtractor } from './types';
 
 const logger = getLogger('extractor/index');
 
@@ -36,7 +36,7 @@ async function processBlocks(services: Services, processor: Processor): Promise<
     ((get(blocks, '[0].number') as number) || 0) +
       services.config.extractorWorker.batch -
       services.networkState.latestEthereumBlockOnStart +
-      1000 >
+      services.config.extractorWorker.reorgBuffer >
     0;
 
   const batchProcessing =
@@ -62,7 +62,13 @@ async function processBlocks(services: Services, processor: Processor): Promise<
         if (isExtractor(processor)) {
           await processor.extract(txServices, blocks);
         } else {
-          await processor.transform(txServices, blocks);
+          const realDeps = findExtractorDependencies(
+            processor.dependencies,
+            services.config.extractors,
+          );
+          const data = await Promise.all(realDeps.map(dep => dep.getData(txServices, blocks)));
+
+          await processor.transform(txServices, data);
         }
 
         logger.debug(
@@ -151,4 +157,23 @@ export function getAllDependencies(p: Processor): string[] {
   } else {
     return [...(p.dependencies || []), ...(p.transformerDependencies || [])];
   }
+}
+
+export function findExtractorDependencies(
+  dependencies: string[],
+  allExtractors: BlockExtractor[],
+): BlockExtractor[] {
+  const extractorsByName = groupBy(allExtractors, 'name');
+
+  const result: BlockExtractor[] = [];
+  for (const d of dependencies) {
+    const realDep = extractorsByName[d];
+    if (!realDep || !realDep[0]) {
+      throw new Error(`Dependency ${realDep} couldn't be found!`);
+    }
+
+    result.push(realDep[0]);
+  }
+
+  return result;
 }

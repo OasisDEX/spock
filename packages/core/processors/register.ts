@@ -19,7 +19,7 @@ export async function registerProcessors(
       }
 
       const job: WritableJobModel = { name: processor.name, last_block_id: 0 };
-      logger.info(`Registering new processor ${processor.name}: (${JSON.stringify(job)})`);
+      logger.info(`Registering a new processor ${processor.name}: (${JSON.stringify(job)})`);
       await saveJob(c, job);
     }
   });
