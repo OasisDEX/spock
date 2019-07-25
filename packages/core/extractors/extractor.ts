@@ -115,11 +115,17 @@ export async function getNextBlocks(
       throw new Error(`Missing processor: ${extractor.name}`);
     }
 
+    // note that dependencies could be also done in memory but doing this in one concurrent environment
+    // todo: maybe rewrite it
     const nextBlocks =
       (await c.manyOrNone<BlockModel>(
+        // prettier-ignore
         `
         SELECT b.* 
         FROM vulcan2x.block b 
+        ${(extractor.extractorDependencies || [])
+          .map((d, i) => `JOIN vulcan2x.job j${i} ON j${i}.name='${d}' AND b.id <= j${i}.last_block_id`)
+          .join('\n')}
         WHERE 
           b.id > ${lastProcessed.last_block_id} AND 
           b.id <= ${lastProcessed.last_block_id + batchSize};
