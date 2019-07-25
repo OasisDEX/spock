@@ -1,7 +1,7 @@
 import { LocalServices } from '../../types';
 import { makeNullUndefined } from '../db';
 
-export interface BlockModel {
+export interface PersistedBlock {
   id: number;
   number: number;
   hash: string;
@@ -11,24 +11,27 @@ export interface BlockModel {
 export async function getBlock(
   { tx }: LocalServices,
   blockHash: string,
-): Promise<BlockModel | undefined> {
+): Promise<PersistedBlock | undefined> {
   return tx
-    .oneOrNone<BlockModel>('SELECT * FROM vulcan2x.block WHERE hash=$1;', blockHash)
+    .oneOrNone<PersistedBlock>('SELECT * FROM vulcan2x.block WHERE hash=$1;', blockHash)
     .then(makeNullUndefined);
 }
 
 export async function getBlockById(
   { tx }: LocalServices,
   id: number,
-): Promise<BlockModel | undefined> {
+): Promise<PersistedBlock | undefined> {
   return tx
-    .oneOrNone<BlockModel>('SELECT * FROM vulcan2x.block WHERE id=$1;', id)
+    .oneOrNone<PersistedBlock>('SELECT * FROM vulcan2x.block WHERE id=$1;', id)
     .then(makeNullUndefined);
 }
 
-export async function getBlockByIdOrDie({ tx }: LocalServices, id: number): Promise<BlockModel> {
+export async function getBlockByIdOrDie(
+  { tx }: LocalServices,
+  id: number,
+): Promise<PersistedBlock> {
   return tx
-    .oneOrNone<BlockModel>('SELECT * FROM vulcan2x.block WHERE id=$1;', id)
+    .oneOrNone<PersistedBlock>('SELECT * FROM vulcan2x.block WHERE id=$1;', id)
     .then(makeNullUndefined)
     .then(r => {
       if (!r) {
@@ -42,11 +45,11 @@ export async function getBlockRange(
   { tx }: LocalServices,
   start: number,
   end: number,
-): Promise<BlockModel[]> {
+): Promise<PersistedBlock[]> {
   const sql = `
 SELECT * FROM vulcan2x.block 
 WHERE id >= ${start} AND id <= ${end}
   `;
 
-  return await tx.manyOrNone<BlockModel>(sql);
+  return await tx.manyOrNone<PersistedBlock>(sql);
 }

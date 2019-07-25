@@ -3,9 +3,11 @@ import { getLogger } from './utils/logger';
 import { withLock } from './db/locks';
 import { SpockConfig } from './config';
 import { createServices } from './services';
+import { archiver } from './archiver/archiver';
 import { blockGenerator } from './blockGenerator';
-import { extract } from './extractors/extractor';
-import { registerProcessor as registerProcessors } from './extractors/register';
+import { queueNewBlocksToExtract, extract } from './extractors/extractor';
+import { queueNewBlocksToTransform, transform } from './transformers/transformers';
+import { statsWorker } from './stats/stats';
 
 ethers.errors.setLogLevel('error');
 const logger = getLogger('runner');
@@ -27,11 +29,22 @@ export async function etl(config: SpockConfig): Promise<void> {
   printSystemInfo(config);
 
   await withLock(services.db, services.config.processDbLock, async () => {
-    await registerProcessors(services, config.extractors);
-
     await Promise.all([
-      blockGenerator(services, config.startingBlock, config.lastBlock),
+      archiver(services),
+      blockGenerator(
+        services,
+        config.startingBlock,
+        (tx, blocks) => {
+          return Promise.all([
+            queueNewBlocksToExtract(tx, config.extractors, blocks),
+            queueNewBlocksToTransform(tx, config.transformers, blocks),
+          ]);
+        },
+        config.lastBlock,
+      ),
       extract(services, config.extractors),
+      transform(services, config.transformers, config.extractors),
+      statsWorker(services),
     ]);
   });
 }

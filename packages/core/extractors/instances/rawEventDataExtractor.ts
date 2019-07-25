@@ -4,7 +4,7 @@ import { BlockExtractor } from '../extractor';
 import { min, max } from 'lodash';
 import { Log } from 'ethers/providers';
 import { TransactionalServices, LocalServices } from '../../types';
-import { BlockModel, getBlock } from '../../db/models/Block';
+import { PersistedBlock, getBlock } from '../../db/models/Block';
 
 export function makeRawLogExtractors(_addresses: string[]): BlockExtractor[] {
   const addresses = _addresses.map(a => a.toLowerCase());
@@ -12,7 +12,7 @@ export function makeRawLogExtractors(_addresses: string[]): BlockExtractor[] {
   return addresses.map(address => ({
     name: getExtractorName(address),
     address,
-    async extract(services: TransactionalServices, blocks: BlockModel[]): Promise<void> {
+    async extract(services: TransactionalServices, blocks: PersistedBlock[]): Promise<void> {
       let logs: Log[];
       if (blocks.length === 0) {
         return;
@@ -58,7 +58,7 @@ export function makeRawLogExtractors(_addresses: string[]): BlockExtractor[] {
       await services.tx.none(query);
     },
 
-    async getData(services: LocalServices, blocks: BlockModel[]): Promise<any> {
+    async getData(services: LocalServices, blocks: PersistedBlock[]): Promise<any> {
       return await getRawLogs(services, address, blocks);
     },
   }));
@@ -67,7 +67,7 @@ export function makeRawLogExtractors(_addresses: string[]): BlockExtractor[] {
 export async function getRawLogs(
   services: LocalServices,
   address: string,
-  blocks: BlockModel[],
+  blocks: PersistedBlock[],
 ): Promise<any[]> {
   const blocksIds = blocks.map(b => b.id);
   const minId = min(blocksIds);
