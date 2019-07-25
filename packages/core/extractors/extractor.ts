@@ -51,14 +51,14 @@ async function extractBlocks(services: Services, extractor: BlockExtractor): Pro
       1000 >
     0;
 
-  const processSeparately = !closeToTheTipOfBlockchain || extractor.disablePerfBoost || false;
-  const blocksInBatches = processSeparately
+  const batchProcessing = !closeToTheTipOfBlockchain || extractor.disablePerfBoost || false;
+  const blocksInBatches = !batchProcessing
     ? blocks.map(b => [b])
     : findConsecutiveSubsets(blocks, 'number');
   logger.debug(
     `Processing ${blocks.length} blocks with ${
       extractor.name
-    }. Processing separately: ${processSeparately}`,
+    }. Process in batch: ${batchProcessing}`,
   );
 
   for (const blocks of blocksInBatches) {
