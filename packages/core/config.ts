@@ -5,6 +5,7 @@ import { Env, getRequiredString, getRequiredNumber } from './utils/configUtils';
 
 export interface SpockConfig {
   startingBlock: number;
+  lastBlock?: number;
   extractors: BlockExtractor[];
   transformers: BlockTransformer[];
   migrations: Dictionary<string>;

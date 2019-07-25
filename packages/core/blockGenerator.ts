@@ -13,6 +13,7 @@ export async function blockGenerator(
   services: Services,
   fromBlockNo: number,
   onNewBlocks: NewBlockHandler = async () => {},
+  toBlockNo?: number,
 ): Promise<void> {
   let currentBlockNo: number;
 
@@ -25,7 +26,7 @@ export async function blockGenerator(
 
   currentBlockNo = (await getLastBlockNo(services)) + 1;
 
-  while (true) {
+  while (toBlockNo ? currentBlockNo < toBlockNo : true) {
     logger.info('Waiting for block:', currentBlockNo);
 
     const blocks = await getRealBlocksStartingFrom(services, currentBlockNo);

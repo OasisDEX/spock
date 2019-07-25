@@ -24,6 +24,10 @@ export async function queueNewBlocksToTransform(
   transformers: BlockTransformer[],
   blocks: PersistedBlock[],
 ): Promise<any> {
+  if (transformers.length === 0) {
+    return;
+  }
+
   const sql = `
   INSERT INTO vulcan2x.transformed_block ( 
     block_id, transformer_name, status
