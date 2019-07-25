@@ -110,7 +110,7 @@ export async function mergeRanges(services: TransactionalServices, name: string)
     const existingBlocks = await getBlockRange(
       services,
       lastRange.end_block_id + 1,
-      lastRange.start_block_id - 1,
+      range.start_block_id - 1,
     );
 
     const areThereAnyBlocksBetween = existingBlocks.length !== 0;

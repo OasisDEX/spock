@@ -2,7 +2,7 @@ import { createDB } from '../db/db';
 import { prepareDB, testConfig, executeSQL, dumpDB } from '../../test/common';
 import { Services } from '../types';
 
-import { archiveTask } from './archiver';
+import { archiveTask, mergeRanges } from './archiver';
 import { pick } from 'lodash';
 
 describe('archiver', () => {
@@ -259,6 +259,69 @@ Object {
 }
 `);
   });
+
+  it('should work with merging existing range with errors', async () => {
+    const dbCtx = createDB(testConfig.db);
+    await prepareDB(dbCtx.db, testConfig);
+
+    await executeSQL(
+      dbCtx.db,
+      `
+      -- blocks
+      INSERT INTO vulcan2x.block(number, hash, timestamp) VALUES(1, '0x01', '2019-07-02 11:18:01+00');
+      INSERT INTO vulcan2x.block(number, hash, timestamp) VALUES(2, '0x02', '2019-07-02 11:18:02+00');
+      INSERT INTO vulcan2x.block(number, hash, timestamp) VALUES(3, '0x03', '2019-07-02 11:18:03+00');
+      INSERT INTO vulcan2x.block(number, hash, timestamp) VALUES(4, '0x04', '2019-07-02 11:18:04+00');
+      INSERT INTO vulcan2x.block(number, hash, timestamp) VALUES(5, '0x05', '2019-07-02 11:18:05+00');
+
+
+      -- add tasks for extraction
+      INSERT INTO vulcan2x.extracted_block(block_id, extractor_name, status) VALUES(1, 'test-extractor', 'done');
+      INSERT INTO vulcan2x.extracted_block(block_id, extractor_name, status) VALUES(2, 'test-extractor', 'done');
+      INSERT INTO vulcan2x.extracted_block(block_id, extractor_name, status) VALUES(3, 'test-extractor', 'done');
+      INSERT INTO vulcan2x.extracted_block(block_id, extractor_name, status) VALUES(4, 'test-extractor', 'error');
+      INSERT INTO vulcan2x.extracted_block(block_id, extractor_name, status) VALUES(5, 'test-extractor', 'done');
+    `,
+    );
+
+    const services: Services = {
+      db: dbCtx.db,
+      pg: dbCtx.pg,
+      config: testConfig,
+      columnSets: undefined as any,
+      provider: undefined as any,
+      networkState: {
+        latestEthereumBlockOnStart: 0,
+      },
+    };
+
+    await archive(services, 'test-extractor');
+
+    const actual = await dumpDB(dbCtx.db);
+    expect(pick(actual, ['done_job', 'extracted_blocks'])).toMatchInlineSnapshot(`
+Object {
+  "done_job": Array [
+    Object {
+      "end_block_id": 3,
+      "name": "test-extractor",
+      "start_block_id": 1,
+    },
+    Object {
+      "end_block_id": 5,
+      "name": "test-extractor",
+      "start_block_id": 5,
+    },
+  ],
+  "extracted_blocks": Array [
+    Object {
+      "block_id": 4,
+      "extractor_name": "test-extractor",
+      "status": "error",
+    },
+  ],
+}
+`);
+  });
 });
 
 async function archive(_services: Services, extractorName: string): Promise<void> {
@@ -269,5 +332,6 @@ async function archive(_services: Services, extractorName: string): Promise<void
     };
 
     await archiveTask(services, 'extract', extractorName);
+    await mergeRanges(services, extractorName);
   });
 }
