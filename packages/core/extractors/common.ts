@@ -3,12 +3,12 @@ export const DEFAULT_ADDRESS = '0x0000000000000000000000000000000000000000';
 import { Transaction } from 'ethers/utils';
 import { makeNullUndefined } from '../db/db';
 import { TransactionalServices, LocalServices } from '../types';
-import { PersistedBlock } from '../db/models/Block';
+import { BlockModel } from '../db/models/Block';
 
 export async function getOrCreateTx(
   services: TransactionalServices,
   transaction: Transaction,
-  block: PersistedBlock,
+  block: BlockModel,
 ): Promise<PersistedTransaction> {
   // this means that reorg is happening or ethereum node is not consistent
   if (!transaction) {
@@ -64,7 +64,7 @@ export async function getTxByIdOrDie(
 export async function addTx(
   services: LocalServices,
   transaction: Transaction,
-  block: PersistedBlock,
+  block: BlockModel,
 ): Promise<PersistedTransaction> {
   const { tx } = services;
 
