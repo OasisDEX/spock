@@ -110,7 +110,6 @@ Object {
       },
     };
 
-    debugger;
     await archive(services, 'test-extractor');
     await archive(services, 'test-extractor-2');
 
@@ -222,7 +221,6 @@ Object {
       INSERT INTO vulcan2x.extracted_block(block_id, extractor_name, status) VALUES(9, 'test-extractor', 'done');
       `,
     );
-    debugger;
     await archive(services, 'test-extractor');
     await archive(services, 'test-extractor-2');
 
