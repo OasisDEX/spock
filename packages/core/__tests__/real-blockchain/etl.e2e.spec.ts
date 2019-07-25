@@ -42,11 +42,8 @@ describe('Spock ETL', () => {
 
 function setupEnv(): void {
   const chainHost = process.env['VL_CHAIN_HOST'];
-  try {
-    require('dotenv').config({ path: join(__dirname, '../../../../.env.local') });
-  } catch {
-    require('dotenv').config({ path: join(__dirname, '../../../../.env') });
-  }
+  require('dotenv').config({ path: join(__dirname, '../../../../.env.local') });
+  require('dotenv').config({ path: join(__dirname, '../../../../.env') });
   // prefer chainHost definition from the environment
   process.env['VL_CHAIN_HOST'] = chainHost || process.env['VL_CHAIN_HOST'];
 }
