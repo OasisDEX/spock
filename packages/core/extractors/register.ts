@@ -6,7 +6,7 @@ import { getLogger } from '../utils/logger';
 
 const logger = getLogger('register');
 
-export async function registerProcessor(
+export async function registerProcessors(
   services: Services,
   processors: BlockExtractor[],
 ): Promise<void> {

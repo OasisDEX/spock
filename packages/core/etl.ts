@@ -5,7 +5,7 @@ import { SpockConfig } from './config';
 import { createServices } from './services';
 import { blockGenerator } from './blockGenerator';
 import { extract } from './extractors/extractor';
-import { registerProcessor as registerProcessors } from './extractors/register';
+import { registerProcessors } from './extractors/register';
 
 ethers.errors.setLogLevel('error');
 const logger = getLogger('runner');
