@@ -21,7 +21,7 @@ export async function process(services: Services, processors: Processor[]): Prom
       const processedNow = await processBlocks(services, p);
       processed += processedNow;
     }
-    
+
     // if we didn't process anything new introduce artificial delay before next run
     if (processed === 0) {
       await delay(1000);
@@ -106,7 +106,7 @@ async function processBlocks(services: Services, processor: Processor): Promise<
     }
   }
 
-  return blocks.length
+  return blocks.length;
 }
 
 export async function getNextBlocks(

@@ -5,6 +5,7 @@ import { TransactionalServices, LocalServices } from '../../../types';
 import { BlockModel, getBlock } from '../../../db/models/Block';
 import { BlockExtractor } from '../../types';
 import { getOrCreateTx } from '../common';
+import { timer } from '../../../utils/timer';
 
 export function makeRawLogExtractors(_addresses: string[]): BlockExtractor[] {
   const addresses = _addresses.map(a => a.toLowerCase());
@@ -13,6 +14,9 @@ export function makeRawLogExtractors(_addresses: string[]): BlockExtractor[] {
     name: getExtractorName(address),
     address,
     async extract(services: TransactionalServices, blocks: BlockModel[]): Promise<void> {
+      const wholeExtractTimer = timer('whole-extract');
+
+      const gettingLogs = timer('getting-logs');
       let logs: Log[];
       if (blocks.length === 0) {
         return;
@@ -31,7 +35,9 @@ export function makeRawLogExtractors(_addresses: string[]): BlockExtractor[] {
           toBlock,
         });
       }
+      gettingLogs();
 
+      const processingLogs = timer(`processing-logs with: ${logs.length}`);
       const logsToInsert = (await Promise.all(
         logs.map(async log => {
           const transaction = await services.provider.getTransaction(log.transactionHash!);
@@ -50,12 +56,17 @@ export function makeRawLogExtractors(_addresses: string[]): BlockExtractor[] {
           };
         }),
       )).filter(log => !!log);
+      processingLogs();
       if (logsToInsert.length === 0) {
         return;
       }
 
+      const addingLogs = timer(`adding-logs with: ${logsToInsert.length} logs`);
       const query = services.pg.helpers.insert(logsToInsert, services.columnSets['extracted_logs']);
       await services.tx.none(query);
+      addingLogs();
+
+      wholeExtractTimer();
     },
 
     async getData(services: LocalServices, blocks: BlockModel[]): Promise<any> {
