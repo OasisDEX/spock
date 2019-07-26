@@ -47,7 +47,7 @@ export class RetryProvider extends JsonRpcProvider {
     } else if (error && error.statusCode) {
       // if we are hitting the api limit retry faster
       logger.debug('Retrying 429...');
-      await delay(Math.random() * 250 + 250);
+      await delay(500);
     } else {
       // just retry if error is not critical
       logger.debug('Retrying...');

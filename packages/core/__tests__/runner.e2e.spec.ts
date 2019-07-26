@@ -85,7 +85,9 @@ describe('Whole solution', () => {
       },
     };
 
-    runBlockGenerator(services);
+    runBlockGenerator(services).catch(() => {
+      process.exit(1);
+    });
     await delay(4000);
 
     expect(pick(await dumpDB(dbCtx.db), 'blocks')).toMatchInlineSnapshot(`
@@ -141,7 +143,6 @@ async function runBlockGenerator(service: Services): Promise<void> {
 
       await blockGenerator(services, 0);
     } catch (e) {
-      process.exit(1);
       reject(e);
     }
   });
