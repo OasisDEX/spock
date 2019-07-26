@@ -7,18 +7,21 @@ import { makeNullUndefined } from '../../db/db';
 
 export async function getOrCreateTx(
   services: TransactionalServices,
-  transaction: Transaction,
+  transactionHash: string,
   block: BlockModel,
 ): Promise<PersistedTransaction> {
   // this means that reorg is happening or ethereum node is not consistent
-  if (!transaction) {
-    throw new RetryableError(`Tx is not defined!`);
-  }
-  const storedTx = await getTx(services, transaction.hash!);
+  const storedTx = await getTx(services, transactionHash);
 
   if (storedTx) {
     return storedTx;
   } else {
+    const transaction = await services.provider.getTransaction(transactionHash);
+
+    if (!transaction) {
+      throw new RetryableError(`Tx is not defined!`);
+    }
+
     const storedTx = await addTx(services, transaction, block);
 
     return storedTx;

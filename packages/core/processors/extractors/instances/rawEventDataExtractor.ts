@@ -1,8 +1,8 @@
 import { getLast } from '../../../utils';
-import { min, max } from 'lodash';
+import { min, max, groupBy, uniq } from 'lodash';
 import { Log } from 'ethers/providers';
 import { TransactionalServices, LocalServices } from '../../../types';
-import { BlockModel, getBlock } from '../../../db/models/Block';
+import { BlockModel } from '../../../db/models/Block';
 import { BlockExtractor } from '../../types';
 import { getOrCreateTx } from '../common';
 import { timer } from '../../../utils/timer';
@@ -17,35 +17,26 @@ export function makeRawLogExtractors(_addresses: string[]): BlockExtractor[] {
       const wholeExtractTimer = timer('whole-extract');
 
       const gettingLogs = timer('getting-logs');
-      let logs: Log[];
-      if (blocks.length === 0) {
-        return;
-      } else if (blocks.length === 1) {
-        logs = await services.provider.getLogs({
-          address,
-          blockHash: blocks[0].hash,
-        });
-      } else {
-        const fromBlock = blocks[0].number;
-        const toBlock = getLast(blocks)!.number;
-
-        logs = await services.provider.getLogs({
-          address,
-          fromBlock,
-          toBlock,
-        });
-      }
+      const logs = await getLogs(services, blocks, address);
       gettingLogs();
 
       const processingLogs = timer(`processing-logs with: ${logs.length}`);
+
+      const blocksByHash = groupBy(blocks, 'hash');
+      const allTxs = uniq(logs.map(l => ({ txHash: l.transactionHash!, blockHash: l.blockHash! })));
+      const allStoredTxs = await Promise.all(
+        allTxs.map(tx => getOrCreateTx(services, tx.txHash, blocksByHash[tx.blockHash][0])),
+      );
+      const allStoredTxsByTxHash = groupBy(allStoredTxs, 'hash');
+
       const logsToInsert = (await Promise.all(
         logs.map(async log => {
-          const transaction = await services.provider.getTransaction(log.transactionHash!);
-          const block = await getBlock(services, log.blockHash!);
-          if (!block) {
+          const _block = blocksByHash[log.blockHash!];
+          if (!_block) {
             return;
           }
-          const storedTx = await getOrCreateTx(services, transaction, block);
+          const block = _block[0];
+          const storedTx = allStoredTxsByTxHash[log.transactionHash!][0];
 
           return {
             ...log,
@@ -110,4 +101,28 @@ export interface PersistedLog {
   address: string;
   data: string;
   topics: string;
+}
+
+export async function getLogs(
+  services: TransactionalServices,
+  blocks: BlockModel[],
+  address: string,
+): Promise<Log[]> {
+  if (blocks.length === 0) {
+    return [];
+  } else if (blocks.length === 1) {
+    return await services.provider.getLogs({
+      address,
+      blockHash: blocks[0].hash,
+    });
+  } else {
+    const fromBlock = blocks[0].number;
+    const toBlock = getLast(blocks)!.number;
+
+    return await services.provider.getLogs({
+      address,
+      fromBlock,
+      toBlock,
+    });
+  }
 }
