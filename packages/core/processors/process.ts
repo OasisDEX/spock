@@ -16,19 +16,24 @@ export async function process(services: Services, processors: Processor[]): Prom
 
   while (processors.length > 0) {
     // NOTE: no two processors extract at the same
+    let processed = 0;
     for (const p of processors) {
-      await processBlocks(services, p);
+      const processedNow = await processBlocks(services, p);
+      processed += processedNow;
     }
-
-    await delay(1000);
+    
+    // if we didn't process anything new introduce artificial delay before next run
+    if (processed === 0) {
+      await delay(1000);
+    }
   }
   logger.warn('Processing done');
 }
 
-async function processBlocks(services: Services, processor: Processor): Promise<void> {
+async function processBlocks(services: Services, processor: Processor): Promise<number> {
   const blocks = await getNextBlocks(services, processor);
   if (blocks.length === 0) {
-    return;
+    return 0;
   }
 
   // We can speed up whole process (process blocks in batches) if we don't have a risk of reorg.
@@ -95,11 +100,13 @@ async function processBlocks(services: Services, processor: Processor): Promise<
         );
       } else {
         // MARK IT AS ERRORED!!!
-        console.log('CATASTROFIC ERROR: ', e);
+        console.log('CATASTROPHIC ERROR: ', e);
         global.process.exit(1);
       }
     }
   }
+
+  return blocks.length
 }
 
 export async function getNextBlocks(
