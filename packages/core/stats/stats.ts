@@ -16,7 +16,7 @@ export async function statsWorker(services: Services): Promise<void> {
   let lastStat: Stats | undefined;
   while (true) {
     const startTime = Date.now();
-    logger.info('Sleeping...');
+    logger.info(`Sleeping for ${statsCfg.interval} sec...`);
     await delay(statsCfg.interval * 1000 * 60);
     logger.info(`Calculating stats...`);
     const stopTime = Date.now();
