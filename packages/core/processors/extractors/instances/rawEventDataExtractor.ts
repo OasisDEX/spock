@@ -1,5 +1,5 @@
 import { getLast } from '../../../utils';
-import { min, max, groupBy, uniq } from 'lodash';
+import { min, max, groupBy, uniqBy } from 'lodash';
 import { Log } from 'ethers/providers';
 import { TransactionalServices, LocalServices } from '../../../types';
 import { BlockModel } from '../../../db/models/Block';
@@ -20,10 +20,13 @@ export function makeRawLogExtractors(_addresses: string[]): BlockExtractor[] {
       const logs = await getLogs(services, blocks, address);
       gettingLogs();
 
-      const processingLogs = timer(`processing-logs with: ${logs.length}`);
+      const processingLogs = timer(`processing-logs`, `with: ${logs.length}`);
 
       const blocksByHash = groupBy(blocks, 'hash');
-      const allTxs = uniq(logs.map(l => ({ txHash: l.transactionHash!, blockHash: l.blockHash! })));
+      const allTxs = uniqBy(
+        logs.map(l => ({ txHash: l.transactionHash!, blockHash: l.blockHash! })),
+        'txHash',
+      );
       const allStoredTxs = await Promise.all(
         allTxs.map(tx => getOrCreateTx(services, tx.txHash, blocksByHash[tx.blockHash][0])),
       );
@@ -48,14 +51,16 @@ export function makeRawLogExtractors(_addresses: string[]): BlockExtractor[] {
         }),
       )).filter(log => !!log);
       processingLogs();
-      if (logsToInsert.length === 0) {
-        return;
-      }
 
-      const addingLogs = timer(`adding-logs with: ${logsToInsert.length} logs`);
-      const query = services.pg.helpers.insert(logsToInsert, services.columnSets['extracted_logs']);
-      await services.tx.none(query);
-      addingLogs();
+      if (logsToInsert.length !== 0) {
+        const addingLogs = timer(`adding-logs`, `with: ${logsToInsert.length} logs`);
+        const query = services.pg.helpers.insert(
+          logsToInsert,
+          services.columnSets['extracted_logs'],
+        );
+        await services.tx.none(query);
+        addingLogs();
+      }
 
       wholeExtractTimer();
     },

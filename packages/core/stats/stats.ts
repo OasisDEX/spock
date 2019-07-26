@@ -5,6 +5,7 @@ import { Stats } from './types';
 import { JobModel, getAllJobs } from '../db/models/Job';
 import { withConnection } from '../db/db';
 import { pick, groupBy, values, flatten } from 'lodash';
+import { printTimersSummary } from '../utils/timer';
 
 const logger = getLogger('stats');
 
@@ -34,6 +35,7 @@ synced: ${(blocksSyncedDelta / timeDeltaSec).toFixed(2)} blocks/sec
 extracted: ${(blocksExtractedDelta / timeDeltaSec).toFixed(2)} tasks/sec
 transformed: ${(blocksTransformedDelta / timeDeltaSec).toFixed(2)} tasks/sec
       `);
+      printTimersSummary();
     } else {
       logger.info('Missing baseline');
     }

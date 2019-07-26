@@ -57,7 +57,7 @@ async function processBlocks(services: Services, processor: Processor): Promise<
   );
 
   for (const blocks of blocksInBatches) {
-    logger.debug(`Extracting blocks: ${blocks.map(b => b.number).join(', ')}`);
+    logger.trace(`Extracting blocks: ${blocks.map(b => b.number).join(', ')}`);
 
     try {
       await services.db.tx(async tx => {

@@ -10,22 +10,16 @@ export async function getOrCreateTx(
   transactionHash: string,
   block: BlockModel,
 ): Promise<PersistedTransaction> {
+  const transaction = await services.provider.getTransaction(transactionHash);
+
   // this means that reorg is happening or ethereum node is not consistent
-  const storedTx = await getTx(services, transactionHash);
-
-  if (storedTx) {
-    return storedTx;
-  } else {
-    const transaction = await services.provider.getTransaction(transactionHash);
-
-    if (!transaction) {
-      throw new RetryableError(`Tx is not defined!`);
-    }
-
-    const storedTx = await addTx(services, transaction, block);
-
-    return storedTx;
+  if (!transaction) {
+    throw new RetryableError(`Tx is not defined!`);
   }
+
+  const storedTx = await addTx(services, transaction, block);
+
+  return storedTx;
 }
 
 export async function getTx(
