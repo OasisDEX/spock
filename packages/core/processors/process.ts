@@ -90,7 +90,7 @@ async function processBlocks(services: Services, processor: Processor): Promise<
     } catch (e) {
       logger.error(
         `ERROR[]: Error occured while processing: ${blocks[0].number} - ${blocks[0].number +
-          blocks.length}`,
+          blocks.length} with ${processor.name}`,
         e,
       );
       //there is a class of error that we want to retry so we don't mark the blocks as processed
