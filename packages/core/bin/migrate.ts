@@ -22,6 +22,7 @@ export async function main(): Promise<void> {
 
 main().catch(e => {
   logger.error(e);
+  console.error(e);
   process.exit(1);
 });
 

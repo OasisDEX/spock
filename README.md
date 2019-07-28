@@ -25,10 +25,9 @@ spock-etl etl|migrate|sync|api yourconfig.js|ts
 ### Commands
 
 - migrate — launches database migrations (core and defined in config)
-- sync — synchronizes work after config changes — It is highly recommended to always run sync before
-  etl
-- etl - launches ETL process (long running process)
+- etl — launches ETL process (long running process)
 - api — run general GrahpQL api exposing database schema `api`
+- validate-logs - task that compares logs data (`rawLogExtractor` output) with Google BigQueryData. 
 
 ## Ethereum node considerations
 
