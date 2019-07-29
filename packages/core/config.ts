@@ -56,7 +56,7 @@ export const getDefaultConfig = (env: Env) => {
     },
     extractorWorker: {
       batch: 400,
-      reorgBuffer: 100, // when to switch off batch processing
+      reorgBuffer: 500, // when to switch off batch processing
     },
     transformerWorker: {
       batch: 1000,
