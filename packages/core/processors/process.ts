@@ -89,14 +89,16 @@ async function processBlocks(services: Services, processor: Processor): Promise<
       });
     } catch (e) {
       logger.error(
-        `ERROR[]: Error occured while processing: ${blocks[0].number} - ${blocks[0].number +
-          blocks.length} with ${processor.name}`,
+        // prettier-ignore
+        `ERROR[]: Error occured while processing: ${blocks[0].number} - ${blocks[0].number + blocks.length} with ${processor.name}`,
         e,
       );
+      console.error(e);
       //there is a class of error that we want to retry so we don't mark the blocks as processed
       if (e instanceof RetryableError || matchMissingForeignKeyError(e)) {
         logger.debug(
-          `Retrying processing for ${blocks[0].number} - ${blocks[0].number + blocks.length}`,
+          // prettier-ignore
+          `Retrying processing for ${blocks[0].number} - ${blocks[0].number + blocks.length} with ${processor.name}`,
         );
       } else {
         // MARK IT AS ERRORED!!!
