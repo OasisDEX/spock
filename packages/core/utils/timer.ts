@@ -2,6 +2,7 @@ import { getLogger } from './logger';
 import { Dictionary } from 'ts-essentials';
 import { entries } from 'lodash';
 import * as prettyMs from 'pretty-ms';
+import * as hrTimeToMs from "convert-hrtime"
 
 const logger = getLogger('Timer');
 
@@ -9,12 +10,11 @@ const timerStats: Dictionary<number[]> = {};
 
 export function timer(label: string, extra?: string): () => void {
   timerStats[label] = timerStats[label] || [];
-  const startTime = process.hrtime.bigint();
+  const startTime = process.hrtime();
 
   return () => {
-    const endTime = process.hrtime.bigint();
-    const result = endTime - startTime;
-    const resultInMs = Number(result / 1000000n);
+    const result = process.hrtime(startTime);
+    const resultInMs = tryOrDefault(() => hrTimeToMs(result).milliseconds, 0);
 
     logger.info(`${label} ${extra ? `(${extra})` : ''} took: ${prettyMs(resultInMs)}`);
     timerStats[label].push(resultInMs);
@@ -37,4 +37,13 @@ export function printTimersSummary(): void {
     timerStats[name] = [];
   }
   logger.info('--------');
+}
+
+function tryOrDefault<T>(fn: () => T, def: T): T {
+  try {
+    return fn();
+  }
+  catch {
+    return def;
+  }
 }

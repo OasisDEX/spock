@@ -57,6 +57,7 @@
     "body-parser": "^1.18.3",
     "compression": "^1.7.4",
     "consola": "^2.7.1",
+    "convert-hrtime": "^3.0.0",
     "ejs": "^2.6.1",
     "ethers": "^4.0.25",
     "express": "^4.16.4",
