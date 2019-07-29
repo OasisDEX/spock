@@ -2,7 +2,7 @@ import { getLogger } from './logger';
 import { Dictionary } from 'ts-essentials';
 import { entries } from 'lodash';
 import * as prettyMs from 'pretty-ms';
-import * as hrTimeToMs from "convert-hrtime"
+import * as hrTimeToMs from 'convert-hrtime';
 
 const logger = getLogger('Timer');
 
@@ -42,8 +42,7 @@ export function printTimersSummary(): void {
 function tryOrDefault<T>(fn: () => T, def: T): T {
   try {
     return fn();
-  }
-  catch {
+  } catch {
     return def;
   }
 }
