@@ -27,7 +27,8 @@ spock-etl etl|migrate|validate|api yourconfig.js|ts
 - migrate — launches database migrations (core and defined in config)
 - etl — launches ETL process (long running process)
 - api — run general GraphQL api exposing database schema `api`
-- validate — task to run multiple internal health checks. Compares logs data (`rawLogExtractor` output) against Google BigQueryData. Checks if there are no errored blocks.
+- validate — task to run multiple internal health checks. Compares logs data (`rawLogExtractor`
+  output) against Google BigQueryData. Checks if there are no errored blocks.
 
 ## Ethereum node considerations
 
