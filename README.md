@@ -19,15 +19,15 @@ npm install spock-etl
 Spock exposes CLI interface like:
 
 ```
-spock-etl etl|migrate|sync|api yourconfig.js|ts
+spock-etl etl|migrate|validate|api yourconfig.js|ts
 ```
 
 ### Commands
 
 - migrate — launches database migrations (core and defined in config)
 - etl — launches ETL process (long running process)
-- api — run general GrahpQL api exposing database schema `api`
-- validate-logs - task that compares logs data (`rawLogExtractor` output) with Google BigQueryData.
+- api — run general GraphQL api exposing database schema `api`
+- validate — task to run multiple internal health checks. Compares logs data (`rawLogExtractor` output) against Google BigQueryData. Checks if there are no errored blocks.
 
 ## Ethereum node considerations
 

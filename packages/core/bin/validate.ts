@@ -1,4 +1,4 @@
-import { validate } from '../../validate/validate-logs';
+import { validate } from '../../validate/validate';
 import { loadConfig } from '../utils/configUtils';
 
 /**
