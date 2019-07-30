@@ -79,8 +79,8 @@ async function processBlocks(services: Services, processor: Processor): Promise<
         }
 
         logger.debug(
-          `Marking blocks as processed from ${blocks[0].number} to ${blocks[0].number +
-            blocks.length}`,
+          // prettier-ignore
+          `Marking blocks as processed from ${blocks[0].number} to ${blocks[0].number + blocks.length} with ${processor.name}`,
         );
         await markBlocksProcessed(tx, blocks, processor);
         logger.debug(

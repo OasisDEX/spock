@@ -91,5 +91,5 @@ AND b.number <= ${maxBlock};
 }
 
 export function findObservedAddresses(config: SpockConfig): string[] {
-  return config.extractors.map(e => (e as any).address);
+  return config.extractors.map(e => (e as any).address).filter(a => !!a);
 }
