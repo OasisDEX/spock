@@ -56,10 +56,10 @@ async function processBlocks(services: Services, processor: Processor): Promise<
     }. Process in batch: ${batchProcessing}`,
   );
 
-  for (const blocks of blocksInBatches) {
-    logger.trace(`Extracting blocks: ${blocks.map(b => b.number).join(', ')}`);
+  try {
+    for (const blocks of blocksInBatches) {
+      logger.trace(`Extracting blocks: ${blocks.map(b => b.number).join(', ')}`);
 
-    try {
       await services.db.tx(async tx => {
         const txServices: TransactionalServices = {
           ...services,
@@ -87,24 +87,24 @@ async function processBlocks(services: Services, processor: Processor): Promise<
           `Closing db transaction for ${blocks[0].number} to ${blocks[0].number + blocks.length}`,
         );
       });
-    } catch (e) {
-      logger.error(
+    }
+  } catch (e) {
+    logger.error(
+      // prettier-ignore
+      `ERROR[]: Error occured while processing: ${blocks[0].number} - ${blocks[0].number + blocks.length} with ${processor.name}`,
+      e,
+    );
+    console.error(e);
+    //there is a class of error that we want to retry so we don't mark the blocks as processed
+    if (e instanceof RetryableError || matchMissingForeignKeyError(e)) {
+      logger.debug(
         // prettier-ignore
-        `ERROR[]: Error occured while processing: ${blocks[0].number} - ${blocks[0].number + blocks.length} with ${processor.name}`,
-        e,
+        `Retrying processing for ${blocks[0].number} - ${blocks[0].number + blocks.length} with ${processor.name}`,
       );
-      console.error(e);
-      //there is a class of error that we want to retry so we don't mark the blocks as processed
-      if (e instanceof RetryableError || matchMissingForeignKeyError(e)) {
-        logger.debug(
-          // prettier-ignore
-          `Retrying processing for ${blocks[0].number} - ${blocks[0].number + blocks.length} with ${processor.name}`,
-        );
-      } else {
-        // MARK IT AS ERRORED!!!
-        console.log('CATASTROPHIC ERROR: ', e);
-        global.process.exit(1);
-      }
+    } else {
+      // MARK IT AS ERRORED!!!
+      console.log('CATASTROPHIC ERROR: ', e);
+      global.process.exit(1);
     }
   }
 
