@@ -49,6 +49,7 @@ export const dumpDB = async (db: DB) => {
       extracted_logs: await c.manyOrNone(
         `SELECT block_id, data, log_index, topics FROM extracted.logs ORDER BY block_id, log_index;`,
       ),
+      job: await c.manyOrNone(`SELECT * FROM vulcan2x.job ORDER BY name;`),
     };
   });
 };

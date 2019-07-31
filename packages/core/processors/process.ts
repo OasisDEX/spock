@@ -4,7 +4,7 @@ import { getLogger } from '../utils/logger';
 import { Services, TransactionalServices } from '../types';
 import { get, sortBy, groupBy } from 'lodash';
 import { BlockModel } from '../db/models/Block';
-import { getJob } from '../db/models/Job';
+import { getJob, stopJob } from '../db/models/Job';
 import { matchMissingForeignKeyError, RetryableError } from './extractors/common';
 import { Processor, isExtractor, BlockExtractor } from './types';
 import { getRandomProvider } from '../services';
@@ -102,9 +102,10 @@ async function processBlocks(services: Services, processor: Processor): Promise<
         `Retrying processing for ${blocks[0].number} - ${blocks[0].number + blocks.length} with ${processor.name}`,
       );
     } else {
-      // MARK IT AS ERRORED!!!
-      console.log('CATASTROPHIC ERROR: ', e);
-      global.process.exit(1);
+      logger.warn(`Stopping ${processor.name}. Restart ETL to continue`);
+      await withConnection(services.db, async c => {
+        await stopJob(c, processor.name, JSON.stringify(e));
+      });
     }
   }
 
