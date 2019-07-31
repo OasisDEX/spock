@@ -22,6 +22,12 @@ describe('register', () => {
       getData: async () => ({}),
     };
 
+    const extractor3: BlockExtractor = {
+      name: 'test-extractor-3',
+      extract: async () => {},
+      getData: async () => ({}),
+    };
+
     const services: Services = {
       db: dbCtx.db,
       pg: dbCtx.pg,
@@ -33,7 +39,7 @@ describe('register', () => {
       },
     };
 
-    await registerProcessors(services, [extractor1]);
+    await registerProcessors(services, [extractor1, extractor2]);
 
     expect(pick(await dumpDB(dbCtx.db), 'job')).toMatchInlineSnapshot(`
 Object {
@@ -45,11 +51,18 @@ Object {
       "name": "test-extractor",
       "status": "processing",
     },
+    Object {
+      "extra_info": null,
+      "id": 2,
+      "last_block_id": 0,
+      "name": "test-extractor-2",
+      "status": "processing",
+    },
   ],
 }
 `);
 
-    await registerProcessors(services, [extractor2]);
+    await registerProcessors(services, [extractor2, extractor3]);
 
     expect(pick(await dumpDB(dbCtx.db), 'job')).toMatchInlineSnapshot(`
 Object {
@@ -66,6 +79,13 @@ Object {
       "id": 2,
       "last_block_id": 0,
       "name": "test-extractor-2",
+      "status": "processing",
+    },
+    Object {
+      "extra_info": null,
+      "id": 3,
+      "last_block_id": 0,
+      "name": "test-extractor-3",
       "status": "processing",
     },
   ],
