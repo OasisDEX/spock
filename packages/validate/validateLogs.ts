@@ -11,7 +11,7 @@ import { getLogger } from '../core/utils/logger';
 
 const logger = getLogger('validate');
 
-export async function validate(config: SpockConfig): Promise<void> {
+export async function validateLogs(config: SpockConfig): Promise<void> {
   logger.info(`Running...`);
   if (config.chain.name !== 'mainnet') {
     logger.error('Only mainnet is supported');

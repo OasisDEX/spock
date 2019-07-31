@@ -1,4 +1,4 @@
-import { validate } from '../../validate/validate';
+import { validateLogs } from '../../validate/validateLogs';
 import { loadConfig } from '../utils/configUtils';
 
 /**
@@ -8,7 +8,7 @@ import { loadConfig } from '../utils/configUtils';
 export async function main(): Promise<void> {
   const config = loadConfig();
 
-  await validate(config);
+  await validateLogs(config);
 }
 
 main().catch(e => {
