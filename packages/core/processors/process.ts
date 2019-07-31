@@ -4,7 +4,7 @@ import { getLogger } from '../utils/logger';
 import { Services, TransactionalServices } from '../types';
 import { get, sortBy, groupBy } from 'lodash';
 import { BlockModel } from '../db/models/Block';
-import { getJob } from '../db/models/Job';
+import { getJob, stopJob } from '../db/models/Job';
 import { matchMissingForeignKeyError, RetryableError } from './extractors/common';
 import { Processor, isExtractor, BlockExtractor } from './types';
 import { getRandomProvider } from '../services';
@@ -102,9 +102,10 @@ async function processBlocks(services: Services, processor: Processor): Promise<
         `Retrying processing for ${blocks[0].number} - ${blocks[0].number + blocks.length} with ${processor.name}`,
       );
     } else {
-      // MARK IT AS ERRORED!!!
-      console.log('CATASTROPHIC ERROR: ', e);
-      global.process.exit(1);
+      logger.warn(`Stopping ${processor.name}. Restart ETL to continue`);
+      await withConnection(services.db, async c => {
+        await stopJob(c, processor.name, JSON.stringify(e));
+      });
     }
   }
 
@@ -120,13 +121,15 @@ export async function getNextBlocks(
   return withConnection(db, async c => {
     const batchSize = config.extractorWorker.batch;
 
-    const lastProcessed = await getJob(c, processor.name);
-    if (!lastProcessed) {
+    const job = await getJob(c, processor.name);
+    if (!job) {
       throw new Error(`Missing processor: ${processor.name}`);
     }
+    if (job.status !== 'processing') {
+      logger.info(`Processors excluded from processing. Status is: ${job.status}`);
+      return [];
+    }
 
-    // note that dependencies could be also done in memory but doing this in one concurrent environment
-    // todo: maybe rewrite it
     const nextBlocks =
       (await c.manyOrNone<BlockModel>(
         // prettier-ignore
@@ -137,8 +140,8 @@ export async function getNextBlocks(
           .map((d, i) => `JOIN vulcan2x.job j${i} ON j${i}.name='${d}' AND b.id <= j${i}.last_block_id`)
           .join('\n')}
         WHERE 
-          b.id > ${lastProcessed.last_block_id} AND 
-          b.id <= ${lastProcessed.last_block_id + batchSize};
+          b.id > ${job.last_block_id} AND 
+          b.id <= ${job.last_block_id + batchSize};
       `,
       )) || [];
 

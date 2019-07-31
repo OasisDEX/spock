@@ -28,8 +28,7 @@ export async function etl(config: SpockConfig): Promise<void> {
   printSystemInfo(config);
 
   await withLock(services.db, services.config.processDbLock, async () => {
-    await registerProcessors(services, config.extractors);
-    await registerProcessors(services, config.transformers);
+    await registerProcessors(services, [...config.extractors, ...config.transformers]);
 
     await Promise.all([
       blockGenerator(services, config.startingBlock, config.lastBlock),

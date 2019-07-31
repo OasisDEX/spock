@@ -1,9 +1,9 @@
-import { createDB } from '../db/db';
-import { prepareDB, testConfig, executeSQL } from '../../test/common';
-import { Services } from '../types';
-import { getNextBlocks } from './process';
-import { registerProcessors } from './register';
-import { BlockExtractor } from './types';
+import { createDB } from '../../db/db';
+import { prepareDB, testConfig, executeSQL } from '../../../test/common';
+import { Services } from '../../types';
+import { getNextBlocks } from '../process';
+import { registerProcessors } from '../register';
+import { BlockExtractor } from '../types';
 
 describe('extractors > getNextBlocks', () => {
   it('should work with extractors without dependencies', async () => {
