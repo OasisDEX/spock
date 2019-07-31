@@ -47,7 +47,7 @@ export async function setJobStatus(
 ): Promise<void> {
   const sql = `
     UPDATE vulcan2x.job 
-    SET status='${newStatus}' AND extra_info=NULL
+    SET status='${newStatus}', extra_info=NULL
     WHERE name='${job.name}'
   `;
 
@@ -57,7 +57,7 @@ export async function setJobStatus(
 export async function stopJob(c: Connection, jobName: string, extraInfo: string): Promise<void> {
   const sql = `
     UPDATE vulcan2x.job 
-    SET status='stopped' AND extra_info='${extraInfo}'
+    SET status='stopped', extra_info='${extraInfo}'
     WHERE name='${jobName}'
   `;
 
