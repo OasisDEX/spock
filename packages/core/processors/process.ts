@@ -121,13 +121,15 @@ export async function getNextBlocks(
   return withConnection(db, async c => {
     const batchSize = config.extractorWorker.batch;
 
-    const lastProcessed = await getJob(c, processor.name);
-    if (!lastProcessed) {
+    const job = await getJob(c, processor.name);
+    if (!job) {
       throw new Error(`Missing processor: ${processor.name}`);
     }
+    if (job.status !== 'processing') {
+      logger.info(`Processors excluded from processing. Status is: ${job.status}`);
+      return [];
+    }
 
-    // note that dependencies could be also done in memory but doing this in one concurrent environment
-    // todo: maybe rewrite it
     const nextBlocks =
       (await c.manyOrNone<BlockModel>(
         // prettier-ignore
@@ -138,8 +140,8 @@ export async function getNextBlocks(
           .map((d, i) => `JOIN vulcan2x.job j${i} ON j${i}.name='${d}' AND b.id <= j${i}.last_block_id`)
           .join('\n')}
         WHERE 
-          b.id > ${lastProcessed.last_block_id} AND 
-          b.id <= ${lastProcessed.last_block_id + batchSize};
+          b.id > ${job.last_block_id} AND 
+          b.id <= ${job.last_block_id + batchSize};
       `,
       )) || [];
 
