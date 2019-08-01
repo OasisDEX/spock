@@ -8,6 +8,7 @@ import { getJob, stopJob } from '../db/models/Job';
 import { matchMissingForeignKeyError, RetryableError } from './extractors/common';
 import { Processor, isExtractor, BlockExtractor } from './types';
 import { getRandomProvider } from '../services';
+import * as serializeError from 'serialize-error';
 
 const logger = getLogger('extractor/index');
 
@@ -30,7 +31,7 @@ export async function process(services: Services, processors: Processor[]): Prom
   logger.warn('Processing done');
 }
 
-async function processBlocks(services: Services, processor: Processor): Promise<number> {
+export async function processBlocks(services: Services, processor: Processor): Promise<number> {
   const blocks = await getNextBlocks(services, processor);
   if (blocks.length === 0) {
     return 0;
@@ -104,7 +105,7 @@ async function processBlocks(services: Services, processor: Processor): Promise<
     } else {
       logger.warn(`Stopping ${processor.name}. Restart ETL to continue`);
       await withConnection(services.db, async c => {
-        await stopJob(c, processor.name, JSON.stringify(e));
+        await stopJob(c, processor.name, JSON.stringify(serializeError(e)));
       });
     }
   }

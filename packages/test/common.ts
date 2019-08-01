@@ -18,6 +18,7 @@ export const testConfig: SpockConfig = {
   },
   extractorWorker: {
     batch: 2,
+    reorgBuffer: 10,
   },
   startingBlock: 0,
 } as any;

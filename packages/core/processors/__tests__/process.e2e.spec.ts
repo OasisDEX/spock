@@ -1,11 +1,12 @@
 import { createDB } from '../../db/db';
-import { prepareDB, testConfig, executeSQL } from '../../../test/common';
+import { prepareDB, testConfig, executeSQL, dumpDB } from '../../../test/common';
 import { Services } from '../../types';
-import { getNextBlocks } from '../process';
+import { getNextBlocks, processBlocks } from '../process';
 import { registerProcessors } from '../register';
 import { BlockExtractor } from '../types';
+import { pick } from 'lodash';
 
-describe('extractors > getNextBlocks', () => {
+describe('process > getNextBlocks', () => {
   it('should work with extractors without dependencies', async () => {
     const dbCtx = createDB(testConfig.db);
     await prepareDB(dbCtx.db, testConfig);
@@ -114,6 +115,75 @@ Array [
     "timestamp": 2019-07-02T11:18:01.000Z,
   },
 ]
+`);
+  });
+});
+
+describe('process', () => {
+  it('should work when extractors throws errors', async () => {
+    const dbCtx = createDB(testConfig.db);
+    await prepareDB(dbCtx.db, testConfig);
+
+    await executeSQL(
+      dbCtx.db,
+      `
+      -- blocks
+      INSERT INTO vulcan2x.block(number, hash, timestamp) VALUES(1, '0x01', '2019-07-02 11:18:01+00');
+      INSERT INTO vulcan2x.block(number, hash, timestamp) VALUES(2, '0x02', '2019-07-02 11:18:02+00');
+      INSERT INTO vulcan2x.block(number, hash, timestamp) VALUES(3, '0x03', '2019-07-02 11:18:03+00');
+    `,
+    );
+
+    const blockExtractor: BlockExtractor = {
+      name: 'test-extractor',
+      extract: async (_s, [b]) => {
+        if (b.number === 2) {
+          throw new Error('Error in the middle of processing!');
+        }
+      },
+      getData: async () => ({}),
+    };
+
+    const dummyProvider = {} as any;
+
+    const services: Services = {
+      db: dbCtx.db,
+      pg: dbCtx.pg,
+      config: {
+        ...testConfig,
+        extractorWorker: {
+          batch: 4,
+          reorgBuffer: 10,
+        },
+      },
+      columnSets: undefined as any,
+      provider: dummyProvider,
+      networkState: {
+        latestEthereumBlockOnStart: 0,
+      },
+    };
+
+    await registerProcessors(services, [blockExtractor]);
+    await processBlocks(services, blockExtractor);
+
+    const db = pick(await dumpDB(services.db), 'job');
+    db.job = db.job.map(e => ({
+      ...e,
+      extra_info: JSON.stringify(pick(JSON.parse(e.extra_info), 'message')),
+    }));
+
+    expect(db).toMatchInlineSnapshot(`
+Object {
+  "job": Array [
+    Object {
+      "extra_info": "{\\"message\\":\\"Error in the middle of processing!\\"}",
+      "id": 1,
+      "last_block_id": 1,
+      "name": "test-extractor",
+      "status": "stopped",
+    },
+  ],
+}
 `);
   });
 });
