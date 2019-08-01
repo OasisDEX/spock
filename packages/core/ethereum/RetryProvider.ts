@@ -71,6 +71,10 @@ export class RetryProvider extends JsonRpcProvider {
     if (error.code === 429) {
       return new RetryableError(error.message);
     }
+    // ERROR: reorg happened during processing and now when asking for logs alchemy gives weird error msg
+    if (error.code === -32602) {
+      return new RetryableError(error.message);
+    }
 
     return error;
   }
