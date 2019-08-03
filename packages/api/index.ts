@@ -6,6 +6,7 @@ import { join } from 'path';
 import { getApiConfig, ApiConfig } from './config';
 import { getLogger } from '../core/utils/logger';
 import { whitelisting } from './whitelisting';
+const apicache = require('apicache');
 
 const ejs = require('ejs');
 const { postgraphile } = require('postgraphile');
@@ -17,6 +18,13 @@ export function startAPI(config: ApiConfig): void {
   app.use(compression());
   app.use(bodyParser.json());
   app.use(helmet());
+
+  //setup cache
+  let cache = apicache.middleware;
+  let cacheLength = '15 seconds';
+  if (process.env.CACHE_LENGTH) cacheLength = process.env.CACHE_LENGTH;
+  app.use(cache(cacheLength));
+  console.log('using cache with length: ', cacheLength);
 
   // Rendering options for the index page
   app.engine('html', ejs.renderFile);

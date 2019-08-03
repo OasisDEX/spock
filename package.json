@@ -53,6 +53,7 @@
     "@types/helmet": "^0.0.43",
     "@types/node-cleanup": "^2.1.0",
     "abi-decoder": "^1.2.0",
+    "apicache": "^1.4.0",
     "bignumber.js": "^8.0.2",
     "body-parser": "^1.18.3",
     "compression": "^1.7.4",
