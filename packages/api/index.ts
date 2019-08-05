@@ -23,7 +23,7 @@ export function startAPI(config: ApiConfig): void {
   if (config.api.responseCaching.enabled) {
     setupCaching(app, config);
   } else {
-    logger.info("Running without cache")
+    logger.info('Running without cache');
   }
 
   // Rendering options for the index page

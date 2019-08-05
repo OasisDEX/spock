@@ -5,7 +5,7 @@ import { ApiConfig } from './config';
 
 const logger = getLogger('API/caching');
 
-export function setupCaching(app: Application, config: ApiConfig) {
+export function setupCaching(app: Application, config: ApiConfig): void {
   const options: CacheOptions = {
     appendKey: (req: any) => JSON.stringify(req.body),
     debug: true,
