@@ -25,6 +25,10 @@ export function startAPI(config: ApiConfig): void {
   if (process.env.CACHE_LENGTH) cacheLength = process.env.CACHE_LENGTH;
   app.use(cache(cacheLength));
   console.log('using cache with length: ', cacheLength);
+  apicache.options({
+    appendKey: (req: any) => JSON.stringify(req.body),
+    debug: true
+  });
 
   // Rendering options for the index page
   app.engine('html', ejs.renderFile);
