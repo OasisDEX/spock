@@ -11,7 +11,7 @@ export function setupCaching(app: Application, config: ApiConfig): void {
     debug: true,
   };
 
-  const middleware = cacheMiddleware(config.api.responseCaching.duration, true, options);
+  const middleware = cacheMiddleware(config.api.responseCaching.duration, undefined, options);
 
   app.use(middleware);
 
