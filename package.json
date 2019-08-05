@@ -24,6 +24,7 @@
     "test:fix": "yarn lint:fix && yarn test:unit"
   },
   "devDependencies": {
+    "@types/apicache": "^1.2.0",
     "@types/bignumber.js": "^5.0.0",
     "@types/body-parser": "^1.17.0",
     "@types/chai": "^4.1.7",
