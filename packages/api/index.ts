@@ -6,10 +6,12 @@ import { join } from 'path';
 import { getApiConfig, ApiConfig } from './config';
 import { getLogger } from '../core/utils/logger';
 import { whitelisting } from './whitelisting';
+import { setupCaching } from './caching';
 
 const ejs = require('ejs');
 const { postgraphile } = require('postgraphile');
 const FilterPlugin = require('postgraphile-plugin-connection-filter');
+
 const logger = getLogger('API');
 
 export function startAPI(config: ApiConfig): void {
@@ -17,6 +19,12 @@ export function startAPI(config: ApiConfig): void {
   app.use(compression());
   app.use(bodyParser.json());
   app.use(helmet());
+
+  if (config.api.responseCaching.enabled) {
+    setupCaching(app, config);
+  } else {
+    logger.info('Running without cache');
+  }
 
   // Rendering options for the index page
   app.engine('html', ejs.renderFile);

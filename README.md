@@ -30,6 +30,20 @@ spock-etl etl|migrate|validate|api yourconfig.js|ts
 - validate-logs — task to check logs against Google BigQueryData
 - validate-jobs - checks if there are no errored jobs (transformers or extractors)
 
+## Response caching
+
+We can automatically cache slow graphql queries. To enable it add: `VL_GRAPHQL_CACHING_ENABLED=true`
+env variable or in your config:
+
+```
+  api: {
+    responseCaching: {
+      enabled: true,
+      duration: "15 seconds" // default
+    };
+  };
+```
+
 ## Ethereum node considerations
 
 spock pulls all the data from ethereum node. Nodes can differ greatly between each other, and some
