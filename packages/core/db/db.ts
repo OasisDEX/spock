@@ -57,14 +57,8 @@ export function makeNullUndefined<T>(value: T | null): T | undefined {
 // tslint:disable-next-line
 export function getColumnSets(pg: pg.IMain) {
   return {
-    extracted_block: new pg.helpers.ColumnSet(['?id', 'status'], {
-      table: new pg.helpers.TableName('extracted_block', 'vulcan2x'),
-    }),
     block: new pg.helpers.ColumnSet(['number', 'hash', 'timestamp'], {
       table: new pg.helpers.TableName('block', 'vulcan2x'),
-    }),
-    transformed_block: new pg.helpers.ColumnSet(['?id', 'status'], {
-      table: new pg.helpers.TableName('transformed_block', 'vulcan2x'),
     }),
     extracted_logs: new pg.helpers.ColumnSet(
       ['block_id', 'tx_id', 'log_index', 'address', 'data', 'topics'],

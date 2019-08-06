@@ -7,14 +7,6 @@ export interface ExtractedBlock {
 
 export type TaskType = 'extract' | 'transform';
 
-export function getTableNameForTask(task: TaskType): string {
-  if (task === 'extract') {
-    return 'vulcan2x.extracted_block';
-  } else {
-    return 'vulcan2x.transformed_block';
-  }
-}
-
 export function getNameFieldForTask(task: TaskType): string {
   if (task === 'extract') {
     return 'extractor_name';
