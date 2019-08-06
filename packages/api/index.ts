@@ -8,6 +8,7 @@ import { getLogger } from '../core/utils/logger';
 import { whitelisting } from './middlewares/whitelisting';
 import { caching } from './middlewares/caching';
 import { graphqlLogging } from './middlewares/graphqlLogging';
+import { getVersion } from '../core/utils/getVersion';
 
 const ejs = require('ejs');
 const { postgraphile } = require('postgraphile');
@@ -15,7 +16,14 @@ const FilterPlugin = require('postgraphile-plugin-connection-filter');
 
 const logger = getLogger('API');
 
+function printSystemInfo(config: ApiConfig): void {
+  logger.info(`Starting Spock ETL ver.${getVersion()}`);
+  logger.info(`Config: ${JSON.stringify(config.api)}`);
+}
+
 export function startAPI(config: ApiConfig): void {
+  printSystemInfo(config);
+
   const app = express();
   app.use(compression());
   app.use(bodyParser.json());

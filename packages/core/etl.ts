@@ -7,6 +7,7 @@ import { blockGenerator } from './blockGenerator';
 import { process } from './processors/process';
 import { registerProcessors } from './processors/register';
 import { statsWorker } from './stats/stats';
+import { getVersion } from './utils/getVersion';
 
 ethers.errors.setLogLevel('error');
 const logger = getLogger('runner');
@@ -16,10 +17,6 @@ function printSystemInfo(config: SpockConfig): void {
   logger.info(`Ethereum node: ${config.chain.host}`);
   logger.info('Extractor worker config:', config.extractorWorker);
   logger.info('Transformer worker config:', config.transformerWorker);
-}
-
-function getVersion(): string {
-  return (require('../../package.json') || {}).version;
 }
 
 export async function etl(config: SpockConfig): Promise<void> {
