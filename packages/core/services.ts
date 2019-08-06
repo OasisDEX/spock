@@ -3,10 +3,15 @@ import { createDB } from './db/db';
 import { SpockConfig } from './config';
 import { Services, TransactionalServices } from './types';
 import { getNetworkState } from './ethereum/getNetworkState';
+import { sample } from 'lodash';
+import { getLogger } from './utils/logger';
+
+const logger = getLogger('services');
 
 export async function createServices(config: SpockConfig): Promise<Services> {
-  const provider = new RetryProvider(config.chain.host, config.chain.retries);
   const db = createDB(config.db);
+  createProviders(config);
+  const provider = getRandomProvider();
   const networkState = await getNetworkState(provider);
 
   return {
@@ -29,4 +34,19 @@ export async function withTx<T>(
 
     return await op(txServices);
   });
+}
+
+let allProviders: RetryProvider[] = [];
+export function createProviders(config: SpockConfig): void {
+  const mainProvider = new RetryProvider(config.chain.host, config.chain.retries);
+  const alternativeProviders = (config.chain.alternativeHosts || []).map(
+    h => new RetryProvider(h, config.chain.retries),
+  );
+
+  allProviders = [mainProvider, ...alternativeProviders];
+  logger.info(`Ethereum providers #${allProviders.length}`);
+}
+
+export function getRandomProvider(): RetryProvider {
+  return sample(allProviders)!;
 }

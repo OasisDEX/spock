@@ -3,10 +3,10 @@ import { createDB } from '../db/db';
 import { ethers } from 'ethers';
 import { Block } from 'ethers/providers';
 import { testConfig, prepareDB, dumpDB } from '../../test/common';
-import { extract, queueNewBlocksToExtract, BlockExtractor } from '../extractors/extractor';
-import { makeRawLogExtractors } from '../extractors/instances/rawEventDataExtractor';
 import { Services } from '../types';
 import { pick } from 'lodash';
+import { createProviders, getRandomProvider } from '../services';
+import { delay } from '../utils';
 
 describe('Whole solution', () => {
   it('should work with reorgs', async () => {
@@ -59,7 +59,15 @@ describe('Whole solution', () => {
     ];
     let blockPointer = 0;
 
-    const provider = new ethers.providers.JsonRpcProvider('http://localhost/not-existing');
+    createProviders({
+      chain: {
+        host: 'http://localhost/not-existing',
+        name: 'mainnet',
+        retries: 0,
+      },
+    } as any);
+    const provider = getRandomProvider();
+
     provider.getBlock = async (blockNumber: number): Promise<Block> => {
       const block = blocks[blockPointer++];
       if (block && block.number !== blockNumber) {
@@ -70,19 +78,19 @@ describe('Whole solution', () => {
 
     const services: Services = {
       config: testConfig,
-      provider: provider as any,
+      provider: provider,
       ...dbCtx,
       networkState: {
         latestEthereumBlockOnStart: 1,
       },
     };
 
-    const extractors = [...makeRawLogExtractors(['0x0'])];
+    runBlockGenerator(services).catch(() => {
+      process.exit(1);
+    });
+    await delay(4000);
 
-    await Promise.all([runBlockGenerator(services, extractors), runWorkers(services, extractors)]);
-
-    expect(pick(await dumpDB(dbCtx.db), 'blocks', 'extracted_blocks', 'transaction'))
-      .toMatchInlineSnapshot(`
+    expect(pick(await dumpDB(dbCtx.db), 'blocks')).toMatchInlineSnapshot(`
 Object {
   "blocks": Array [
     Object {
@@ -110,35 +118,12 @@ Object {
       "timestamp": 1970-01-01T00:00:03.000Z,
     },
   ],
-  "extracted_blocks": Array [
-    Object {
-      "block_id": 1,
-      "extractor_name": "raw_log_0x0_extractor",
-      "status": "error",
-    },
-    Object {
-      "block_id": 3,
-      "extractor_name": "raw_log_0x0_extractor",
-      "status": "error",
-    },
-    Object {
-      "block_id": 4,
-      "extractor_name": "raw_log_0x0_extractor",
-      "status": "error",
-    },
-    Object {
-      "block_id": 5,
-      "extractor_name": "raw_log_0x0_extractor",
-      "status": "error",
-    },
-  ],
-  "transaction": Array [],
 }
 `);
   });
 });
 
-async function runBlockGenerator(service: Services, extractors: BlockExtractor[]): Promise<void> {
+async function runBlockGenerator(service: Services): Promise<void> {
   await new Promise<void>(async (resolve, reject) => {
     try {
       const provider = {
@@ -156,20 +141,9 @@ async function runBlockGenerator(service: Services, extractors: BlockExtractor[]
         provider: provider as any,
       };
 
-      await blockGenerator(services, 0, (tx, blocks) => {
-        return Promise.all([queueNewBlocksToExtract(tx, extractors, blocks)]);
-      });
+      await blockGenerator(services, 0);
     } catch (e) {
       reject(e);
     }
   });
-}
-
-async function runWorkers(service: Services, extractors: BlockExtractor[]): Promise<void> {
-  // @todo figure out a better way to realize that all blocks were processed. Maybe inspect processed blocks?
-  await Promise.race([extract(service, extractors), delay(4000)]);
-}
-
-function delay(n: number): Promise<void> {
-  return new Promise(resolve => setInterval(resolve, n));
 }

@@ -1,12 +1,12 @@
 import { DB, ColumnSets, DbTransactedConnection } from './db/db';
-import { JsonRpcProvider } from 'ethers/providers';
+import { Provider } from 'ethers/providers';
 import { StrictOmit } from 'ts-essentials';
 import pgPromise = require('pg-promise');
 import { SpockConfig } from './config';
 import { NetworkState } from './ethereum/getNetworkState';
 
 export interface Services {
-  provider: JsonRpcProvider;
+  provider: Provider;
   db: DB;
   pg: pgPromise.IMain;
   config: SpockConfig;
@@ -20,5 +20,3 @@ export interface TransactionalServices extends StrictOmit<Services, 'db'> {
 
 // No external data sources like blockchain
 export type LocalServices = Omit<TransactionalServices, 'provider'>;
-
-export type JobType = 'extract' | 'transform';

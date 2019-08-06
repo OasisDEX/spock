@@ -5,11 +5,14 @@ import * as helmet from 'helmet';
 import { join } from 'path';
 import { getApiConfig, ApiConfig } from './config';
 import { getLogger } from '../core/utils/logger';
-import { whitelisting } from './whitelisting';
+import { whitelisting } from './middlewares/whitelisting';
+import { setupCaching } from './caching';
+import { graphqlLogging } from './middlewares/graphqlLogging';
 
 const ejs = require('ejs');
 const { postgraphile } = require('postgraphile');
 const FilterPlugin = require('postgraphile-plugin-connection-filter');
+
 const logger = getLogger('API');
 
 export function startAPI(config: ApiConfig): void {
@@ -17,6 +20,12 @@ export function startAPI(config: ApiConfig): void {
   app.use(compression());
   app.use(bodyParser.json());
   app.use(helmet());
+
+  if (config.api.responseCaching.enabled) {
+    setupCaching(app, config);
+  } else {
+    logger.info('Running without cache');
+  }
 
   // Rendering options for the index page
   app.engine('html', ejs.renderFile);
@@ -49,6 +58,9 @@ export function startAPI(config: ApiConfig): void {
   } else {
     logger.info('Whitelisting disabled.');
   }
+
+  logger.info('Enabling graphQL request logging');
+  app.use(graphqlConfig.graphqlRoute, graphqlLogging);
 
   app.use(postgraphile(config.db, schemas, graphqlConfig));
 

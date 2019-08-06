@@ -18,6 +18,7 @@ export const testConfig: SpockConfig = {
   },
   extractorWorker: {
     batch: 2,
+    reorgBuffer: 10,
   },
   startingBlock: 0,
 } as any;
@@ -39,16 +40,11 @@ export const dumpDB = async (db: DB) => {
   return await withConnection(db, async c => {
     return {
       blocks: await c.manyOrNone(`SELECT * FROM vulcan2x.block`),
-      extracted_blocks: await c.manyOrNone(
-        `SELECT block_id, extractor_name, status FROM vulcan2x.extracted_block ORDER BY block_id`,
-      ),
-      done_job: await c.manyOrNone(
-        `SELECT start_block_id, end_block_id, name FROM vulcan2x.done_job ORDER BY name, start_block_id`,
-      ),
       transaction: await c.manyOrNone(`SELECT * FROM vulcan2x.transaction`),
       extracted_logs: await c.manyOrNone(
         `SELECT block_id, data, log_index, topics FROM extracted.logs ORDER BY block_id, log_index;`,
       ),
+      job: await c.manyOrNone(`SELECT * FROM vulcan2x.job ORDER BY name;`),
     };
   });
 };

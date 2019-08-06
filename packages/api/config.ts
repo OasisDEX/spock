@@ -12,6 +12,10 @@ export interface ApiConfig {
       whitelistedQueriesDir: string;
       bypassSecret: string;
     };
+    responseCaching: {
+      enabled: boolean;
+      duration: string;
+    };
     port: number;
   };
   db: {
@@ -40,6 +44,11 @@ export function getApiConfig(env: Env, configPath: string): ApiConfig {
       whitelisting: {
         enabled: !!process.env.VL_GRAPHQL_WHITELISTING_ENABLED,
         ...externalConfig.api.whitelisting,
+      },
+      responseCaching: {
+        enabled: !!process.env.VL_GRAPHQL_CACHING_ENABLED,
+        duration: process.env.VL_GRAPHQL_CACHING_DURATION || '15 seconds',
+        ...externalConfig.api.responseCaching,
       },
     },
   };

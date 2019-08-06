@@ -19,16 +19,30 @@ npm install spock-etl
 Spock exposes CLI interface like:
 
 ```
-spock-etl etl|migrate|sync|api yourconfig.js|ts
+spock-etl etl|migrate|validate|api yourconfig.js|ts
 ```
 
 ### Commands
 
 - migrate — launches database migrations (core and defined in config)
-- sync — synchronizes work after config changes — It is highly recommended to always run sync before
-  etl
-- etl - launches ETL process (long running process)
-- api — run general GrahpQL api exposing database schema `api`
+- etl — launches ETL process (long running process)
+- api — run general GraphQL api exposing database schema `api`
+- validate-logs — task to check logs against Google BigQueryData
+- validate-jobs - checks if there are no errored jobs (transformers or extractors)
+
+## Response caching
+
+We can automatically cache slow graphql queries. To enable it add: `VL_GRAPHQL_CACHING_ENABLED=true`
+env variable or in your config:
+
+```
+  api: {
+    responseCaching: {
+      enabled: true,
+      duration: "15 seconds" // default
+    };
+  };
+```
 
 ## Ethereum node considerations
 

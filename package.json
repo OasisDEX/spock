@@ -1,6 +1,6 @@
 {
   "name": "spock-etl",
-  "version": "0.0.16",
+  "version": "0.0.29",
   "license": "AGPL-3.0-or-later",
   "bin": "lib/core/runner.js",
   "files": [
@@ -24,6 +24,7 @@
     "test:fix": "yarn lint:fix && yarn test:unit"
   },
   "devDependencies": {
+    "@types/apicache": "^1.2.0",
     "@types/bignumber.js": "^5.0.0",
     "@types/body-parser": "^1.17.0",
     "@types/chai": "^4.1.7",
@@ -31,7 +32,9 @@
     "@types/express": "^4.16.1",
     "@types/jest": "^24.0.11",
     "@types/lodash": "^4.14.123",
-    "@types/node": "^10.12.18",
+    "@types/node": "10.14.2",
+    "@types/pretty-hrtime": "^1.0.0",
+    "@types/pretty-ms": "^5.0.1",
     "@types/promise-retry": "^1.1.1",
     "chai": "^4.2.0",
     "dotenv-flow": "^0.3.0",
@@ -51,10 +54,12 @@
     "@types/helmet": "^0.0.43",
     "@types/node-cleanup": "^2.1.0",
     "abi-decoder": "^1.2.0",
+    "apicache": "^1.4.0",
     "bignumber.js": "^8.0.2",
     "body-parser": "^1.18.3",
     "compression": "^1.7.4",
     "consola": "^2.7.1",
+    "convert-hrtime": "^3.0.0",
     "ejs": "^2.6.1",
     "ethers": "^4.0.25",
     "express": "^4.16.4",
@@ -65,6 +70,9 @@
     "postgraphile": "^4.3.3",
     "postgraphile-plugin-connection-filter": "^1.0.0-rc.2",
     "postgres-migrations-oasis": "^3.0.2",
-    "promise-retry": "^1.1.1"
+    "pretty-ms": "^5.0.0",
+    "promise-retry": "^1.1.1",
+    "serialize-error": "^4.1.0",
+    "sql-template-strings": "^2.2.2"
   }
 }

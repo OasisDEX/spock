@@ -1,7 +1,6 @@
-import { BlockExtractor } from './extractors/extractor';
-import { BlockTransformer } from './transformers/transformers';
 import { Dictionary, MarkRequired } from 'ts-essentials';
 import { Env, getRequiredString, getRequiredNumber } from './utils/configUtils';
+import { BlockExtractor, BlockTransformer } from './processors/types';
 
 export interface SpockConfig {
   startingBlock: number;
@@ -17,6 +16,7 @@ export interface SpockConfig {
   };
   extractorWorker: {
     batch: number;
+    reorgBuffer: number;
   };
   transformerWorker: {
     batch: number;
@@ -32,6 +32,7 @@ export interface SpockConfig {
     host: string;
     name: string;
     retries: number;
+    alternativeHosts?: string[];
   };
   db: {
     database: string;
@@ -54,14 +55,11 @@ export const getDefaultConfig = (env: Env) => {
       batch: 40,
     },
     extractorWorker: {
-      batch: 500,
+      batch: 400,
+      reorgBuffer: 500, // when to switch off batch processing
     },
     transformerWorker: {
       batch: 1000,
-    },
-    archiverWorker: {
-      batch: 50000,
-      delay: 5, // in minutes
     },
     statsWorker: {
       interval: 10, // get stats every 10 minutes

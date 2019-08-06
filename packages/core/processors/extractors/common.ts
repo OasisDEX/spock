@@ -1,28 +1,25 @@
 export const DEFAULT_ADDRESS = '0x0000000000000000000000000000000000000000';
 
 import { Transaction } from 'ethers/utils';
-import { makeNullUndefined } from '../db/db';
-import { TransactionalServices, LocalServices } from '../types';
-import { PersistedBlock } from '../db/models/Block';
+import { TransactionalServices, LocalServices } from '../../types';
+import { BlockModel } from '../../db/models/Block';
+import { makeNullUndefined } from '../../db/db';
 
 export async function getOrCreateTx(
   services: TransactionalServices,
-  transaction: Transaction,
-  block: PersistedBlock,
+  transactionHash: string,
+  block: BlockModel,
 ): Promise<PersistedTransaction> {
+  const transaction = await services.provider.getTransaction(transactionHash);
+
   // this means that reorg is happening or ethereum node is not consistent
   if (!transaction) {
     throw new RetryableError(`Tx is not defined!`);
   }
-  const storedTx = await getTx(services, transaction.hash!);
 
-  if (storedTx) {
-    return storedTx;
-  } else {
-    const storedTx = await addTx(services, transaction, block);
+  const storedTx = await addTx(services, transaction, block);
 
-    return storedTx;
-  }
+  return storedTx;
 }
 
 export async function getTx(
@@ -64,7 +61,7 @@ export async function getTxByIdOrDie(
 export async function addTx(
   services: LocalServices,
   transaction: Transaction,
-  block: PersistedBlock,
+  block: BlockModel,
 ): Promise<PersistedTransaction> {
   const { tx } = services;
 
@@ -115,6 +112,10 @@ export function matchMissingForeignKeyError(e: any): boolean {
 
 export function matchUniqueKeyError(e: any): boolean {
   return e.code === '23505';
+}
+
+export function matchDeadlockDetectedError(e: any): boolean {
+  return e.code === '40P01';
 }
 
 export const silenceError = (...matchers: Array<(e: any) => boolean>) => (e: any) => {

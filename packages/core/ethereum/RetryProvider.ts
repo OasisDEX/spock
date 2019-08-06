@@ -3,6 +3,7 @@ import { Networkish } from 'ethers/utils';
 import { ConnectionInfo, poll } from 'ethers/utils/web';
 import { delay } from '../utils';
 import { getLogger } from '../utils/logger';
+import { RetryableError } from '../processors/extractors/common';
 
 const logger = getLogger('ethereum/RetryProvider');
 
@@ -43,7 +44,7 @@ export class RetryProvider extends JsonRpcProvider {
   private async handleError(attempt: number, error: any): Promise<void> {
     if (attempt >= this.maxAttempts) {
       logger.debug('Got error, failing...', JSON.stringify(error));
-      throw error;
+      throw this.transformError(error);
     } else if (error && error.statusCode) {
       // if we are hitting the api limit retry faster
       logger.debug('Retrying 429...');
@@ -53,6 +54,29 @@ export class RetryProvider extends JsonRpcProvider {
       logger.debug('Retrying...');
       await delay(1000);
     }
+  }
+
+  /**
+   * Wraps not critical errors in RetryableError
+   */
+  private transformError(error: any): any {
+    if (!error) {
+      return error;
+    }
+    // ERROR: One of the blocks specified in filter (fromBlock, toBlock or blockHash) cannot be found
+    if (error.code === -32000) {
+      return new RetryableError(error.message);
+    }
+    // ERROR: rate limiting
+    if (error.code === 429) {
+      return new RetryableError(error.message);
+    }
+    // ERROR: reorg happened during processing and now when asking for logs alchemy gives weird error msg
+    if (error.code === -32602) {
+      return new RetryableError(error.message);
+    }
+
+    return error;
   }
 }
 

@@ -3,10 +3,9 @@ import { getLogger } from './utils/logger';
 import { withLock } from './db/locks';
 import { SpockConfig } from './config';
 import { createServices } from './services';
-import { archiver } from './archiver/archiver';
 import { blockGenerator } from './blockGenerator';
-import { queueNewBlocksToExtract, extract } from './extractors/extractor';
-import { queueNewBlocksToTransform, transform } from './transformers/transformers';
+import { process } from './processors/process';
+import { registerProcessors } from './processors/register';
 import { statsWorker } from './stats/stats';
 
 ethers.errors.setLogLevel('error');
@@ -29,21 +28,12 @@ export async function etl(config: SpockConfig): Promise<void> {
   printSystemInfo(config);
 
   await withLock(services.db, services.config.processDbLock, async () => {
+    await registerProcessors(services, [...config.extractors, ...config.transformers]);
+
     await Promise.all([
-      archiver(services),
-      blockGenerator(
-        services,
-        config.startingBlock,
-        (tx, blocks) => {
-          return Promise.all([
-            queueNewBlocksToExtract(tx, config.extractors, blocks),
-            queueNewBlocksToTransform(tx, config.transformers, blocks),
-          ]);
-        },
-        config.lastBlock,
-      ),
-      extract(services, config.extractors),
-      transform(services, config.transformers, config.extractors),
+      blockGenerator(services, config.startingBlock, config.lastBlock),
+      process(services, config.extractors),
+      process(services, config.transformers),
       statsWorker(services),
     ]);
   });
