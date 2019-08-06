@@ -15,6 +15,7 @@ export interface ApiConfig {
     responseCaching: {
       enabled: boolean;
       duration: string;
+      transformKey: (key: string) => string;
     };
     port: number;
   };
@@ -48,6 +49,7 @@ export function getApiConfig(env: Env, configPath: string): ApiConfig {
       responseCaching: {
         enabled: !!process.env.VL_GRAPHQL_CACHING_ENABLED,
         duration: process.env.VL_GRAPHQL_CACHING_DURATION || '15 seconds',
+        transformKey: k => k,
         ...externalConfig.api.responseCaching,
       },
     },

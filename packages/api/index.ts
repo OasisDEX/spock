@@ -6,7 +6,7 @@ import { join } from 'path';
 import { getApiConfig, ApiConfig } from './config';
 import { getLogger } from '../core/utils/logger';
 import { whitelisting } from './middlewares/whitelisting';
-import { setupCaching } from './caching';
+import { caching } from './middlewares/caching';
 import { graphqlLogging } from './middlewares/graphqlLogging';
 
 const ejs = require('ejs');
@@ -20,12 +20,6 @@ export function startAPI(config: ApiConfig): void {
   app.use(compression());
   app.use(bodyParser.json());
   app.use(helmet());
-
-  if (config.api.responseCaching.enabled) {
-    setupCaching(app, config);
-  } else {
-    logger.info('Running without cache');
-  }
 
   // Rendering options for the index page
   app.engine('html', ejs.renderFile);
@@ -61,6 +55,12 @@ export function startAPI(config: ApiConfig): void {
 
   logger.info('Enabling graphQL request logging');
   app.use(graphqlConfig.graphqlRoute, graphqlLogging);
+
+  if (config.api.responseCaching.enabled) {
+    app.use(caching(config));
+  } else {
+    logger.info('Running without cache');
+  }
 
   app.use(postgraphile(config.db, schemas, graphqlConfig));
 
