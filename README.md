@@ -44,6 +44,32 @@ env variable or in your config:
   };
 ```
 
+## Query whitelisting
+
+Probably you don't want users to issue any query on GraphQL API. That's why we support query
+whitelisting.
+
+Enable it by:
+
+```javascript
+{
+  // ...
+  api: {
+    whitelisting: {
+      enabled: true,
+      whitelistedQueriesDir: "./queries",
+      bypassSecret: "SECRET VALUE 123",
+    },
+  }
+}
+```
+
+We rely on special `operationName` (part of request's body) parameter to match requested query with
+a query that is defined in `whitelistedQueriesDir`.
+
+You can bypass whole mechanism (for example to test new queries) by providing `bypassSecret` as
+`devMode` in request's body.
+
 ## Ethereum node considerations
 
 spock pulls all the data from ethereum node. Nodes can differ greatly between each other, and some

@@ -6,16 +6,6 @@ import { Request, NextFunction, Response, response, RequestHandler } from 'expre
 
 const logger = getLogger('whitelisting');
 
-function readEntities(dirPath: string, ext: string): Dictionary<string> {
-  return fromPairs(
-    fs
-      .readdirSync(dirPath)
-      .filter(file => file.endsWith(ext))
-      .map(file => file.substr(0, file.length - ext.length))
-      .map(file => [file, fs.readFileSync(`${dirPath}/${file}${ext}`, 'utf-8')]),
-  );
-}
-
 export function whitelisting(absPathToQueryDefs: string, bypassSecret: string): RequestHandler {
   const allowedQueries = readEntities(absPathToQueryDefs, '.graphql');
   logger.info(
@@ -54,4 +44,14 @@ export function whitelisting(absPathToQueryDefs: string, bypassSecret: string): 
 
     next();
   };
+}
+
+function readEntities(dirPath: string, ext: string): Dictionary<string> {
+  return fromPairs(
+    fs
+      .readdirSync(dirPath)
+      .filter(file => file.endsWith(ext))
+      .map(file => file.substr(0, file.length - ext.length))
+      .map(file => [file, fs.readFileSync(`${dirPath}/${file}${ext}`, 'utf-8')]),
+  );
 }
