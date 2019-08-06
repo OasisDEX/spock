@@ -5,7 +5,11 @@ import { Services, TransactionalServices } from '../types';
 import { get, sortBy, groupBy } from 'lodash';
 import { BlockModel } from '../db/models/Block';
 import { getJob, stopJob } from '../db/models/Job';
-import { matchMissingForeignKeyError, RetryableError } from './extractors/common';
+import {
+  matchMissingForeignKeyError,
+  RetryableError,
+  matchDeadlockDetectedError,
+} from './extractors/common';
 import { Processor, isExtractor, BlockExtractor } from './types';
 import { getRandomProvider } from '../services';
 import * as serializeError from 'serialize-error';
@@ -97,7 +101,11 @@ export async function processBlocks(services: Services, processor: Processor): P
     );
     console.error(e);
     //there is a class of error that we want to retry so we don't mark the blocks as processed
-    if (e instanceof RetryableError || matchMissingForeignKeyError(e)) {
+    if (
+      e instanceof RetryableError ||
+      matchMissingForeignKeyError(e) ||
+      matchDeadlockDetectedError(e)
+    ) {
       logger.debug(
         // prettier-ignore
         `Retrying processing for ${blocks[0].number} - ${blocks[0].number + blocks.length} with ${processor.name}`,

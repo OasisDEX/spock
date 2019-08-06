@@ -114,6 +114,10 @@ export function matchUniqueKeyError(e: any): boolean {
   return e.code === '23505';
 }
 
+export function matchDeadlockDetectedError(e: any): boolean {
+  return e.code === '40P01';
+}
+
 export const silenceError = (...matchers: Array<(e: any) => boolean>) => (e: any) => {
   const matched = matchers.filter(m => m(e)).length > 0;
 
