@@ -1,6 +1,5 @@
 import { makeNullUndefined, DbConnection } from '../db';
 import { Connection } from './common';
-import { SQL } from 'sql-template-strings';
 
 export interface JobModel {
   id: number;
@@ -46,23 +45,23 @@ export async function setJobStatus(
   job: JobModel,
   newStatus: JobStatus,
 ): Promise<void> {
-  const sql = SQL`
+  const sql = `
     UPDATE vulcan2x.job 
-    SET status=${newStatus}, extra_info=NULL
-    WHERE name=${job.name}
+    SET status=\${newStatus}, extra_info=NULL
+    WHERE name=\${jobName}
   `;
 
-  await c.none(sql);
+  await c.none(sql, { newStatus, jobName: job.name });
 }
 
 export async function stopJob(c: Connection, jobName: string, extraInfo: string): Promise<void> {
-  const sql = SQL`
+  const sql = `
     UPDATE vulcan2x.job 
-    SET status='stopped', extra_info=${extraInfo}
-    WHERE name=${jobName}
+    SET status='stopped', extra_info=\${extraInfo}
+    WHERE name=\${jobName}
   `;
 
-  await c.none(sql);
+  await c.none(sql, { extraInfo, jobName });
 }
 
 export async function excludeAllJobs(c: DbConnection): Promise<void> {
