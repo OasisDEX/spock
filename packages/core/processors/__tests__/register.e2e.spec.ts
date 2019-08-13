@@ -1,5 +1,5 @@
 import { createDB } from '../../db/db';
-import { prepareDB, testConfig, dumpDB } from '../../../test/common';
+import { prepareDB, testConfig, dumpDB, networkState } from '../../../test/common';
 import { Services } from '../../types';
 import { registerProcessors } from '../register';
 import { BlockExtractor } from '../types';
@@ -34,9 +34,7 @@ describe('register', () => {
       config: testConfig,
       columnSets: undefined as any,
       provider: undefined as any,
-      networkState: {
-        latestEthereumBlockOnStart: 0,
-      },
+      networkState,
     };
 
     await registerProcessors(services, [extractor1, extractor2]);
