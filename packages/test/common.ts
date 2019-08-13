@@ -57,4 +57,4 @@ export async function executeSQL(db: DB, sql: string): Promise<void> {
 export const networkState: NetworkState = {
   latestEthereumBlockOnStart: 1,
   networkName: { name: 'test', chainId: 1337, ensAddress: '0x0' },
-}
+};
