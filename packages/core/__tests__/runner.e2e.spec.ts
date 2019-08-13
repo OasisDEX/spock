@@ -2,7 +2,7 @@ import { blockGenerator } from '../blockGenerator';
 import { createDB } from '../db/db';
 import { ethers } from 'ethers';
 import { Block } from 'ethers/providers';
-import { testConfig, prepareDB, dumpDB } from '../../test/common';
+import { testConfig, prepareDB, dumpDB, networkState } from '../../test/common';
 import { Services } from '../types';
 import { pick } from 'lodash';
 import { createProviders, getRandomProvider } from '../services';
@@ -80,9 +80,7 @@ describe('Whole solution', () => {
       config: testConfig,
       provider: provider,
       ...dbCtx,
-      networkState: {
-        latestEthereumBlockOnStart: 1,
-      },
+      networkState,
     };
 
     runBlockGenerator(services).catch(() => {

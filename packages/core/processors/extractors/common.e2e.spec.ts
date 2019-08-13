@@ -1,6 +1,6 @@
 import { addTx, matchMissingForeignKeyError, matchUniqueKeyError } from './common';
 import { createDB, withConnection } from '../../db/db';
-import { prepareDB, testConfig } from '../../../test/common';
+import { prepareDB, testConfig, networkState } from '../../../test/common';
 import { ethers } from 'ethers';
 import { TransactionalServices } from '../../types';
 import { BlockModel } from '../../db/models/Block';
@@ -32,9 +32,7 @@ describe('extractors/common matchMissingForeignKeyError', () => {
         pg: dbCtx.pg,
         config: testConfig,
         provider: undefined as any,
-        networkState: {
-          latestEthereumBlockOnStart: 0,
-        },
+        networkState,
       };
 
       try {

@@ -1,5 +1,5 @@
 import { createDB } from '../../db/db';
-import { prepareDB, testConfig, executeSQL, dumpDB } from '../../../test/common';
+import { prepareDB, testConfig, executeSQL, dumpDB, networkState } from '../../../test/common';
 import { Services } from '../../types';
 import { getNextBlocks, processBlocks } from '../process';
 import { registerProcessors } from '../register';
@@ -32,9 +32,7 @@ describe('process > getNextBlocks', () => {
       config: testConfig,
       columnSets: undefined as any,
       provider: undefined as any,
-      networkState: {
-        latestEthereumBlockOnStart: 0,
-      },
+      networkState,
     };
 
     await registerProcessors(services, [blockExtractor]);
@@ -90,9 +88,7 @@ Array [
       config: testConfig,
       columnSets: undefined as any,
       provider: undefined as any,
-      networkState: {
-        latestEthereumBlockOnStart: 0,
-      },
+      networkState,
     };
 
     await registerProcessors(services, [blockExtractor, blockExtractor2]);
@@ -158,9 +154,7 @@ describe('process', () => {
       },
       columnSets: undefined as any,
       provider: dummyProvider,
-      networkState: {
-        latestEthereumBlockOnStart: 0,
-      },
+      networkState,
     };
 
     await registerProcessors(services, [blockExtractor]);

@@ -6,6 +6,7 @@ import { getDefaultConfig } from './config';
 import { createDB } from './db/db';
 import { RetryProvider } from './ethereum/RetryProvider';
 import { Services, TransactionalServices } from './types';
+import { networkState } from '../test/common';
 
 ethers.errors.setLogLevel('error');
 
@@ -17,9 +18,7 @@ const services: Services = {
   provider,
   ...db,
   config,
-  networkState: {
-    latestEthereumBlockOnStart: 0,
-  },
+  networkState,
 };
 
 const transformer = null as any;

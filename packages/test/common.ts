@@ -2,6 +2,7 @@ import { migrate } from 'postgres-migrations-oasis';
 
 import { DB, withConnection } from '../core/db/db';
 import { getDefaultConfig, SpockConfig } from '../core/config';
+import { NetworkState } from '../core/ethereum/getNetworkState';
 
 export const testConfig: SpockConfig = {
   ...getDefaultConfig({
@@ -52,3 +53,8 @@ export const dumpDB = async (db: DB) => {
 export async function executeSQL(db: DB, sql: string): Promise<void> {
   await db.none(sql);
 }
+
+export const networkState: NetworkState = {
+  latestEthereumBlockOnStart: 1,
+  networkName: { name: 'test', chainId: 1337, ensAddress: '0x0' },
+};

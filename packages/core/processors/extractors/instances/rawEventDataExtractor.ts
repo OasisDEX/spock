@@ -6,6 +6,7 @@ import { BlockModel } from '../../../db/models/Block';
 import { BlockExtractor } from '../../types';
 import { getOrCreateTx } from '../common';
 import { timer } from '../../../utils/timer';
+import { isGanache } from '../../../ethereum/getNetworkState';
 
 export function makeRawLogExtractors(_addresses: string[]): BlockExtractor[] {
   const addresses = _addresses.map(a => a.toLowerCase());
@@ -115,7 +116,8 @@ export async function getLogs(
 ): Promise<Log[]> {
   if (blocks.length === 0) {
     return [];
-  } else if (blocks.length === 1) {
+  } else if (blocks.length === 1 && !isGanache(services.networkState)) {
+    // note: ganache doesnt support this RPC call so we avoid id
     return await services.provider.getLogs({
       address,
       blockHash: blocks[0].hash,
