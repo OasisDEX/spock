@@ -18,7 +18,7 @@ export function makeRawLogExtractors(_addresses: string[]): BlockExtractor[] {
       await extractRawLogs(services, blocks, address);
     },
     async getData(services: LocalServices, blocks: BlockModel[]): Promise<any> {
-      return await getRawLogs(services, address, blocks);
+      return await getPersistedLogs(services, [address], blocks);
     },
   }));
 }
@@ -27,7 +27,7 @@ export async function extractRawLogs(
   services: TransactionalServices,
   blocks: BlockModel[],
   address: string,
-): Promise<void> {
+): Promise<PersistedLog[]> {
   const wholeExtractTimer = timer('whole-extract');
 
   const gettingLogs = timer('getting-logs');
@@ -66,19 +66,24 @@ export async function extractRawLogs(
   )).filter(log => !!log);
   processingLogs();
 
+  let insertedLogs: PersistedLog[] = [];
   if (logsToInsert.length !== 0) {
     const addingLogs = timer(`adding-logs`, `with: ${logsToInsert.length} logs`);
-    const query = services.pg.helpers.insert(logsToInsert, services.columnSets['extracted_logs']);
-    await services.tx.none(query);
+    const query =
+      services.pg.helpers.insert(logsToInsert, services.columnSets['extracted_logs']) +
+      ' RETURNING *';
+    insertedLogs = await services.tx.many<PersistedLog>(query);
     addingLogs();
   }
 
   wholeExtractTimer();
+
+  return insertedLogs;
 }
 
-export async function getRawLogs(
+export async function getPersistedLogs(
   services: LocalServices,
-  address: string,
+  addresses: string[],
   blocks: BlockModel[],
 ): Promise<any[]> {
   const blocksIds = blocks.map(b => b.id);
@@ -89,10 +94,10 @@ export async function getRawLogs(
     (await services.tx.manyOrNone(
       `
 SELECT * FROM extracted.logs 
-WHERE logs.block_id >= \${id_min} AND logs.block_id <= \${id_max} AND address=\${address};
+WHERE logs.block_id >= \${id_min} AND logs.block_id <= \${id_max} AND address IN (\${addresses}:csv);
   `,
       {
-        address,
+        address: addresses,
         id_min: minId,
         id_max: maxId,
       },
