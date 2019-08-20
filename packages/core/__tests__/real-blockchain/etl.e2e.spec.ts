@@ -7,7 +7,7 @@ import { dumpDB, testConfig, prepareDB } from '../../../test/common';
 import { createDB } from '../../db/db';
 import { mergeConfig } from '../../utils/configUtils';
 import { delay } from '../../utils';
-import { pick } from 'lodash';
+import { pick, omit, sortBy, flatten } from 'lodash';
 import { join } from 'path';
 import { BlockTransformer } from '../../processors/types';
 
@@ -36,12 +36,17 @@ describe('Spock ETL', () => {
       process.exit(1);
     });
 
-    await delay(20 * 1000);
+    let fullySynced = false;
+    while (!fullySynced) {
+      await delay(1000);
+      const jobs = (await dumpDB(dbCtx.db)).job;
+      fullySynced = jobs.filter(p => p.last_block_id === 40).length === 2;
+    }
 
     const dump = await dumpDB(dbCtx.db);
 
     expect(pick(dump, ['blocks', 'extracted_logs'])).toMatchSnapshot();
-    expect(allDaiData).toMatchSnapshot();
+    expect(sortBy(allDaiData, ['block_id', 'log_index'])).toMatchSnapshot();
   });
 });
 
@@ -58,6 +63,7 @@ const daiTransformer: BlockTransformer = {
   name: 'DAI-transformer',
   dependencies: [getExtractorName(DAI)],
   transform: async (_s, data) => {
-    allDaiData.push(data);
+    const deterministicData = flatten(data).map(d => omit(d, 'tx_id'));
+    allDaiData.push(...deterministicData);
   },
 };
