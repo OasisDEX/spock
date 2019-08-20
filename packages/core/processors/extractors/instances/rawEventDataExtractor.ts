@@ -94,10 +94,10 @@ export async function getPersistedLogs(
     (await services.tx.manyOrNone(
       `
 SELECT * FROM extracted.logs 
-WHERE logs.block_id >= \${id_min} AND logs.block_id <= \${id_max} AND address IN (\${addresses}:csv);
+WHERE logs.block_id >= \${id_min} AND logs.block_id <= \${id_max} AND address IN (\${addresses:csv});
   `,
       {
-        address: addresses,
+        addresses,
         id_min: minId,
         id_max: maxId,
       },
