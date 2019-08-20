@@ -14,67 +14,76 @@ export function makeRawLogExtractors(_addresses: string[]): BlockExtractor[] {
   return addresses.map(address => ({
     name: getExtractorName(address),
     address,
-    async extract(services: TransactionalServices, blocks: BlockModel[]): Promise<void> {
-      const wholeExtractTimer = timer('whole-extract');
-
-      const gettingLogs = timer('getting-logs');
-      const logs = await getLogs(services, blocks, address);
-      gettingLogs();
-
-      const processingLogs = timer(`processing-logs`, `with: ${logs.length}`);
-
-      const blocksByHash = groupBy(blocks, 'hash');
-      const allTxs = uniqBy(
-        logs.map(l => ({ txHash: l.transactionHash!, blockHash: l.blockHash! })),
-        'txHash',
-      );
-      const allStoredTxs = await Promise.all(
-        allTxs.map(tx => getOrCreateTx(services, tx.txHash, blocksByHash[tx.blockHash][0])),
-      );
-      const allStoredTxsByTxHash = groupBy(allStoredTxs, 'hash');
-
-      const logsToInsert = (await Promise.all(
-        logs.map(async log => {
-          const _block = blocksByHash[log.blockHash!];
-          if (!_block) {
-            return;
-          }
-          const block = _block[0];
-          const storedTx = allStoredTxsByTxHash[log.transactionHash!][0];
-
-          return {
-            ...log,
-            address: log.address.toLowerCase(), // always use lower case
-            log_index: log.logIndex,
-            block_id: block.id,
-            tx_id: storedTx.id,
-          };
-        }),
-      )).filter(log => !!log);
-      processingLogs();
-
-      if (logsToInsert.length !== 0) {
-        const addingLogs = timer(`adding-logs`, `with: ${logsToInsert.length} logs`);
-        const query = services.pg.helpers.insert(
-          logsToInsert,
-          services.columnSets['extracted_logs'],
-        );
-        await services.tx.none(query);
-        addingLogs();
-      }
-
-      wholeExtractTimer();
+    extract: async (services, blocks) => {
+      await extractRawLogs(services, blocks, address);
     },
-
     async getData(services: LocalServices, blocks: BlockModel[]): Promise<any> {
-      return await getRawLogs(services, address, blocks);
+      return await getPersistedLogs(services, [address], blocks);
     },
   }));
 }
 
-export async function getRawLogs(
-  services: LocalServices,
+export async function extractRawLogs(
+  services: TransactionalServices,
+  blocks: BlockModel[],
   address: string,
+): Promise<PersistedLog[]> {
+  const wholeExtractTimer = timer('whole-extract');
+
+  const gettingLogs = timer('getting-logs');
+  const logs = await getLogs(services, blocks, address);
+  gettingLogs();
+
+  const processingLogs = timer(`processing-logs`, `with: ${logs.length}`);
+
+  const blocksByHash = groupBy(blocks, 'hash');
+  const allTxs = uniqBy(
+    logs.map(l => ({ txHash: l.transactionHash!, blockHash: l.blockHash! })),
+    'txHash',
+  );
+  const allStoredTxs = await Promise.all(
+    allTxs.map(tx => getOrCreateTx(services, tx.txHash, blocksByHash[tx.blockHash][0])),
+  );
+  const allStoredTxsByTxHash = groupBy(allStoredTxs, 'hash');
+
+  const logsToInsert = (await Promise.all(
+    logs.map(async log => {
+      const _block = blocksByHash[log.blockHash!];
+      if (!_block) {
+        return;
+      }
+      const block = _block[0];
+      const storedTx = allStoredTxsByTxHash[log.transactionHash!][0];
+
+      return {
+        ...log,
+        address: log.address.toLowerCase(), // always use lower case
+        log_index: log.logIndex,
+        block_id: block.id,
+        tx_id: storedTx.id,
+      };
+    }),
+  )).filter(log => !!log);
+  processingLogs();
+
+  let insertedLogs: PersistedLog[] = [];
+  if (logsToInsert.length !== 0) {
+    const addingLogs = timer(`adding-logs`, `with: ${logsToInsert.length} logs`);
+    const query =
+      services.pg.helpers.insert(logsToInsert, services.columnSets['extracted_logs']) +
+      ' RETURNING *';
+    insertedLogs = await services.tx.many<PersistedLog>(query);
+    addingLogs();
+  }
+
+  wholeExtractTimer();
+
+  return insertedLogs;
+}
+
+export async function getPersistedLogs(
+  services: LocalServices,
+  addresses: string[],
   blocks: BlockModel[],
 ): Promise<any[]> {
   const blocksIds = blocks.map(b => b.id);
@@ -85,10 +94,10 @@ export async function getRawLogs(
     (await services.tx.manyOrNone(
       `
 SELECT * FROM extracted.logs 
-WHERE logs.block_id >= \${id_min} AND logs.block_id <= \${id_max} AND address=\${address};
+WHERE logs.block_id >= \${id_min} AND logs.block_id <= \${id_max} AND address IN (\${addresses:csv});
   `,
       {
-        address,
+        addresses,
         id_min: minId,
         id_max: maxId,
       },
