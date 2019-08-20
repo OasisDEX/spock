@@ -1,11 +1,15 @@
 import { etl } from '../../etl';
-import { makeRawLogExtractors } from '../../processors/extractors/instances/rawEventDataExtractor';
+import {
+  makeRawLogExtractors,
+  getExtractorName,
+} from '../../processors/extractors/instances/rawEventDataExtractor';
 import { dumpDB, testConfig, prepareDB } from '../../../test/common';
 import { createDB } from '../../db/db';
 import { mergeConfig } from '../../utils/configUtils';
 import { delay } from '../../utils';
 import { pick } from 'lodash';
 import { join } from 'path';
+import { BlockTransformer } from '../../processors/types';
 
 const DAI = '0x89d24a6b4ccb1b6faa2625fe562bdd9a23260359';
 
@@ -21,7 +25,7 @@ describe('Spock ETL', () => {
       startingBlock: startingBlock,
       lastBlock: startingBlock + 40,
       extractors: [...makeRawLogExtractors([DAI])],
-      transformers: [],
+      transformers: [daiTransformer],
     });
 
     const dbCtx = createDB(testConfig.db);
@@ -37,6 +41,7 @@ describe('Spock ETL', () => {
     const dump = await dumpDB(dbCtx.db);
 
     expect(pick(dump, ['blocks', 'extracted_logs'])).toMatchSnapshot();
+    expect(allDaiData).toMatchSnapshot();
   });
 });
 
@@ -47,3 +52,12 @@ function setupEnv(): void {
   // prefer chainHost definition from the environment
   process.env['VL_CHAIN_HOST'] = chainHost || process.env['VL_CHAIN_HOST'];
 }
+
+let allDaiData: any = [];
+const daiTransformer: BlockTransformer = {
+  name: 'DAI-transformer',
+  dependencies: [getExtractorName(DAI)],
+  transform: async (_s, data) => {
+    allDaiData.push(data);
+  },
+};
