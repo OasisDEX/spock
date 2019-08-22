@@ -78,3 +78,7 @@ export const getDefaultConfig = (env: Env) => {
     },
   };
 };
+
+export function isProd(): boolean {
+  return process.env.NODE_ENV === 'production';
+}

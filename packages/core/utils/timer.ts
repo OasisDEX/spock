@@ -3,12 +3,19 @@ import { Dictionary } from 'ts-essentials';
 import { entries } from 'lodash';
 import * as prettyMs from 'pretty-ms';
 import * as hrTimeToMs from 'convert-hrtime';
+import { isProd } from '../config';
 
 const logger = getLogger('Timer');
 
 const timerStats: Dictionary<number[]> = {};
 
+const noop = () => {};
+
 export function timer(label: string, extra?: string): () => void {
+  if (isProd()) {
+    return noop;
+  }
+
   timerStats[label] = timerStats[label] || [];
   const startTime = process.hrtime();
 
@@ -22,11 +29,19 @@ export function timer(label: string, extra?: string): () => void {
 }
 
 export function printTimersSummary(): void {
+  if (isProd()) {
+    return;
+  }
+
   for (const [name, measurements] of entries(timerStats)) {
+    if (measurements.length === 0) {
+      logger.info(`${name} - no data`);
+      continue;
+    }
     const sum = measurements.reduce((a, c) => a + c, 0) || 0;
     const avg = measurements.length ? sum / measurements.length : 0;
-    const min = Math.min(...measurements) || 0;
-    const max = Math.max(...measurements) || 0;
+    const min = Math.min(...measurements);
+    const max = Math.max(...measurements);
 
     logger.info(
       // prettier-ignore
