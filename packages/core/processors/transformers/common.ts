@@ -4,15 +4,24 @@ import { zip } from 'lodash';
 import BigNumber from 'bignumber.js';
 import { LocalServices } from '../../types';
 
+// abi decoder has internal state with all loaded ABIs so we need to make sure that we don't load the same ABI multiple times
 const abiDecoder = require('abi-decoder');
+const alreadyLoadedAbis = new Set<any>();
 
+/**
+ * Note make sure that for the same ABI you always provide same object (reference). Otherwise this can lead to memory leaks.
+ */
 export async function handleEvents<TServices>(
   services: TServices,
   abi: any,
   logs: PersistedLog[],
   handlers: EventHandlers<TServices>,
 ): Promise<void> {
-  abiDecoder.addABI(abi);
+  if (!alreadyLoadedAbis.has(abi)) {
+    abiDecoder.addABI(abi);
+    alreadyLoadedAbis.add(abi);
+  }
+
   // @todo sanity check for handlers is to check if event names exist in ABI
 
   const rawEvents: RawEvent[] = abiDecoder.decodeLogs(
