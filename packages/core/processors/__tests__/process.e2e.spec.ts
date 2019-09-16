@@ -169,11 +169,11 @@ describe('process', () => {
 Object {
   "job": Array [
     Object {
-      "extra_info": "",
+      "extra_info": null,
       "id": 1,
       "last_block_id": 1,
       "name": "test-extractor",
-      "status": "stopped",
+      "status": "processing",
     },
   ],
 }
