@@ -22,6 +22,9 @@ export const testConfig: SpockConfig = {
     reorgBuffer: 10,
   },
   startingBlock: 0,
+  processorsWorker: {
+    retriesOnErrors: 1,
+  },
 } as any;
 
 export async function prepareDB(db: DB, config: SpockConfig): Promise<void> {

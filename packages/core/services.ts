@@ -1,10 +1,11 @@
 import { RetryProvider } from './ethereum/RetryProvider';
 import { createDB } from './db/db';
-import { SpockConfig } from './config';
+import { SpockConfig, getAllProcessors } from './config';
 import { Services, TransactionalServices } from './types';
 import { getNetworkState } from './ethereum/getNetworkState';
 import { sample } from 'lodash';
 import { getLogger } from './utils/logger';
+import { getInitialProcessorsState } from './processors/state';
 
 const logger = getLogger('services');
 
@@ -13,12 +14,14 @@ export async function createServices(config: SpockConfig): Promise<Services> {
   createProviders(config);
   const provider = getRandomProvider();
   const networkState = await getNetworkState(provider);
+  const processorsState = getInitialProcessorsState(getAllProcessors(config));
 
   return {
     provider,
     ...db,
     config,
     networkState,
+    processorsState,
   };
 }
 

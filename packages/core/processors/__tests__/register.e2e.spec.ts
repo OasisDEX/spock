@@ -4,6 +4,7 @@ import { Services } from '../../types';
 import { registerProcessors } from '../register';
 import { BlockExtractor } from '../types';
 import { pick } from 'lodash';
+import { getInitialProcessorsState } from '../state';
 
 describe('register', () => {
   it('should register new processors', async () => {
@@ -35,6 +36,7 @@ describe('register', () => {
       columnSets: undefined as any,
       provider: undefined as any,
       networkState,
+      processorsState: getInitialProcessorsState([extractor1, extractor2]),
     };
 
     await registerProcessors(services, [extractor1, extractor2]);

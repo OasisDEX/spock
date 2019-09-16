@@ -5,6 +5,7 @@ import { getNextBlocks, processBlocks } from '../process';
 import { registerProcessors } from '../register';
 import { BlockExtractor } from '../types';
 import { pick } from 'lodash';
+import { getInitialProcessorsState } from '../state';
 
 describe('process > getNextBlocks', () => {
   it('should work with extractors without dependencies', async () => {
@@ -33,6 +34,7 @@ describe('process > getNextBlocks', () => {
       columnSets: undefined as any,
       provider: undefined as any,
       networkState,
+      processorsState: getInitialProcessorsState([blockExtractor]),
     };
 
     await registerProcessors(services, [blockExtractor]);
@@ -89,6 +91,7 @@ Array [
       columnSets: undefined as any,
       provider: undefined as any,
       networkState,
+      processorsState: getInitialProcessorsState([blockExtractor]),
     };
 
     await registerProcessors(services, [blockExtractor, blockExtractor2]);
@@ -155,22 +158,24 @@ describe('process', () => {
       columnSets: undefined as any,
       provider: dummyProvider,
       networkState,
+      processorsState: getInitialProcessorsState([blockExtractor]),
     };
 
     await registerProcessors(services, [blockExtractor]);
+    await processBlocks(services, blockExtractor);
     await processBlocks(services, blockExtractor);
 
     const db = pick(await dumpDB(services.db), 'job');
     db.job = db.job.map(e => ({
       ...e,
-      extra_info: JSON.stringify(pick(JSON.parse(e.extra_info), 'message')),
+      extra_info: JSON.stringify(JSON.parse(e.extra_info).map((e: any) => pick(e, 'message'))),
     }));
 
     expect(db).toMatchInlineSnapshot(`
 Object {
   "job": Array [
     Object {
-      "extra_info": "{\\"message\\":\\"Error in the middle of processing!\\"}",
+      "extra_info": "[{\\"message\\":\\"Error in the middle of processing!\\"},{\\"message\\":\\"Error in the middle of processing!\\"}]",
       "id": 1,
       "last_block_id": 1,
       "name": "test-extractor",

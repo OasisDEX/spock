@@ -5,14 +5,9 @@ import { Services, TransactionalServices } from '../types';
 import { get, sortBy, groupBy } from 'lodash';
 import { BlockModel } from '../db/models/Block';
 import { getJob, stopJob } from '../db/models/Job';
-import {
-  matchMissingForeignKeyError,
-  RetryableError,
-  matchDeadlockDetectedError,
-} from './extractors/common';
 import { Processor, isExtractor, BlockExtractor } from './types';
 import { getRandomProvider } from '../services';
-import * as serializeError from 'serialize-error';
+import { clearProcessorState, addProcessorError, getProcessorErrors } from './state';
 
 const logger = getLogger('extractor/index');
 
@@ -93,6 +88,8 @@ export async function processBlocks(services: Services, processor: Processor): P
         );
       });
     }
+
+    clearProcessorState(services, processor);
   } catch (e) {
     logger.error(
       // prettier-ignore
@@ -100,20 +97,17 @@ export async function processBlocks(services: Services, processor: Processor): P
       e,
     );
     console.error(e);
-    //there is a class of error that we want to retry so we don't mark the blocks as processed
+
+    addProcessorError(services, processor, e);
+
     if (
-      e instanceof RetryableError ||
-      matchMissingForeignKeyError(e) ||
-      matchDeadlockDetectedError(e)
+      getProcessorErrors(services, processor).length >
+      services.config.processorsWorker.retriesOnErrors
     ) {
-      logger.debug(
-        // prettier-ignore
-        `Retrying processing for ${blocks[0].number} - ${blocks[0].number + blocks.length} with ${processor.name}`,
-      );
-    } else {
       logger.warn(`Stopping ${processor.name}. Restart ETL to continue`);
+
       await withConnection(services.db, async c => {
-        await stopJob(c, processor.name, JSON.stringify(serializeError(e)));
+        await stopJob(c, processor.name, JSON.stringify(getProcessorErrors(services, processor)));
       });
     }
   }

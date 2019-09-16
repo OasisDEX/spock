@@ -33,6 +33,7 @@ describe('extractors/common matchMissingForeignKeyError', () => {
         config: testConfig,
         provider: undefined as any,
         networkState,
+        processorsState: {},
       };
 
       try {
