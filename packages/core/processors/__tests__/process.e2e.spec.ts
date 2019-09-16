@@ -162,15 +162,29 @@ describe('process', () => {
     };
 
     await registerProcessors(services, [blockExtractor]);
-    await processBlocks(services, blockExtractor);
-    await processBlocks(services, blockExtractor);
 
+    await processBlocks(services, blockExtractor);
+    const dbBeforeError = pick(await dumpDB(services.db), 'job');
+    expect(dbBeforeError).toMatchInlineSnapshot(`
+Object {
+  "job": Array [
+    Object {
+      "extra_info": "",
+      "id": 1,
+      "last_block_id": 1,
+      "name": "test-extractor",
+      "status": "stopped",
+    },
+  ],
+}
+`);
+
+    await processBlocks(services, blockExtractor);
     const db = pick(await dumpDB(services.db), 'job');
     db.job = db.job.map(e => ({
       ...e,
       extra_info: JSON.stringify(JSON.parse(e.extra_info).map((e: any) => pick(e, 'message'))),
     }));
-
     expect(db).toMatchInlineSnapshot(`
 Object {
   "job": Array [
