@@ -81,6 +81,7 @@ describe('Whole solution', () => {
       provider: provider,
       ...dbCtx,
       networkState,
+      processorsState: {},
     };
 
     runBlockGenerator(services).catch(() => {

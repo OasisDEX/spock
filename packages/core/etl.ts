@@ -1,7 +1,7 @@
 import * as ethers from 'ethers';
 import { getLogger } from './utils/logger';
 import { withLock } from './db/locks';
-import { SpockConfig } from './config';
+import { SpockConfig, getAllProcessors } from './config';
 import { createServices } from './services';
 import { blockGenerator } from './blockGenerator';
 import { process } from './processors/process';
@@ -25,7 +25,7 @@ export async function etl(config: SpockConfig): Promise<void> {
   printSystemInfo(config);
 
   await withLock(services.db, services.config.processDbLock, async () => {
-    await registerProcessors(services, [...config.extractors, ...config.transformers]);
+    await registerProcessors(services, getAllProcessors(config));
 
     await Promise.all([
       blockGenerator(services, config.startingBlock, config.lastBlock),

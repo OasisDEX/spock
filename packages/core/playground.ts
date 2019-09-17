@@ -19,6 +19,7 @@ const services: Services = {
   ...db,
   config,
   networkState,
+  processorsState: {},
 };
 
 const transformer = null as any;

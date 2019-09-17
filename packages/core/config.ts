@@ -1,6 +1,6 @@
 import { Dictionary, MarkRequired } from 'ts-essentials';
 import { Env, getRequiredString, getRequiredNumber } from './utils/configUtils';
-import { BlockExtractor, BlockTransformer } from './processors/types';
+import { BlockExtractor, BlockTransformer, Processor } from './processors/types';
 
 export interface SpockConfig {
   startingBlock: number;
@@ -21,9 +21,8 @@ export interface SpockConfig {
   transformerWorker: {
     batch: number;
   };
-  archiverWorker: {
-    batch: number;
-    delay: number; // in minutes
+  processorsWorker: {
+    retriesOnErrors: number;
   };
   statsWorker: {
     interval: number; // in minutes
@@ -61,6 +60,9 @@ export const getDefaultConfig = (env: Env) => {
     transformerWorker: {
       batch: 1000,
     },
+    processorsWorker: {
+      retriesOnErrors: 10,
+    },
     statsWorker: {
       interval: 10, // get stats every 10 minutes
     },
@@ -81,4 +83,8 @@ export const getDefaultConfig = (env: Env) => {
 
 export function isProd(): boolean {
   return process.env.NODE_ENV === 'production';
+}
+
+export function getAllProcessors(config: SpockConfig): Processor[] {
+  return [...config.extractors, ...config.transformers];
 }

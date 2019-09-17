@@ -4,6 +4,7 @@ import { StrictOmit } from 'ts-essentials';
 import pgPromise = require('pg-promise');
 import { SpockConfig } from './config';
 import { NetworkState } from './ethereum/getNetworkState';
+import { ProcessorsState } from './processors/state';
 
 export interface Services {
   provider: Provider;
@@ -12,6 +13,7 @@ export interface Services {
   config: SpockConfig;
   columnSets: ColumnSets;
   networkState: NetworkState;
+  processorsState: ProcessorsState;
 }
 
 export interface TransactionalServices extends StrictOmit<Services, 'db'> {
