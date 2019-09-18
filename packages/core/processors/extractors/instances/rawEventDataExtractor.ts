@@ -86,6 +86,10 @@ export async function getPersistedLogs(
   addresses: string[],
   blocks: BlockModel[],
 ): Promise<any[]> {
+  if (addresses.length === 0) {
+    return [];
+  }
+
   const blocksIds = blocks.map(b => b.id);
   const minId = min(blocksIds);
   const maxId = max(blocksIds);

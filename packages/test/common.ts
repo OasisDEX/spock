@@ -1,8 +1,9 @@
 import { migrate } from 'postgres-migrations-oasis';
 
-import { DB, withConnection } from '../core/db/db';
+import { DB, withConnection, createDB } from '../core/db/db';
 import { getDefaultConfig, SpockConfig } from '../core/config';
 import { NetworkState } from '../core/ethereum/getNetworkState';
+import { Services } from '../core/types';
 
 export const testConfig: SpockConfig = {
   ...getDefaultConfig({
@@ -61,3 +62,18 @@ export const networkState: NetworkState = {
   latestEthereumBlockOnStart: 1,
   networkName: { name: 'test', chainId: 1337, ensAddress: '0x0' },
 };
+
+export async function servicesFixture(): Promise<Services> {
+  const dbCtx = createDB(testConfig.db);
+  await prepareDB(dbCtx.db, testConfig);
+
+  return {
+    db: dbCtx.db,
+    pg: dbCtx.pg,
+    config: testConfig,
+    columnSets: undefined as any,
+    provider: undefined as any,
+    networkState,
+    processorsState: {},
+  };
+}
