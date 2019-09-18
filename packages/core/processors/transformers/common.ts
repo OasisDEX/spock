@@ -69,7 +69,7 @@ export async function handleDsNoteEvents(
       // NOTE: we need to be careful not to ignore leading 0
       const guy = '0x' + guyRaw.slice(guyRaw.length - 40, guyRaw.length);
       const value = '0x' + l.data.slice(2, 64 + 2);
-      const calldata = '0x' + l.data.slice(2 + 64 * 3);
+      const calldata = '0x' + l.data.slice(2 + 64 * 2);
       const decodedCallData = abiDecoder.decodeMethod(calldata);
 
       // it might be a standard log so we won't decode it
