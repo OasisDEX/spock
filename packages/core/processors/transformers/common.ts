@@ -59,7 +59,10 @@ export async function handleDsNoteEvents(
   logs: PersistedLog[],
   handlers: DsNoteHandlers,
 ): Promise<void> {
-  abiDecoder.addABI(abi);
+  if (!alreadyLoadedAbis.has(abi)) {
+    abiDecoder.addABI(abi);
+    alreadyLoadedAbis.add(abi);
+  }
   // @todo sanity check for handlers is to check if event names exist in ABI
 
   const parsedNotes = logs.map(

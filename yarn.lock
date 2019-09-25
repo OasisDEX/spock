@@ -642,10 +642,9 @@ abab@^2.0.0:
   resolved "https://registry.yarnpkg.com/abab/-/abab-2.0.0.tgz#aba0ab4c5eee2d4c79d3487d85450fb2376ebb0f"
   integrity sha512-sY5AXXVZv4Y1VACTtR11UJCPHHudgY5i26Qj5TypE6DKlIApbwb5uqhXcJ5UUGbvZNRh7EeIoW+LrJumBsKp7w==
 
-abi-decoder@^2.2.0:
+abi-decoder@krzkaczor/abi-decoder#kk/fix-log-decoding:
   version "2.2.0"
-  resolved "https://registry.yarnpkg.com/abi-decoder/-/abi-decoder-2.2.0.tgz#04b3c18e330e7b031d3b91f70ceba8fef3e6a47f"
-  integrity sha512-FVgkAvPRNa08E85Q+t52KlGto8XZeQITmCYdRIWHHth/t/pgdpAzZijy3LKUCBqmJjXnrosj4c6WGOB1q+KJ9w==
+  resolved "https://codeload.github.com/krzkaczor/abi-decoder/tar.gz/2d48eac1884851c0cea0feff0e64dabd6cb3896d"
   dependencies:
     web3-eth-abi "^1.2.1"
     web3-utils "^1.2.1"
