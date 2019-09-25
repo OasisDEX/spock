@@ -61,7 +61,7 @@
     "consola": "^2.7.1",
     "convert-hrtime": "^3.0.0",
     "ejs": "^2.6.1",
-    "ethers": "^4.0.25",
+    "ethers": "krzkaczor/ethers.js#kk/get-logs-multiple-address-build",
     "express": "^4.16.4",
     "helmet": "^3.16.0",
     "lodash": "^4.17.11",

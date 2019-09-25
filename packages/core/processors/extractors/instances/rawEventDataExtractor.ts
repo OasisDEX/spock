@@ -26,7 +26,7 @@ export function makeRawLogExtractors(_addresses: string[]): BlockExtractor[] {
 export async function extractRawLogs(
   services: TransactionalServices,
   blocks: BlockModel[],
-  address: string,
+  address: string | string[],
 ): Promise<PersistedLog[]> {
   const wholeExtractTimer = timer('whole-extract');
 
@@ -125,7 +125,7 @@ export interface PersistedLog {
 export async function getLogs(
   services: TransactionalServices,
   blocks: BlockModel[],
-  address: string,
+  address: string[] | string,
 ): Promise<Log[]> {
   if (blocks.length === 0) {
     return [];
