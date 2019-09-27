@@ -91,12 +91,12 @@ export async function processBlocks(services: Services, processor: Processor): P
 
     clearProcessorState(services, processor);
   } catch (e) {
-    logger.error(
+    logger.warn(
       // prettier-ignore
-      `ERROR[]: Error occured while processing: ${blocks[0].number} - ${blocks[0].number + blocks.length} with ${processor.name}`,
+      `WARN[]: Error occured while processing: ${blocks[0].number} - ${blocks[0].number + blocks.length} with ${processor.name}`,
       e,
     );
-    console.error(e);
+    console.warn('WARN:', e);
 
     addProcessorError(services, processor, e);
 
@@ -104,11 +104,15 @@ export async function processBlocks(services: Services, processor: Processor): P
       getProcessorErrors(services, processor).length >
       services.config.processorsWorker.retriesOnErrors
     ) {
-      logger.warn(`Stopping ${processor.name}. Restart ETL to continue`);
+      logger.error(`Stopping ${processor.name}. Restart ETL to continue`);
+
+      const allErrors = JSON.stringify(getProcessorErrors(services, processor));
+      logger.error('ERROR:', allErrors);
 
       await withConnection(services.db, async c => {
-        await stopJob(c, processor.name, JSON.stringify(getProcessorErrors(services, processor)));
+        await stopJob(c, processor.name, allErrors);
       });
+      clearProcessorState(services, processor);
     }
   }
 
