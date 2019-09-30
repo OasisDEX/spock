@@ -27,7 +27,7 @@ describe('handleEvents', () => {
 Object {
   "address": "0xf9be8f0945acddeedaa64dfca5fe9629d0cf8e5d",
   "args": Array [
-    "0x14341f81dF14cA86E1420eC9e6Abd343Fb1c5bfC",
+    "0x14341f81df14ca86e1420ec9e6abd343fb1c5bfc",
     "34",
     "1",
   ],
@@ -35,7 +35,7 @@ Object {
   "params": Object {
     "optionId": "1",
     "pollId": "34",
-    "voter": "0x14341f81dF14cA86E1420eC9e6Abd343Fb1c5bfC",
+    "voter": "0x14341f81df14ca86e1420ec9e6abd343fb1c5bfc",
   },
 }
 `);
