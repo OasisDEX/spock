@@ -1,7 +1,8 @@
 import { Dictionary, ValueOf } from 'ts-essentials';
 import { zip } from 'lodash';
-import { ethers } from 'ethers';
+import { ethers, utils } from 'ethers';
 import BigNumber from 'bignumber.js';
+import Web3 = require('web3');
 
 import { PersistedLog } from '../extractors/instances/rawEventDataExtractor';
 import { LocalServices } from '../../types';
@@ -23,28 +24,32 @@ export async function handleEvents<TServices>(
     (l: any): ParsedEvent | undefined => {
       const topics = l.topics;
       const newTopics = topics.slice(1, topics.length - 1).split(',');
-      const parsedEvent = iface.parseLog({ data: l.data, topics: newTopics });
+      const event = iface.parseLog({ data: l.data, topics: newTopics });
+
+      if (!event) {
+        return;
+      }
 
       // we want to split positional arguments from named arguments,
       // this turns out to be a PITA because they are merged together inside parsedEvent.values object/array thing
 
-      const eventDefinition = iface.events[parsedEvent.signature].inputs;
+      const eventDefinition = iface.events[event.signature].inputs;
       const paramsNames = eventDefinition.map(p => p.name);
 
       const params: Dictionary<string> = {};
       for (const p of paramsNames) {
         if (p) {
-          params[p] = parsedEvent.values[p].toString(10).toLowerCase();
+          params[p] = normalizeValue(event.values[p]);
         }
       }
 
       const args: string[] = [];
       for (let i = 0; i < eventDefinition.length; i++) {
-        args.push(parsedEvent.values[i].toString(10).toLowerCase());
+        args.push(normalizeValue(event.values[i]));
       }
 
       return {
-        name: parsedEvent.name,
+        name: event.name,
         address: l.address.toLowerCase(),
         args,
         params,
@@ -67,6 +72,18 @@ export async function handleEvents<TServices>(
     const filteredEvents = fullEventInfo.filter(e => e.event && e.event.name === handlerName);
     await Promise.all(filteredEvents.map(e => handler(services, e as any)));
   }
+}
+
+function normalizeValue(v: any): string {
+  if (utils.BigNumber.isBigNumber(v)) {
+    return v.toString();
+  }
+
+  if (Web3.utils.checkAddressChecksum(v)) {
+    return v.toLowerCase();
+  }
+
+  return v.toString();
 }
 
 export async function handleDsNoteEvents(
@@ -102,11 +119,11 @@ export async function handleDsNoteEvents(
       for (const [i, param] of decodedCallData.args.entries()) {
         const name = names[i];
         if (name !== undefined) {
-          params[name] = param.toString(10).toLowerCase();
+          params[name] = normalizeValue(param);
         }
       }
 
-      const args = decodedCallData.args.map(a => a.toString(10).toLowerCase());
+      const args = decodedCallData.args.map(a => normalizeValue(a));
 
       return {
         name: decodedCallData.signature,

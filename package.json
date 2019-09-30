@@ -36,6 +36,7 @@
     "@types/pretty-hrtime": "^1.0.0",
     "@types/pretty-ms": "^5.0.1",
     "@types/promise-retry": "^1.1.1",
+    "@types/web3": "^1.0.20",
     "chai": "^4.2.0",
     "dotenv-flow": "^0.3.0",
     "jest": "^24.4.0",
@@ -47,7 +48,8 @@
     "tslint": "^5.12.1",
     "tslint-language-service": "^0.9.9",
     "typescript": "^3.5.3",
-    "typestrict": "^1.0.2"
+    "typestrict": "^1.0.2",
+    "web3": "^1.2.1"
   },
   "dependencies": {
     "@google-cloud/bigquery": "^3.0.0",
