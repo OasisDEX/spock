@@ -40,6 +40,9 @@ describe('handleDsNoteEvents', () => {
           "tx_id": 1593810,
         },
         "note": Object {
+          "args": Array [
+            "619233468364760295",
+          ],
           "caller": "0x0bd9f5ff1d2c35bef94d7bed48d4fdeb9c261c97",
           "ethValue": "64",
           "name": "free(uint256)",
