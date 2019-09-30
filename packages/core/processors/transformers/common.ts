@@ -1,12 +1,10 @@
-import { PersistedLog } from '../extractors/instances/rawEventDataExtractor';
 import { Dictionary, ValueOf } from 'ts-essentials';
 import { zip } from 'lodash';
+import { ethers } from 'ethers';
 import BigNumber from 'bignumber.js';
-import { LocalServices } from '../../types';
 
-// abi decoder has internal state with all loaded ABIs so we need to make sure that we don't load the same ABI multiple times
-const abiDecoder = require('abi-decoder');
-const alreadyLoadedAbis = new Set<any>();
+import { PersistedLog } from '../extractors/instances/rawEventDataExtractor';
+import { LocalServices } from '../../types';
 
 /**
  * Note make sure that for the same ABI you always provide same object (reference). Otherwise this can lead to memory leaks.
@@ -17,32 +15,50 @@ export async function handleEvents<TServices>(
   logs: PersistedLog[],
   handlers: EventHandlers<TServices>,
 ): Promise<void> {
-  if (!alreadyLoadedAbis.has(abi)) {
-    abiDecoder.addABI(abi);
-    alreadyLoadedAbis.add(abi);
-  }
+  const iface = new ethers.utils.Interface(abi);
 
   // @todo sanity check for handlers is to check if event names exist in ABI
 
-  const rawEvents: RawEvent[] = abiDecoder.decodeLogs(
-    logs.map((l: any) => {
+  const parsedEvents = logs.map(
+    (l: any): ParsedEvent | undefined => {
       const topics = l.topics;
       const newTopics = topics.slice(1, topics.length - 1).split(',');
+      const parsedEvent = iface.parseLog({ data: l.data, topics: newTopics });
+
+      // we want to split positional arguments from named arguments,
+      // this turns out to be a PITA because they are merged together inside parsedEvent.values object/array thing
+
+      const eventDefinition = iface.events[parsedEvent.signature].inputs;
+      const paramsNames = eventDefinition.map(p => p.name);
+
+      const params: Dictionary<string> = {};
+      for (const p of paramsNames) {
+        if (p) {
+          params[p] = parsedEvent.values[p].toString(10).toLowerCase();
+        }
+      }
+
+      const args: string[] = [];
+      for (let i = 0; i < eventDefinition.length; i++) {
+        args.push(parsedEvent.values[i].toString(10).toLowerCase());
+      }
 
       return {
-        ...l,
-        topics: newTopics,
+        name: parsedEvent.name,
+        address: l.address.toLowerCase(),
+        args,
+        params,
       };
-    }),
+    },
   );
-  const parsedEvents = rawEvents.map(e => parseEvent(e));
 
   if (parsedEvents.length !== logs.length) {
     throw new Error('Length mismatch');
   }
-  const fullEventInfo: FullEventInfoUnfiltered[] = zip(parsedEvents, logs).map(
-    ([event, log]) => ({ event, log } as any),
-  );
+  const fullEventInfo: FullEventInfoUnfiltered[] = zip(parsedEvents, logs).map(([event, log]) => ({
+    event,
+    log: log!,
+  }));
 
   for (const handlerName of Object.keys(handlers)) {
     const handler: ValueOf<typeof handlers> = (handlers as any)[handlerName];
@@ -59,36 +75,43 @@ export async function handleDsNoteEvents(
   logs: PersistedLog[],
   handlers: DsNoteHandlers,
 ): Promise<void> {
-  if (!alreadyLoadedAbis.has(abi)) {
-    abiDecoder.addABI(abi);
-    alreadyLoadedAbis.add(abi);
-  }
   // @todo sanity check for handlers is to check if event names exist in ABI
+
+  const iface = new ethers.utils.Interface(abi);
 
   const parsedNotes = logs.map(
     (l: PersistedLog): NoteDecoded | undefined => {
       const explodedTopics = l.topics.slice(1, l.topics.length - 1).split(',');
       const [, guyRaw] = explodedTopics;
+
       // NOTE: we need to be careful not to ignore leading 0
       const guy = '0x' + guyRaw.slice(guyRaw.length - 40, guyRaw.length);
       const value = '0x' + l.data.slice(2, 64 + 2);
       const calldata = '0x' + l.data.slice(2 + 64 * 2);
-      const decodedCallData = abiDecoder.decodeMethod(calldata);
+      const decodedCallData = iface.parseTransaction({ data: calldata });
 
       // it might be a standard log so we won't decode it
       if (!decodedCallData) {
         return;
       }
 
-      const paramsDecoded: any = {};
-      for (const param of decodedCallData.params) {
-        paramsDecoded[param.name] = param.value.toString();
+      // we need to query abi and get args names b/c ethers won't return them
+      // NOTE: there might be no named args and thus you will have to use positional args
+      const names = iface.functions[decodedCallData.signature].inputs.map(i => i.name);
+      const params: Dictionary<string> = {};
+      for (const [i, param] of decodedCallData.args.entries()) {
+        const name = names[i];
+        if (name !== undefined) {
+          params[name] = param.toString(10).toLowerCase();
+        }
       }
 
+      const args = decodedCallData.args.map(a => a.toString(10).toLowerCase());
+
       return {
-        name:
-          decodedCallData.name + `(${decodedCallData.params.map((p: any) => p.type).join(',')})`,
-        params: paramsDecoded,
+        name: decodedCallData.signature,
+        args,
+        params,
         ethValue: new BigNumber(value).toString(10),
         caller: guy,
       };
@@ -120,38 +143,17 @@ export async function handleDsNoteEvents(
 
 interface NoteDecoded {
   name: string;
-  params: Dictionary<string>;
+  args: Array<string>; // positional args
+  params: Dictionary<string>; // named args
   ethValue: string;
   caller: string;
-}
-
-interface RawEvent {
-  address: string;
-  name: string;
-  events: { name: string; type: string; value: string }[];
-}
-
-function parseEvent(event: RawEvent | undefined): ParsedEvent | undefined {
-  if (!event) {
-    return undefined;
-  }
-
-  const args: Dictionary<string> = {};
-  for (const e of event.events) {
-    args[e.name] = e.value.toString();
-  }
-
-  return {
-    address: event.address,
-    name: event.name,
-    args,
-  };
 }
 
 export interface ParsedEvent {
   address: string;
   name: string;
-  args: Dictionary<string>;
+  args: Array<string>;
+  params: Dictionary<string>;
 }
 
 export interface FullEventInfo {
