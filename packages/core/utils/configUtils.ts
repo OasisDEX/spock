@@ -1,7 +1,7 @@
 import { isAbsolute, join, extname, dirname } from 'path';
 import { Dictionary } from 'ts-essentials';
 
-import { SpockConfig, getDefaultConfig } from '../config';
+import { SpockConfig, getDefaultConfig, UserProvidedSpockConfig } from '../config';
 import { mapValues, get } from 'lodash';
 
 export function loadConfig(): SpockConfig {
@@ -55,7 +55,7 @@ function fixConfigPaths(configPath: string, config: any): any {
   return config;
 }
 
-export function mergeConfig(externalCfg: any): SpockConfig {
+export function mergeConfig(externalCfg: UserProvidedSpockConfig): SpockConfig {
   const defaultCfg = getDefaultConfig(process.env);
   const config: SpockConfig = {
     ...defaultCfg,
