@@ -42,8 +42,8 @@ export async function withLocalEnv<T>(fn: () => Promise<T> | T): Promise<T> {
   const backupEnv = { ...process.env };
 
   const chainHost = process.env['VL_CHAIN_HOST'];
-  require('dotenv').config({ path: join(__dirname, '../.env.local') });
-  require('dotenv').config({ path: join(__dirname, '../.env') });
+  require('dotenv').config({ path: join(__dirname, '../../.env.local') });
+  require('dotenv').config({ path: join(__dirname, '../../.env') });
   // prefer chainHost definition from the external environment
   process.env['VL_CHAIN_HOST'] = chainHost || process.env['VL_CHAIN_HOST'];
 
