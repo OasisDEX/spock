@@ -1,14 +1,12 @@
 import { UserProvidedSpockConfig } from '../core/config';
-import { createDB } from '../core/db/db';
+import { createDB, DB } from '../core/db/db';
 import { dumpDB, prepareDB, testConfig } from './common';
 import { mergeConfig } from '../core/utils/configUtils';
 import { etl } from '../core/etl';
 import { delay } from '../core/utils';
 import { join } from 'path';
 
-export async function runIntegrationTest(
-  externalConfig: UserProvidedSpockConfig,
-): ReturnType<typeof dumpDB> {
+export async function runIntegrationTest(externalConfig: UserProvidedSpockConfig): Promise<DB> {
   return await withLocalEnv(async () => {
     const config = mergeConfig(externalConfig);
 
@@ -17,7 +15,7 @@ export async function runIntegrationTest(
     }
 
     const dbCtx = createDB(testConfig.db);
-    await prepareDB(dbCtx.db, testConfig);
+    await prepareDB(dbCtx.db, config);
 
     etl(config).catch(e => {
       console.log('ETL FAILED WITH ', e);
@@ -31,10 +29,10 @@ export async function runIntegrationTest(
     while (!fullySynced) {
       await delay(1000);
       const jobs = (await dumpDB(dbCtx.db)).job;
-      fullySynced = jobs.filter(p => p.last_block_id === lastBlockId).length === allJobs;
+      fullySynced = jobs.filter(p => p.last_block_id >= lastBlockId).length === allJobs;
     }
 
-    return await dumpDB(dbCtx.db);
+    return dbCtx.db;
   });
 }
 

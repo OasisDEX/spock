@@ -3,7 +3,6 @@ import { withConnection, makeNullUndefined } from './db/db';
 import { compact } from 'lodash';
 import { getLast, getRangeAsString } from './utils';
 import { getLogger } from './utils/logger';
-import { SpockConfig } from './config';
 import { Services } from './types';
 import { BlockModel } from './db/models/Block';
 import { getRandomProvider } from './services';

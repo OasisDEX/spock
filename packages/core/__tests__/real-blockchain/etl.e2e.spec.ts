@@ -5,6 +5,7 @@ import {
 import { pick, omit, sortBy, flatten } from 'lodash';
 import { BlockTransformer } from '../../processors/types';
 import { runIntegrationTest } from '../../../test/common-utils';
+import { dumpDB } from '../../../test/common';
 
 const DAI = '0x89d24a6b4ccb1b6faa2625fe562bdd9a23260359';
 
@@ -22,15 +23,15 @@ describe('Spock ETL', () => {
   it('should work for past events', async () => {
     jest.setTimeout(1000 * 60);
 
-    // setupEnv();
     const startingBlock = 8219360;
-    const dump = await runIntegrationTest({
+    const db = await runIntegrationTest({
       startingBlock,
       lastBlock: startingBlock + 40,
       extractors: [...makeRawLogExtractors([DAI])],
       transformers: [daiTransformer],
       migrations: {},
     });
+    const dump = await dumpDB(db);
 
     expect(pick(dump, ['blocks', 'extracted_logs'])).toMatchSnapshot();
     expect(sortBy(allDaiData, ['block_id', 'log_index'])).toMatchSnapshot();
