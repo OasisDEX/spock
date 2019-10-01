@@ -35,8 +35,12 @@ export function loadExternalConfig(path: string): any {
  * Turn any relative paths in the config to absolute ones
  */
 function fixConfigPaths(configPath: string, config: any): any {
-  const newMigrations = mapValues(config.migrations, migrationRelativePath => {
-    return join(dirname(configPath), migrationRelativePath);
+  const newMigrations = mapValues(config.migrations, path => {
+    if (isAbsolute(path)) {
+      return path;
+    } else {
+      return join(dirname(configPath), path);
+    }
   });
 
   const whitelistedQueriesDir = get(config, 'api.whitelisting.whitelistedQueriesDir');
