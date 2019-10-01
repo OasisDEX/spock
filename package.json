@@ -1,6 +1,6 @@
 {
   "name": "spock-etl",
-  "version": "0.0.44",
+  "version": "0.0.45",
   "license": "AGPL-3.0-or-later",
   "bin": "lib/core/runner.js",
   "files": [
@@ -48,10 +48,10 @@
     "tslint": "^5.12.1",
     "tslint-language-service": "^0.9.9",
     "typescript": "^3.5.3",
-    "typestrict": "^1.0.2",
-    "web3": "^1.2.1"
+    "typestrict": "^1.0.2"
   },
   "dependencies": {
+    "web3": "^1.2.1",
     "@google-cloud/bigquery": "^3.0.0",
     "@types/helmet": "^0.0.43",
     "@types/node-cleanup": "^2.1.0",
