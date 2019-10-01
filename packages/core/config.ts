@@ -1,4 +1,4 @@
-import { Dictionary, MarkRequired } from 'ts-essentials';
+import { Dictionary, MarkRequired, DeepPartial } from 'ts-essentials';
 import { Env, getRequiredString, getRequiredNumber } from './utils/configUtils';
 import { BlockExtractor, BlockTransformer, Processor } from './processors/types';
 
@@ -41,6 +41,9 @@ export interface SpockConfig {
     port: number;
   };
 }
+
+export type UserProvidedSpockConfig = DeepPartial<SpockConfig> &
+  Pick<SpockConfig, 'startingBlock' | 'lastBlock' | 'extractors' | 'transformers' | 'migrations'>;
 
 export type ExternalVulcan2xConfig = MarkRequired<
   Partial<SpockConfig>,

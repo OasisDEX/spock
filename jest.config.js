@@ -5,4 +5,5 @@ module.exports = {
   },
   testRegex: '(.*)\\.spec\\.tsx?$',
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
+  setupFiles: ["./packages/test/setup.js"],
 };

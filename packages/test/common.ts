@@ -1,9 +1,8 @@
-import { migrate } from 'postgres-migrations-oasis';
-
 import { DB, withConnection, createDB } from '../core/db/db';
 import { getDefaultConfig, SpockConfig } from '../core/config';
 import { NetworkState } from '../core/ethereum/getNetworkState';
 import { Services } from '../core/types';
+import { migrateFromConfig } from '../core/bin/migrateUtils';
 
 export const testConfig: SpockConfig = {
   ...getDefaultConfig({
@@ -26,6 +25,7 @@ export const testConfig: SpockConfig = {
   processorsWorker: {
     retriesOnErrors: 1,
   },
+  migrations: {},
 } as any;
 
 export async function prepareDB(db: DB, config: SpockConfig): Promise<void> {
@@ -37,7 +37,7 @@ export async function prepareDB(db: DB, config: SpockConfig): Promise<void> {
     `);
   });
 
-  await migrate(config.db, 'migrate', undefined as any);
+  await migrateFromConfig(config);
   console.log('DB prepared');
 }
 
