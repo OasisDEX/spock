@@ -1,6 +1,6 @@
 import { handleEvents } from '../common';
 import { PersistedLog } from '../../extractors/instances/rawEventDataExtractor';
-const abi = require('./polling-emitter.json');
+const abi = require('./abis/polling-emitter.json');
 
 describe('handleEvents', () => {
   it('decodes events', async () => {
