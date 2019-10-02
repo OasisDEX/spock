@@ -1,7 +1,7 @@
 import { Dictionary, ValueOf } from 'ts-essentials';
 import { zip } from 'lodash';
 import { ethers, utils } from 'ethers';
-import BigNumber from 'bignumber.js';
+import { tryParseDsNote, tryParseDsNoteVer2 } from './tryParseDsNote';
 import Web3 = require('web3');
 
 import { PersistedLog } from '../extractors/instances/rawEventDataExtractor';
@@ -86,34 +86,39 @@ function normalizeValue(v: any): string {
   return v.toString();
 }
 
+/**
+ * DsNote Ver 2 doesnt encode call value, it's used in MCD
+ */
 export async function handleDsNoteEvents(
   services: LocalServices,
   abi: any,
   logs: PersistedLog[],
   handlers: DsNoteHandlers,
+  version: 1 | 2 = 1,
 ): Promise<void> {
-  // @todo sanity check for handlers is to check if event names exist in ABI
-
   const iface = new ethers.utils.Interface(abi);
 
   const parsedNotes = logs.map(
     (l: PersistedLog): NoteDecoded | undefined => {
       const explodedTopics = l.topics.slice(1, l.topics.length - 1).split(',');
-      const [, guyRaw] = explodedTopics;
+      const parsedNote =
+        version === 2
+          ? tryParseDsNoteVer2(explodedTopics, l.data)
+          : tryParseDsNote(explodedTopics, l.data);
 
-      // NOTE: we need to be careful not to ignore leading 0
-      const guy = '0x' + guyRaw.slice(guyRaw.length - 40, guyRaw.length);
-      const value = '0x' + l.data.slice(2, 64 + 2);
-      const calldata = '0x' + l.data.slice(2 + 64 * 2);
-      const decodedCallData = iface.parseTransaction({ data: calldata });
+      if (!parsedNote) {
+        return;
+      }
 
-      // it might be a standard log so we won't decode it
+      const decodedCallData = iface.parseTransaction({ data: parsedNote.values.fax });
+
+      // // it might be a standard log so we won't decode it
       if (!decodedCallData) {
         return;
       }
 
-      // we need to query abi and get args names b/c ethers won't return them
-      // NOTE: there might be no named args and thus you will have to use positional args
+      // // we need to query abi and get args names b/c ethers won't return them
+      // // NOTE: there might be no named args and thus you will have to use positional args
       const names = iface.functions[decodedCallData.signature].inputs.map(i => i.name);
       const params: Dictionary<string> = {};
       for (const [i, param] of decodedCallData.args.entries()) {
@@ -129,8 +134,8 @@ export async function handleDsNoteEvents(
         name: decodedCallData.signature,
         args,
         params,
-        ethValue: new BigNumber(value).toString(10),
-        caller: guy,
+        ethValue: parsedNote.values.wad && parsedNote.values.wad.toString(10),
+        caller: parsedNote.values.guy.toLowerCase(),
       };
     },
   );
@@ -162,7 +167,7 @@ interface NoteDecoded {
   name: string;
   args: Array<string>; // positional args
   params: Dictionary<string>; // named args
-  ethValue: string;
+  ethValue?: string; // its undefined for DsNoteVer2 used in MCD
   caller: string;
 }
 
