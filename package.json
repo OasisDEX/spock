@@ -36,7 +36,6 @@
     "@types/pretty-hrtime": "^1.0.0",
     "@types/pretty-ms": "^5.0.1",
     "@types/promise-retry": "^1.1.1",
-    "@types/web3": "^1.0.20",
     "chai": "^4.2.0",
     "dotenv-flow": "^0.3.0",
     "jest": "^24.4.0",
@@ -51,7 +50,6 @@
     "typestrict": "^1.0.2"
   },
   "dependencies": {
-    "web3": "^1.2.1",
     "@google-cloud/bigquery": "^3.0.0",
     "@types/helmet": "^0.0.43",
     "@types/node-cleanup": "^2.1.0",

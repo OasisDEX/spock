@@ -43,17 +43,29 @@ describe('handleDsNoteEvents', () => {
         },
         "note": Object {
           "args": Array [
-            "1",
-            "40000000000000000000",
-            "2500000000000000000000000000000000000000000000000",
+            BigNumber {
+              "_hex": "0x01",
+            },
+            BigNumber {
+              "_hex": "0x022b1c8c1227a00000",
+            },
+            BigNumber {
+              "_hex": "0x01b5e7e08ca3a8f6987819baecbe22800000000000",
+            },
           ],
           "caller": "0xe6ac5629b9ade2132f42887fbbc3a3860afbd07b",
           "ethValue": undefined,
           "name": "tend(uint256,uint256,uint256)",
           "params": Object {
-            "bid": "2500000000000000000000000000000000000000000000000",
-            "id": "1",
-            "lot": "40000000000000000000",
+            "bid": BigNumber {
+              "_hex": "0x01b5e7e08ca3a8f6987819baecbe22800000000000",
+            },
+            "id": BigNumber {
+              "_hex": "0x01",
+            },
+            "lot": BigNumber {
+              "_hex": "0x022b1c8c1227a00000",
+            },
           },
         },
       },
@@ -108,13 +120,17 @@ describe('handleDsNoteEvents', () => {
         },
         "note": Object {
           "args": Array [
-            "1000000000000000000",
+            BigNumber {
+              "_hex": "0x0de0b6b3a7640000",
+            },
           ],
           "caller": "0x7af825793449f92a96fa4223e7e6486e3a5da31d",
           "ethValue": "0",
           "name": "lock(uint256)",
           "params": Object {
-            "wad": "1000000000000000000",
+            "wad": BigNumber {
+              "_hex": "0x0de0b6b3a7640000",
+            },
           },
         },
       },

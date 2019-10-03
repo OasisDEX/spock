@@ -1,8 +1,7 @@
 import { Dictionary, ValueOf } from 'ts-essentials';
 import { zip } from 'lodash';
-import { ethers, utils } from 'ethers';
+import { ethers } from 'ethers';
 import { tryParseDsNote, tryParseDsNoteVer2 } from './tryParseDsNote';
-import Web3 = require('web3');
 
 import { PersistedLog } from '../extractors/instances/rawEventDataExtractor';
 import { LocalServices } from '../../types';
@@ -39,13 +38,13 @@ export async function handleEvents<TServices>(
       const params: Dictionary<string> = {};
       for (const p of paramsNames) {
         if (p) {
-          params[p] = normalizeValue(event.values[p]);
+          params[p] = event.values[p];
         }
       }
 
       const args: string[] = [];
       for (let i = 0; i < eventDefinition.length; i++) {
-        args.push(normalizeValue(event.values[i]));
+        args.push(event.values[i]);
       }
 
       return {
@@ -72,18 +71,6 @@ export async function handleEvents<TServices>(
     const filteredEvents = fullEventInfo.filter(e => e.event && e.event.name === handlerName);
     await Promise.all(filteredEvents.map(e => handler(services, e as any)));
   }
-}
-
-function normalizeValue(v: any): string {
-  if (utils.BigNumber.isBigNumber(v)) {
-    return v.toString();
-  }
-
-  if (Web3.utils.checkAddressChecksum(v)) {
-    return v.toLowerCase();
-  }
-
-  return v.toString();
 }
 
 /**
@@ -124,15 +111,13 @@ export async function handleDsNoteEvents(
       for (const [i, param] of decodedCallData.args.entries()) {
         const name = names[i];
         if (name !== undefined) {
-          params[name] = normalizeValue(param);
+          params[name] = param;
         }
       }
 
-      const args = decodedCallData.args.map(a => normalizeValue(a));
-
       return {
         name: decodedCallData.signature,
-        args,
+        args: decodedCallData.args,
         params,
         ethValue: parsedNote.values.wad && parsedNote.values.wad.toString(10),
         caller: parsedNote.values.guy.toLowerCase(),
