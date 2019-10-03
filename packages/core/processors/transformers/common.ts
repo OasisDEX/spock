@@ -5,7 +5,6 @@ import { tryParseDsNote, tryParseDsNoteVer2 } from './tryParseDsNote';
 
 import { PersistedLog } from '../extractors/instances/rawEventDataExtractor';
 import { LocalServices } from '../../types';
-import { BigNumber } from 'ethers/utils';
 
 /**
  * Note make sure that for the same ABI you always provide same object (reference). Otherwise this can lead to memory leaks.
