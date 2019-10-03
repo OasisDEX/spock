@@ -5,6 +5,7 @@ import { tryParseDsNote, tryParseDsNoteVer2 } from './tryParseDsNote';
 
 import { PersistedLog } from '../extractors/instances/rawEventDataExtractor';
 import { LocalServices } from '../../types';
+import { BigNumber } from 'ethers/utils';
 
 /**
  * Note make sure that for the same ABI you always provide same object (reference). Otherwise this can lead to memory leaks.
@@ -150,8 +151,8 @@ export async function handleDsNoteEvents(
 
 interface NoteDecoded {
   name: string;
-  args: Array<string>; // positional args
-  params: Dictionary<string>; // named args
+  args: Array<any>; // positional args
+  params: Dictionary<any>; // named args
   ethValue?: string; // its undefined for DsNoteVer2 used in MCD
   caller: string;
 }
@@ -159,8 +160,8 @@ interface NoteDecoded {
 export interface ParsedEvent {
   address: string;
   name: string;
-  args: Array<string>;
-  params: Dictionary<string>;
+  args: Array<any>;
+  params: Dictionary<any>;
 }
 
 export interface FullEventInfo {
