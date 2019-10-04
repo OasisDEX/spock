@@ -25,6 +25,7 @@ export interface SpockConfig {
     retriesOnErrors: number;
   };
   statsWorker: {
+    enabled: boolean;
     interval: number; // in minutes
   };
   chain: {
@@ -67,6 +68,7 @@ export const getDefaultConfig = (env: Env) => {
       retriesOnErrors: 10,
     },
     statsWorker: {
+      enabled: true,
       interval: 10, // get stats every 10 minutes
     },
     chain: {

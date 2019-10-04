@@ -1,7 +1,7 @@
 import { Block } from 'ethers/providers';
 import { withConnection, makeNullUndefined } from './db/db';
 import { compact } from 'lodash';
-import { getLast, getRangeAsString } from './utils';
+import { getLast, getRangeAsString, getSpockBreakout } from './utils';
 import { getLogger } from './utils/logger';
 import { Services } from './types';
 import { BlockModel } from './db/models/Block';
@@ -25,7 +25,7 @@ export async function blockGenerator(
 
   currentBlockNo = (await getLastBlockNo(services)) + 1;
 
-  while (toBlockNo ? currentBlockNo < toBlockNo : true) {
+  while (toBlockNo ? currentBlockNo < toBlockNo : true && !getSpockBreakout()) {
     logger.info('Waiting for block:', currentBlockNo);
 
     const blocks = await getRealBlocksStartingFrom(services, currentBlockNo);

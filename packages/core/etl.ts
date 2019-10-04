@@ -31,7 +31,7 @@ export async function etl(config: SpockConfig): Promise<void> {
       blockGenerator(services, config.startingBlock, config.lastBlock),
       process(services, config.extractors),
       process(services, config.transformers),
-      statsWorker(services),
+      config.statsWorker.enabled ? statsWorker(services) : Promise.resolve(),
     ]);
   });
 }

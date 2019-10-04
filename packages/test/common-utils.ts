@@ -3,11 +3,11 @@ import { createDB, DB } from '../core/db/db';
 import { dumpDB, prepareDB, testConfig } from './common';
 import { mergeConfig } from '../core/utils/configUtils';
 import { etl } from '../core/etl';
-import { delay } from '../core/utils';
+import { delay, setSpockBreakout } from '../core/utils';
 import { join } from 'path';
 
 export async function runIntegrationTest(externalConfig: UserProvidedSpockConfig): Promise<DB> {
-  const config = mergeConfig(externalConfig);
+  const config = mergeConfig({ ...externalConfig, statsWorker: { enabled: false } });
 
   if (!config.lastBlock) {
     throw new Error("You need to specify 'lastBlock' during tests!");
@@ -16,7 +16,7 @@ export async function runIntegrationTest(externalConfig: UserProvidedSpockConfig
   const dbCtx = createDB(testConfig.db);
   await prepareDB(dbCtx.db, config);
 
-  etl(config).catch(e => {
+  const etlTask = etl(config).catch(e => {
     console.log('ETL FAILED WITH ', e);
     process.exit(1);
   });
@@ -30,6 +30,9 @@ export async function runIntegrationTest(externalConfig: UserProvidedSpockConfig
     const jobs = (await dumpDB(dbCtx.db)).job;
     fullySynced = jobs.filter(p => p.last_block_id >= lastBlockId).length === allJobs;
   }
+  setSpockBreakout();
+
+  await etlTask;
 
   return dbCtx.db;
 }
