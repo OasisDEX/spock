@@ -1,5 +1,5 @@
 import { withConnection } from '../db/db';
-import { delay, getLast, findConsecutiveSubsets } from '../utils';
+import { delay, getLast, findConsecutiveSubsets, getSpockBreakout } from '../utils';
 import { getLogger } from '../utils/logger';
 import { Services, TransactionalServices } from '../types';
 import { get, sortBy, groupBy } from 'lodash';
@@ -14,7 +14,7 @@ const logger = getLogger('extractor/index');
 export async function process(services: Services, processors: Processor[]): Promise<void> {
   logger.debug('Spawning extractors: ', processors.length);
 
-  while (processors.length > 0) {
+  while (processors.length > 0 && !getSpockBreakout()) {
     // NOTE: no two processors extract at the same
     let processed = 0;
     for (const p of processors) {

@@ -1,5 +1,5 @@
 import { Services } from '../types';
-import { delay } from '../utils';
+import { delay, getSpockBreakout } from '../utils';
 import { getLogger } from '../utils/logger';
 import { Stats } from './types';
 import { JobModel, getAllJobs } from '../db/models/Job';
@@ -15,7 +15,7 @@ export async function statsWorker(services: Services): Promise<void> {
   logger.info('Stats process starting...');
 
   let lastStat: Stats | undefined;
-  while (true) {
+  while (true && !getSpockBreakout()) {
     const startTime = Date.now();
     logger.info(`Sleeping for ${statsCfg.interval} sec...`);
     await delay(statsCfg.interval * 1000 * 60);

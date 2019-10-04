@@ -26,6 +26,9 @@ export const testConfig: SpockConfig = {
     retriesOnErrors: 1,
   },
   migrations: {},
+  statsWorker: {
+    enabled: false,
+  },
 } as any;
 
 export async function prepareDB(db: DB, config: SpockConfig): Promise<void> {
