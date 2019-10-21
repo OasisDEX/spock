@@ -3,7 +3,7 @@ import { createDB, DB } from '../core/db/db';
 import { dumpDB, prepareDB, testConfig } from './common';
 import { mergeConfig } from '../core/utils/configUtils';
 import { etl } from '../core/etl';
-import { delay, setSpockBreakout } from '../core/utils';
+import { delay, setSpockBreakout, resetSpockBreakout } from '../core/utils';
 import { join } from 'path';
 
 export async function runIntegrationTest(externalConfig: UserProvidedSpockConfig): Promise<DB> {
@@ -15,6 +15,7 @@ export async function runIntegrationTest(externalConfig: UserProvidedSpockConfig
 
   const dbCtx = createDB(testConfig.db);
   await prepareDB(dbCtx.db, config);
+  resetSpockBreakout();
 
   const etlTask = etl(config).catch(e => {
     console.log('ETL FAILED WITH ', e);
