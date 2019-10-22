@@ -33,8 +33,15 @@ export const testConfig: SpockConfig = {
 
 export async function prepareDB(db: DB, config: SpockConfig): Promise<void> {
   await withConnection(db, async c => {
+    const schemasWrapped: { name: string }[] = await c.many(
+      'SELECT schema_name as name FROM information_schema.schemata;',
+    );
+    const schemasToDelete = schemasWrapped
+      .map(s => s.name)
+      .filter(n => !n.startsWith('pg_') && n !== 'information_schema');
+
     await c.none(`
-    DROP SCHEMA IF EXISTS public, api, rest_api, dschief, oasis, oasis_market, vulcan2x, extracted, erc20, proxy CASCADE;
+    DROP SCHEMA IF EXISTS ${schemasToDelete.join(',')} CASCADE;
     CREATE SCHEMA public;
     GRANT ALL ON SCHEMA public TO public;
     `);

@@ -80,3 +80,7 @@ export function getSpockBreakout(): boolean {
 export function setSpockBreakout(): void {
   (global as any).SPOCK_BREAKOUT = true;
 }
+
+export function resetSpockBreakout(): void {
+  (global as any).SPOCK_BREAKOUT = false;
+}
