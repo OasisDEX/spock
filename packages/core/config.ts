@@ -41,6 +41,10 @@ export interface SpockConfig {
     host: string;
     port: number;
   };
+  sentry?: {
+    dsn: string;
+    environment: string;
+  };
 }
 
 export type UserProvidedSpockConfig = DeepPartial<SpockConfig> &
@@ -82,6 +86,10 @@ export const getDefaultConfig = (env: Env) => {
       password: getRequiredString(env, 'VL_DB_PASSWORD'),
       host: getRequiredString(env, 'VL_DB_HOST'),
       port: getRequiredNumber(env, 'VL_DB_PORT'),
+    },
+    sentry: env.SENTRY_DSN && {
+      dsn: getRequiredString(env, 'SENTRY_DSN'),
+      environment: getRequiredString(env, 'SENTRY_ENV'),
     },
   };
 };

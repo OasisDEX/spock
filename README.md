@@ -114,3 +114,14 @@ We use [consola](https://github.com/nuxt/consola#readme) for logging. By default
 everything. To adjust logging [levels](https://github.com/nuxt/consola#level) set
 `VL_LOGGING_LEVEL`. env variable. Ex. use `VL_LOGGING_LEVEL=4` to omit detailed db logs (most
 verbose).
+
+### Sentry integration
+
+Configure sentry by providing environmental variables:
+
+```
+SENTRY_DSN=...
+SENTRY_ENV=production
+```
+
+We will only report critical errors (ie. stopped jobs).
