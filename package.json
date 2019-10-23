@@ -1,6 +1,6 @@
 {
   "name": "spock-etl",
-  "version": "0.0.51",
+  "version": "0.0.52",
   "license": "AGPL-3.0-or-later",
   "bin": "lib/core/runner.js",
   "files": [
