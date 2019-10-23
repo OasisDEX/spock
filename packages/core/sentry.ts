@@ -6,11 +6,12 @@ import { getLogger } from './utils/logger';
 const logger = getLogger('sentry');
 
 export function setupSentry(config: SpockConfig): void {
-  if (config.sentry.dsn) {
-    logger.info('Enabling Sentry integration');
+  if (config.sentry) {
+    logger.info(`Enabling Sentry integration (env=${config.sentry.environment})`);
 
     Sentry.init({
       dsn: config.sentry.dsn,
+      environment: config.sentry.environment,
     });
   } else {
     logger.warn('Sentry disabled');

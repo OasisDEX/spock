@@ -41,8 +41,9 @@ export interface SpockConfig {
     host: string;
     port: number;
   };
-  sentry: {
-    dsn?: string;
+  sentry?: {
+    dsn: string;
+    environment: string;
   };
 }
 
@@ -86,8 +87,9 @@ export const getDefaultConfig = (env: Env) => {
       host: getRequiredString(env, 'VL_DB_HOST'),
       port: getRequiredNumber(env, 'VL_DB_PORT'),
     },
-    sentry: {
-      dsn: env['SENTRY_DSN'],
+    sentry: env.SENTRY_DSN && {
+      dsn: getRequiredString(env, 'SENTRY_DSN'),
+      environment: getRequiredString(env, 'SENTRY_ENV'),
     },
   };
 };
