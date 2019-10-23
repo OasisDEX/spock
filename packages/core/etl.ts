@@ -8,6 +8,7 @@ import { process } from './processors/process';
 import { registerProcessors } from './processors/register';
 import { statsWorker } from './stats/stats';
 import { getVersion } from './utils/getVersion';
+import { setupSentry } from './sentry';
 
 ethers.errors.setLogLevel('error');
 const logger = getLogger('runner');
@@ -23,6 +24,7 @@ export async function etl(config: SpockConfig): Promise<void> {
   const services = await createServices(config);
 
   printSystemInfo(config);
+  setupSentry(config);
 
   await withLock(services.db, services.config.processDbLock, async () => {
     await registerProcessors(services, getAllProcessors(config));

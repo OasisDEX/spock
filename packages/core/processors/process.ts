@@ -8,6 +8,7 @@ import { getJob, stopJob } from '../db/models/Job';
 import { Processor, isExtractor, BlockExtractor } from './types';
 import { getRandomProvider } from '../services';
 import { clearProcessorState, addProcessorError, getProcessorErrors } from './state';
+import { captureException } from '@sentry/node';
 
 const logger = getLogger('extractor/index');
 
@@ -108,6 +109,8 @@ export async function processBlocks(services: Services, processor: Processor): P
 
       const allErrors = JSON.stringify(getProcessorErrors(services, processor));
       logger.error('ERROR:', allErrors);
+
+      captureException(e);
 
       await withConnection(services.db, async c => {
         await stopJob(c, processor.name, allErrors);
