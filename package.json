@@ -24,7 +24,6 @@
     "test:fix": "yarn lint:fix && yarn test:unit"
   },
   "devDependencies": {
-    "@sentry/node": "5.7.1",
     "@types/apicache": "^1.2.0",
     "@types/bignumber.js": "^5.0.0",
     "@types/body-parser": "^1.17.0",
@@ -51,6 +50,7 @@
     "typestrict": "^1.0.2"
   },
   "dependencies": {
+    "@sentry/node": "5.7.1",
     "@google-cloud/bigquery": "^3.0.0",
     "@types/helmet": "^0.0.43",
     "@types/node-cleanup": "^2.1.0",
