@@ -1,6 +1,7 @@
 import { Dictionary, MarkRequired, DeepPartial } from 'ts-essentials';
 import { Env, getRequiredString, getRequiredNumber } from './utils/configUtils';
 import { BlockExtractor, BlockTransformer, Processor } from './processors/types';
+import { Services } from './types';
 
 export interface SpockConfig {
   startingBlock: number;
@@ -8,6 +9,7 @@ export interface SpockConfig {
   extractors: BlockExtractor[];
   transformers: BlockTransformer[];
   migrations: Dictionary<string>;
+  onStart?: (services: Services) => Promise<void>;
 
   // unique number that will be used to acquire lock on database
   processDbLock: number;
@@ -63,7 +65,7 @@ export const getDefaultConfig = (env: Env) => {
     },
     extractorWorker: {
       batch: 400,
-      reorgBuffer: 500, // when to switch off batch processing
+      reorgBuffer: 100, // when to switch off batch processing
     },
     transformerWorker: {
       batch: 1000,

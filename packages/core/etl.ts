@@ -27,6 +27,11 @@ export async function etl(config: SpockConfig): Promise<void> {
   setupSentry(config);
 
   await withLock(services.db, services.config.processDbLock, async () => {
+    if (services.config.onStart) {
+      logger.debug('Running onStart hook.');
+      await services.config.onStart(services);
+    }
+
     await registerProcessors(services, getAllProcessors(config));
 
     await Promise.all([
