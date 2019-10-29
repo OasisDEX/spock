@@ -18,7 +18,7 @@ export async function runIntegrationTest(externalConfig: UserProvidedSpockConfig
   resetSpockBreakout();
 
   const etlTask = etl(config).catch(e => {
-    console.log('ETL FAILED WITH ', e);
+    console.error('ETL FAILED WITH ', e);
     process.exit(1);
   });
 
