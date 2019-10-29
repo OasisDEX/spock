@@ -64,8 +64,12 @@ export const dumpDB = async (db: DB) => {
   });
 };
 
-export async function executeSQL(db: DB, sql: string): Promise<any[]> {
-  return await db.any(sql);
+export async function executeSQL(db: DB, sql: string): Promise<void> {
+  await db.any(sql);
+}
+
+export async function getSQL(db: DB, sql: string): Promise<any[]> {
+  return db.any(sql);
 }
 
 export const networkState: NetworkState = {
