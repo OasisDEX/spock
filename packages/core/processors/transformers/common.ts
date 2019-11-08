@@ -7,7 +7,12 @@ import { PersistedLog } from '../extractors/instances/rawEventDataExtractor';
 import { LocalServices } from '../../types';
 
 /**
- * Note make sure that for the same ABI you always provide same object (reference). Otherwise this can lead to memory leaks.
+ * Decode events from raw logs using provided ABI.
+ *
+ * @param handlers - Keys are event names.
+ *
+ * NOTE: make sure that for the same ABI you always provide same object (reference). Otherwise this can lead to memory leaks.
+ * NOTE: For support for DSNote generated events use "handleDsNoteEvents"
  */
 export async function handleEvents<TServices>(
   services: TServices,
@@ -74,7 +79,10 @@ export async function handleEvents<TServices>(
 }
 
 /**
- * DsNote Ver 2 doesnt encode call value, it's used in MCD
+ * Decode dsnote generated anonymous events.
+ *
+ * @param handlers - Keys are method signatures.
+ * @param version - There are two different DSNotes versions in the wild. DsNote Ver 2 doesnt encode call value, it's used in MCD.
  */
 export async function handleDsNoteEvents(
   services: LocalServices,
