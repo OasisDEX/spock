@@ -1,3 +1,5 @@
+import { flush, captureException } from '@sentry/node';
+
 import { loadConfig } from '../utils/configUtils';
 import { getLogger } from '../utils/logger';
 import { migrateFromConfig } from './migrateUtils';
@@ -10,8 +12,15 @@ export async function main(): Promise<void> {
   await migrateFromConfig(config);
 }
 
-main().catch(e => {
-  logger.error(e);
-  console.error(e);
-  process.exit(1);
-});
+//tslint:disable-next-line
+main()
+  .catch(async e => {
+    logger.error(e);
+
+    captureException(e);
+    // need for sentry to send async requests
+    await flush();
+  })
+  .finally(() => {
+    process.exit(1);
+  });
