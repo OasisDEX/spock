@@ -1,3 +1,5 @@
+import { captureException, flush } from '@sentry/node';
+
 import { validateJobs } from '../../validate/validateJobs';
 import { loadConfig } from '../utils/configUtils';
 
@@ -11,7 +13,15 @@ export async function main(): Promise<void> {
   await validateJobs(config);
 }
 
-main().catch(e => {
-  console.error(e);
-  process.exit(1);
-});
+//tslint:disable-next-line
+main()
+  .catch(async e => {
+    console.error(e);
+
+    captureException(e);
+    // need for sentry to send async requests
+    await flush();
+  })
+  .finally(() => {
+    process.exit(1);
+  });

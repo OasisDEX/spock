@@ -7,7 +7,6 @@ import { blockGenerator } from './blockGenerator';
 import { process } from './processors/process';
 import { registerProcessors } from './processors/register';
 import { statsWorker } from './stats/stats';
-import { setupSentry } from './sentry';
 import { printSystemInfo } from './printSystemInfo';
 
 ethers.errors.setLogLevel('error');
@@ -17,7 +16,6 @@ export async function etl(config: SpockConfig): Promise<void> {
   const services = await createServices(config);
 
   printSystemInfo(config);
-  setupSentry(config);
 
   await withLock(services.db, services.config.processDbLock, async () => {
     if (services.config.onStart) {
