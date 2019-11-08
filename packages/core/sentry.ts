@@ -7,10 +7,10 @@ const logger = getLogger('sentry');
 
 export function setupSentry(): void {
   const env = process.env;
-  const sentryDSN = getRequiredString(env, 'SENTRY_DSN');
-  const sentryEnv = getRequiredString(env, 'SENTRY_ENV');
+  const sentryDSN = env.SENTRY_DSN;
 
   if (env.SENTRY_DSN) {
+    const sentryEnv = getRequiredString(env, 'SENTRY_ENV');
     logger.info(`Enabling Sentry integration (env=${sentryEnv}, dsn=${sentryDSN})`);
 
     Sentry.init({
