@@ -56,6 +56,8 @@ export type ExternalVulcan2xConfig = MarkRequired<
   Partial<SpockConfig>,
   'startingBlock' | 'extractors' | 'transformers'
 >;
+// ExternalVulcan2xConfig but with any additional fields
+export type ExtendedExternalVulcan2xConfig = ExternalVulcan2xConfig & Dictionary<any>;
 
 export const getDefaultConfig = (env: Env) => {
   return {
