@@ -152,9 +152,9 @@ export async function getNextBlocks(
         ${getAllDependencies(processor)
           .map((d, i) => `JOIN vulcan2x.job j${i} ON j${i}.name='${d}' AND b.id <= j${i}.last_block_id`)
           .join('\n')}
-        WHERE 
-          b.id > ${job.last_block_id} AND 
-          b.id <= ${job.last_block_id + batchSize};
+        WHERE b.id > ${job.last_block_id}
+        ORDER BY id
+        LIMIT ${batchSize};
       `,
       )) || [];
 

@@ -116,6 +116,70 @@ Array [
 ]
 `);
   });
+
+  it('should run processors even with huge "gaps" (reorgs) in blocks', async () => {
+    const dbCtx = createDB(testConfig.db);
+    await prepareDB(dbCtx.db, testConfig);
+
+    await executeSQL(
+      dbCtx.db,
+      `
+      -- blocks
+      INSERT INTO vulcan2x.block(number, hash, timestamp) VALUES(1, '0x01', '2019-07-02 11:18:01+00');
+      INSERT INTO vulcan2x.block(number, hash, timestamp) VALUES(2, '0x02', '2019-07-02 11:18:02+00');
+      INSERT INTO vulcan2x.block(id,number, hash, timestamp) VALUES(100, 3, '0x03', '2019-07-02 11:18:03+00'); -- note: id difference is more than batch
+    `,
+    );
+
+    const blockExtractor: BlockExtractor = {
+      name: 'test-extractor',
+      extract: async () => {},
+      getData: async () => ({}),
+    };
+
+    const services: Services = {
+      db: dbCtx.db,
+      pg: dbCtx.pg,
+      config: {
+        ...testConfig,
+        extractorWorker: {
+          batch: 3,
+          reorgBuffer: 10,
+        },
+      },
+      columnSets: undefined as any,
+      provider: undefined as any,
+      networkState,
+      processorsState: getInitialProcessorsState([blockExtractor]),
+    };
+
+    await registerProcessors(services, [blockExtractor]);
+
+    const actual = await getNextBlocks(services, blockExtractor);
+
+    expect(actual).toMatchInlineSnapshot(`
+Array [
+  Object {
+    "hash": "0x01",
+    "id": 1,
+    "number": 1,
+    "timestamp": 2019-07-02T11:18:01.000Z,
+  },
+  Object {
+    "hash": "0x02",
+    "id": 2,
+    "number": 2,
+    "timestamp": 2019-07-02T11:18:02.000Z,
+  },
+  Object {
+    "hash": "0x03",
+    "id": 100,
+    "number": 3,
+    "timestamp": 2019-07-02T11:18:03.000Z,
+  },
+]
+`);
+  });
 });
 
 describe('process', () => {
