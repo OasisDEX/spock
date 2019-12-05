@@ -1,4 +1,4 @@
-import { Dictionary, MarkRequired, DeepPartial } from 'ts-essentials';
+import { Dictionary, DeepPartial } from 'ts-essentials';
 import { Env, getRequiredString, getRequiredNumber } from './utils/configUtils';
 import { BlockExtractor, BlockTransformer, Processor } from './processors/types';
 import { Services } from './types';
@@ -49,13 +49,10 @@ export interface SpockConfig {
   };
 }
 
+// Config type that should be used as an input for spock. It can have any additional fields (hence & Dictionary<any>)
 export type UserProvidedSpockConfig = DeepPartial<SpockConfig> &
-  Pick<SpockConfig, 'startingBlock' | 'lastBlock' | 'extractors' | 'transformers' | 'migrations'>;
-
-export type ExternalVulcan2xConfig = MarkRequired<
-  Partial<SpockConfig>,
-  'startingBlock' | 'extractors' | 'transformers'
->;
+  Pick<SpockConfig, 'startingBlock' | 'lastBlock' | 'extractors' | 'transformers' | 'migrations'> &
+  Dictionary<any>;
 
 export const getDefaultConfig = (env: Env) => {
   return {
@@ -65,7 +62,7 @@ export const getDefaultConfig = (env: Env) => {
     },
     extractorWorker: {
       batch: 400,
-      reorgBuffer: 100, // when to switch off batch processing
+      reorgBuffer: 100, // when to switch off batch processing, set to 0 to turn always process in batches
     },
     transformerWorker: {
       batch: 1000,

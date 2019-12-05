@@ -2,7 +2,8 @@ import { Services } from '../types';
 import { getJob, saveJob, WritableJobModel, setJobStatus, excludeAllJobs } from '../db/models/Job';
 import { withConnection, DbConnection } from '../db/db';
 import { getLogger } from '../utils/logger';
-import { Processor } from './types';
+import { Processor, isExtractor } from './types';
+import { difference } from 'lodash';
 
 const logger = getLogger('register');
 
@@ -13,6 +14,8 @@ export async function registerProcessors(
   services: Services,
   processors: Processor[],
 ): Promise<void> {
+  validateIntegrity(processors);
+
   await withConnection(services.db, async c => {
     logger.info('De-registering all processors...');
     await excludeAllJobs(c);
@@ -42,5 +45,55 @@ async function registerProcessor(c: DbConnection, processor: Processor): Promise
 
     logger.info(`Registering a new processor ${processor.name}: (${JSON.stringify(newJob)})`);
     await saveJob(c, newJob);
+  }
+}
+
+function validateIntegrity(processors: Processor[]): void {
+  checkNameUniqueness(processors);
+  checkDependencies(processors);
+}
+
+function checkNameUniqueness(processors: Processor[]): void {
+  const uniqueNames = new Set<string>();
+  const names = processors.map(p => p.name);
+
+  for (const name of names) {
+    if (uniqueNames.has(name)) {
+      throw new Error(`${name} processor name is not unique!`);
+    }
+    uniqueNames.add(name);
+  }
+}
+
+// ensures that all dependencies exist
+function checkDependencies(processors: Processor[]): void {
+  const allNames = processors.map(p => p.name);
+
+  for (const processor of processors) {
+    if (isExtractor(processor)) {
+      const diff = difference(processor.extractorDependencies || [], allNames);
+      if (diff.length > 0) {
+        throw new Error(
+          `Processor ${processor.name} has extractorDependencies that couldn't be find: ${diff.join(
+            ', ',
+          )}`,
+        );
+      }
+    } else {
+      const diff = difference(processor.dependencies || [], allNames);
+      if (diff.length > 0) {
+        throw new Error(
+          `Processor ${processor.name} has dependencies that couldn't be find: ${diff.join(', ')}`,
+        );
+      }
+      const diff2 = difference(processor.transformerDependencies || [], allNames);
+      if (diff2.length > 0) {
+        throw new Error(
+          `Processor ${
+            processor.name
+          } has transformerDependencies that couldn't be find: ${diff2.join(', ')}`,
+        );
+      }
+    }
   }
 }

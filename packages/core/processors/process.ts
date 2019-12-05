@@ -39,12 +39,15 @@ export async function processBlocks(services: Services, processor: Processor): P
 
   // We can speed up whole process (process blocks in batches) if we don't have a risk of reorg.
   // Otherwise we process blocks separately to avoid problems with reorgs while processing tip of the blockchain.
+  // By setting extractorWorker.reorgBuffer = 0 you can switch off this behaviour on chains that can't reorg (POA networks).
   const closeToTheTipOfBlockchain =
-    ((get(blocks, '[0].number') as number) || 0) +
-      services.config.extractorWorker.batch -
-      services.networkState.latestEthereumBlockOnStart +
-      services.config.extractorWorker.reorgBuffer >
-    0;
+    services.config.extractorWorker.reorgBuffer === 0
+      ? false
+      : ((get(blocks, '[0].number') as number) || 0) +
+          services.config.extractorWorker.batch -
+          services.networkState.latestEthereumBlockOnStart +
+          services.config.extractorWorker.reorgBuffer >
+        0;
 
   const batchProcessing =
     !closeToTheTipOfBlockchain || (processor as any).disablePerfBoost || false;
@@ -149,9 +152,9 @@ export async function getNextBlocks(
         ${getAllDependencies(processor)
           .map((d, i) => `JOIN vulcan2x.job j${i} ON j${i}.name='${d}' AND b.id <= j${i}.last_block_id`)
           .join('\n')}
-        WHERE 
-          b.id > ${job.last_block_id} AND 
-          b.id <= ${job.last_block_id + batchSize};
+        WHERE b.id > ${job.last_block_id}
+        ORDER BY id
+        LIMIT ${batchSize};
       `,
       )) || [];
 
