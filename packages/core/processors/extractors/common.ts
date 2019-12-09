@@ -4,20 +4,26 @@ import { Transaction } from 'ethers/utils';
 import { TransactionalServices, LocalServices } from '../../types';
 import { BlockModel } from '../../db/models/Block';
 import { makeNullUndefined } from '../../db/db';
+import { getTrace, addTrace } from './traces';
 
 export async function getOrCreateTx(
   services: TransactionalServices,
   transactionHash: string,
   block: BlockModel,
 ): Promise<PersistedTransaction> {
-  const transaction = await services.provider.getTransaction(transactionHash);
+  const [transaction, trace] = await Promise.all([
+    services.provider.getTransaction(transactionHash),
+    getTrace(services, transactionHash),
+  ]);
 
   // this means that reorg is happening or ethereum node is not consistent
-  if (!transaction) {
+  if (!transaction || !trace) {
     throw new RetryableError(`Tx is not defined!`);
   }
 
   const storedTx = await addTx(services, transaction, block);
+
+  await addTrace(services, storedTx.id, trace);
 
   return storedTx;
 }
@@ -86,11 +92,15 @@ export async function addTx(
     .catch(silenceError(matchUniqueKeyError));
 
   const storedTx = await getTx(services, transaction.hash!);
-  if (!storedTx) {
-    throw new Error('It should never happen!');
-  }
+  assert(storedTx, 'Stored tx has to be defined!');
 
   return storedTx;
+}
+
+function assert(condition: any, msg?: string): asserts condition {
+  if (!condition) {
+    throw new Error(msg);
+  }
 }
 
 interface PersistedTransaction {

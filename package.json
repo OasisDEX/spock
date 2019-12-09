@@ -40,20 +40,21 @@
     "dotenv-flow": "^0.3.0",
     "jest": "^24.4.0",
     "mocha": "^5.2.0",
-    "prettier": "^1.15.3",
+    "prettier": "^1.19.1",
     "ts-essentials": "^3.0.0",
     "ts-jest": "^24.0.0",
     "ts-node": "^8.0.3",
     "tslint": "^5.12.1",
     "tslint-language-service": "^0.9.9",
-    "typescript": "^3.5.3",
+    "typescript": "^3.7.3",
     "typestrict": "^1.0.2"
   },
   "dependencies": {
-    "@sentry/node": "5.7.1",
     "@google-cloud/bigquery": "^3.0.0",
+    "@sentry/node": "5.7.1",
     "@types/helmet": "^0.0.43",
     "@types/node-cleanup": "^2.1.0",
+    "@types/request-promise-native": "^1.0.17",
     "apicache": "^1.4.0",
     "bignumber.js": "^8.0.2",
     "body-parser": "^1.18.3",
@@ -64,6 +65,7 @@
     "ethers": "krzkaczor/ethers.js#kk/get-logs-multiple-address-build",
     "express": "^4.16.4",
     "helmet": "^3.16.0",
+    "invariant": "^2.2.4",
     "lodash": "^4.17.11",
     "node-cleanup": "^2.1.2",
     "pg-promise": "^8.5.5",
@@ -72,6 +74,8 @@
     "postgres-migrations-oasis": "^3.0.2",
     "pretty-ms": "^5.0.0",
     "promise-retry": "^1.1.1",
+    "request": "^2.88.0",
+    "request-promise-native": "^1.0.8",
     "serialize-error": "^4.1.0"
   }
 }
