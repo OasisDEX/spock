@@ -4,13 +4,14 @@ import {
   Env,
   loadExternalConfig,
 } from '../core/utils/configUtils';
+import { merge } from 'lodash';
 
 export interface ApiConfig {
   api: {
     whitelisting: {
       enabled: boolean;
-      whitelistedQueriesDir: string;
-      bypassSecret: string;
+      whitelistedQueriesDir?: string;
+      bypassSecret?: string;
     };
     responseCaching: {
       enabled: boolean;
@@ -31,7 +32,7 @@ export interface ApiConfig {
 export function getApiConfig(env: Env, configPath: string): ApiConfig {
   const externalConfig = loadExternalConfig(configPath);
 
-  return {
+  const defaultCfg: ApiConfig = {
     db: {
       database: getRequiredString(env, 'VL_DB_DATABASE'),
       user: getRequiredString(env, 'VL_DB_USER'),
@@ -41,17 +42,16 @@ export function getApiConfig(env: Env, configPath: string): ApiConfig {
     },
     api: {
       port: 3001,
-      ...externalConfig.api,
       whitelisting: {
         enabled: !!process.env.VL_GRAPHQL_WHITELISTING_ENABLED,
-        ...externalConfig.api.whitelisting,
       },
       responseCaching: {
         enabled: !!process.env.VL_GRAPHQL_CACHING_ENABLED,
         duration: process.env.VL_GRAPHQL_CACHING_DURATION || '15 seconds',
         transformKey: k => k,
-        ...externalConfig.api.responseCaching,
       },
     },
   };
+
+  return merge({}, defaultCfg, externalConfig);
 }

@@ -53,8 +53,8 @@ export function startAPI(config: ApiConfig): void {
     app.use(
       graphqlConfig.graphqlRoute,
       whitelisting(
-        config.api.whitelisting.whitelistedQueriesDir,
-        config.api.whitelisting.bypassSecret,
+        config.api.whitelisting.whitelistedQueriesDir!,
+        config.api.whitelisting.bypassSecret!,
       ),
     );
   } else {
