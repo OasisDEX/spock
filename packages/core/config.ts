@@ -42,6 +42,9 @@ export interface SpockConfig {
     password: string;
     host: string;
     port: number;
+
+    // potentially any setting supported by pg-promise
+    [any: string]: any;
   };
   sentry?: {
     dsn: string;
