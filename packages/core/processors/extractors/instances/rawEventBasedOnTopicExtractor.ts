@@ -49,24 +49,26 @@ export async function extractRawLogsOnTopic(
   );
   const allStoredTxsByTxHash = groupBy(allStoredTxs, 'hash');
 
-  const logsToInsert = (await Promise.all(
-    logs.map(async log => {
-      const _block = blocksByHash[log.blockHash!];
-      if (!_block) {
-        return;
-      }
-      const block = _block[0];
-      const storedTx = allStoredTxsByTxHash[log.transactionHash!][0];
+  const logsToInsert = (
+    await Promise.all(
+      logs.map(async log => {
+        const _block = blocksByHash[log.blockHash!];
+        if (!_block) {
+          return;
+        }
+        const block = _block[0];
+        const storedTx = allStoredTxsByTxHash[log.transactionHash!][0];
 
-      return {
-        ...log,
-        address: log.address.toLowerCase(), // always use lower case
-        log_index: log.logIndex,
-        block_id: block.id,
-        tx_id: storedTx.id,
-      };
-    }),
-  )).filter(log => !!log);
+        return {
+          ...log,
+          address: log.address.toLowerCase(), // always use lower case
+          log_index: log.logIndex,
+          block_id: block.id,
+          tx_id: storedTx.id,
+        };
+      }),
+    )
+  ).filter(log => !!log);
 
   let insertedLogs: PersistedLog[] = [];
   if (logsToInsert.length !== 0) {

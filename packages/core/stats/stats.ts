@@ -55,11 +55,21 @@ export async function getStats(services: Services): Promise<Stats> {
     const allJobsByName = groupBy(allJobs, 'name');
 
     const extractors = flatten(
-      values(pick(allJobsByName, services.config.extractors.map(e => e.name))),
+      values(
+        pick(
+          allJobsByName,
+          services.config.extractors.map(e => e.name),
+        ),
+      ),
     );
     const blocksExtracted = sumWork(extractors);
     const transformers = flatten(
-      values(pick(allJobsByName, services.config.transformers.map(e => e.name))),
+      values(
+        pick(
+          allJobsByName,
+          services.config.transformers.map(e => e.name),
+        ),
+      ),
     );
     const blocksTransformed = sumWork(transformers);
 

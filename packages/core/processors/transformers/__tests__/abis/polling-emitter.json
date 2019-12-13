@@ -10,7 +10,10 @@
   },
   {
     "constant": false,
-    "inputs": [{ "name": "pollId", "type": "uint256" }, { "name": "optionId", "type": "uint256" }],
+    "inputs": [
+      { "name": "pollId", "type": "uint256" },
+      { "name": "optionId", "type": "uint256" }
+    ],
     "name": "vote",
     "outputs": [],
     "payable": false,

@@ -55,9 +55,7 @@ export async function processBlocks(services: Services, processor: Processor): P
     ? blocks.map(b => [b])
     : findConsecutiveSubsets(blocks, 'number');
   logger.debug(
-    `Processing ${blocks.length} blocks with ${
-      processor.name
-    }. Process in batch: ${batchProcessing}`,
+    `Processing ${blocks.length} blocks with ${processor.name}. Process in batch: ${batchProcessing}`,
   );
 
   try {

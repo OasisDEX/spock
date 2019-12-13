@@ -24,42 +24,40 @@ export async function handleEvents<TServices>(
 
   // @todo sanity check for handlers is to check if event names exist in ABI
 
-  const parsedEvents = logs.map(
-    (l: any): ParsedEvent | undefined => {
-      const topics = l.topics;
-      const newTopics = topics.slice(1, topics.length - 1).split(',');
-      const event = iface.parseLog({ data: l.data, topics: newTopics });
+  const parsedEvents = logs.map((l: any): ParsedEvent | undefined => {
+    const topics = l.topics;
+    const newTopics = topics.slice(1, topics.length - 1).split(',');
+    const event = iface.parseLog({ data: l.data, topics: newTopics });
 
-      if (!event) {
-        return;
+    if (!event) {
+      return;
+    }
+
+    // we want to split positional arguments from named arguments,
+    // this turns out to be a PITA because they are merged together inside parsedEvent.values object/array thing
+
+    const eventDefinition = iface.events[event.signature].inputs;
+    const paramsNames = eventDefinition.map(p => p.name);
+
+    const params: Dictionary<string> = {};
+    for (const p of paramsNames) {
+      if (p) {
+        params[p] = event.values[p];
       }
+    }
 
-      // we want to split positional arguments from named arguments,
-      // this turns out to be a PITA because they are merged together inside parsedEvent.values object/array thing
+    const args: string[] = [];
+    for (let i = 0; i < eventDefinition.length; i++) {
+      args.push(event.values[i]);
+    }
 
-      const eventDefinition = iface.events[event.signature].inputs;
-      const paramsNames = eventDefinition.map(p => p.name);
-
-      const params: Dictionary<string> = {};
-      for (const p of paramsNames) {
-        if (p) {
-          params[p] = event.values[p];
-        }
-      }
-
-      const args: string[] = [];
-      for (let i = 0; i < eventDefinition.length; i++) {
-        args.push(event.values[i]);
-      }
-
-      return {
-        name: event.name,
-        address: l.address.toLowerCase(),
-        args,
-        params,
-      };
-    },
-  );
+    return {
+      name: event.name,
+      address: l.address.toLowerCase(),
+      args,
+      params,
+    };
+  });
 
   if (parsedEvents.length !== logs.length) {
     throw new Error('Length mismatch');
@@ -93,45 +91,43 @@ export async function handleDsNoteEvents(
 ): Promise<void> {
   const iface = new ethers.utils.Interface(abi);
 
-  const parsedNotes = logs.map(
-    (l: PersistedLog): NoteDecoded | undefined => {
-      const explodedTopics = l.topics.slice(1, l.topics.length - 1).split(',');
-      const parsedNote =
-        version === 2
-          ? tryParseDsNoteVer2(explodedTopics, l.data)
-          : tryParseDsNote(explodedTopics, l.data);
+  const parsedNotes = logs.map((l: PersistedLog): NoteDecoded | undefined => {
+    const explodedTopics = l.topics.slice(1, l.topics.length - 1).split(',');
+    const parsedNote =
+      version === 2
+        ? tryParseDsNoteVer2(explodedTopics, l.data)
+        : tryParseDsNote(explodedTopics, l.data);
 
-      if (!parsedNote) {
-        return;
+    if (!parsedNote) {
+      return;
+    }
+
+    const decodedCallData = iface.parseTransaction({ data: parsedNote.values.fax });
+
+    // // it might be a standard log so we won't decode it
+    if (!decodedCallData) {
+      return;
+    }
+
+    // // we need to query abi and get args names b/c ethers won't return them
+    // // NOTE: there might be no named args and thus you will have to use positional args
+    const names = iface.functions[decodedCallData.signature].inputs.map(i => i.name);
+    const params: Dictionary<string> = {};
+    for (const [i, param] of decodedCallData.args.entries()) {
+      const name = names[i];
+      if (name !== undefined) {
+        params[name] = param;
       }
+    }
 
-      const decodedCallData = iface.parseTransaction({ data: parsedNote.values.fax });
-
-      // // it might be a standard log so we won't decode it
-      if (!decodedCallData) {
-        return;
-      }
-
-      // // we need to query abi and get args names b/c ethers won't return them
-      // // NOTE: there might be no named args and thus you will have to use positional args
-      const names = iface.functions[decodedCallData.signature].inputs.map(i => i.name);
-      const params: Dictionary<string> = {};
-      for (const [i, param] of decodedCallData.args.entries()) {
-        const name = names[i];
-        if (name !== undefined) {
-          params[name] = param;
-        }
-      }
-
-      return {
-        name: decodedCallData.signature,
-        args: decodedCallData.args,
-        params,
-        ethValue: parsedNote.values.wad && parsedNote.values.wad.toString(10),
-        caller: parsedNote.values.guy.toLowerCase(),
-      };
-    },
-  );
+    return {
+      name: decodedCallData.signature,
+      args: decodedCallData.args,
+      params,
+      ethValue: parsedNote.values.wad && parsedNote.values.wad.toString(10),
+      caller: parsedNote.values.guy.toLowerCase(),
+    };
+  });
 
   if (parsedNotes.length !== logs.length) {
     throw new Error('Length mismatch');

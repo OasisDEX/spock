@@ -10,7 +10,10 @@
   },
   {
     "constant": false,
-    "inputs": [{ "name": "what", "type": "bytes32" }, { "name": "data", "type": "uint256" }],
+    "inputs": [
+      { "name": "what", "type": "bytes32" },
+      { "name": "data", "type": "uint256" }
+    ],
     "name": "file",
     "outputs": [],
     "payable": false,
@@ -168,7 +171,10 @@
     "type": "function"
   },
   {
-    "inputs": [{ "name": "vat_", "type": "address" }, { "name": "gem_", "type": "address" }],
+    "inputs": [
+      { "name": "vat_", "type": "address" },
+      { "name": "gem_", "type": "address" }
+    ],
     "payable": false,
     "stateMutability": "nonpayable",
     "type": "constructor"

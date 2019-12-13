@@ -4,6 +4,7 @@ import { Transaction } from 'ethers/utils';
 import { TransactionalServices, LocalServices } from '../../types';
 import { BlockModel } from '../../db/models/Block';
 import { makeNullUndefined } from '../../db/db';
+import { assert } from 'ts-essentials';
 
 export async function getOrCreateTx(
   services: TransactionalServices,
@@ -12,10 +13,7 @@ export async function getOrCreateTx(
 ): Promise<PersistedTransaction> {
   const transaction = await services.provider.getTransaction(transactionHash);
 
-  // this means that reorg is happening or ethereum node is not consistent
-  if (!transaction) {
-    throw new RetryableError(`Tx is not defined!`);
-  }
+  assert(transaction, `Tx (${transactionHash}) couldn't be found - probably reorg is in progress`);
 
   const storedTx = await addTx(services, transaction, block);
 
@@ -86,9 +84,7 @@ export async function addTx(
     .catch(silenceError(matchUniqueKeyError));
 
   const storedTx = await getTx(services, transaction.hash!);
-  if (!storedTx) {
-    throw new Error('It should never happen!');
-  }
+  assert(storedTx, 'storedTx MUST be defined');
 
   return storedTx;
 }
