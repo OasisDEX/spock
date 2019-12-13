@@ -37,7 +37,10 @@
   },
   {
     "constant": true,
-    "inputs": [{ "name": "code", "type": "address" }, { "name": "sig", "type": "bytes4" }],
+    "inputs": [
+      { "name": "code", "type": "address" },
+      { "name": "sig", "type": "bytes4" }
+    ],
     "name": "getCapabilityRoles",
     "outputs": [{ "name": "", "type": "bytes32" }],
     "payable": false,
@@ -46,7 +49,10 @@
   },
   {
     "constant": true,
-    "inputs": [{ "name": "code", "type": "address" }, { "name": "sig", "type": "bytes4" }],
+    "inputs": [
+      { "name": "code", "type": "address" },
+      { "name": "sig", "type": "bytes4" }
+    ],
     "name": "isCapabilityPublic",
     "outputs": [{ "name": "", "type": "bool" }],
     "payable": false,
@@ -136,7 +142,10 @@
   },
   {
     "constant": true,
-    "inputs": [{ "name": "who", "type": "address" }, { "name": "role", "type": "uint8" }],
+    "inputs": [
+      { "name": "who", "type": "address" },
+      { "name": "role", "type": "uint8" }
+    ],
     "name": "hasUserRole",
     "outputs": [{ "name": "", "type": "bool" }],
     "payable": false,
@@ -176,7 +185,10 @@
   },
   {
     "constant": true,
-    "inputs": [{ "name": "", "type": "bytes32" }, { "name": "", "type": "uint256" }],
+    "inputs": [
+      { "name": "", "type": "bytes32" },
+      { "name": "", "type": "uint256" }
+    ],
     "name": "slates",
     "outputs": [{ "name": "", "type": "address" }],
     "payable": false,
@@ -198,7 +210,10 @@
   },
   {
     "constant": false,
-    "inputs": [{ "name": "who", "type": "address" }, { "name": "enabled", "type": "bool" }],
+    "inputs": [
+      { "name": "who", "type": "address" },
+      { "name": "enabled", "type": "bool" }
+    ],
     "name": "setRootUser",
     "outputs": [],
     "payable": false,

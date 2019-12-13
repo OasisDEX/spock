@@ -17,7 +17,8 @@
     "sourceMap": true,
     "declaration": true,
     "outDir": "lib",
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "skipLibCheck": true
   },
   "include": ["packages/**/*.ts", "instances/**/*.ts"],
   "exclude": ["node_modules", "packages/rest-api"]
