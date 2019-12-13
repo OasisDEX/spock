@@ -6,6 +6,7 @@ import { getLogger } from './utils/logger';
 import { Services } from './types';
 import { BlockModel } from './db/models/Block';
 import { getRandomProvider } from './services';
+import { assert } from 'ts-essentials';
 
 const logger = getLogger('block-generator');
 
@@ -31,9 +32,7 @@ export async function blockGenerator(
     const blocks = await getRealBlocksStartingFrom(services, currentBlockNo);
     const previousBlock = await getBlock(services, currentBlockNo - 1);
 
-    if (!previousBlock) {
-      throw new Error('Should not get here!');
-    }
+    assert(previousBlock, 'previousBlock should be defined');
 
     if (!verifyBlocksConsistency(previousBlock, blocks)) {
       currentBlockNo = currentBlockNo - 1;
