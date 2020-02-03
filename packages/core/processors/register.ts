@@ -4,6 +4,7 @@ import { withConnection, DbConnection } from '../db/db';
 import { getLogger } from '../utils/logger';
 import { Processor, isExtractor } from './types';
 import { difference } from 'lodash';
+import { getBlockByNumber } from '../db/models/Block';
 
 const logger = getLogger('register');
 
@@ -39,13 +40,29 @@ async function registerProcessor(c: DbConnection, processor: Processor): Promise
   } else {
     const newJob: WritableJobModel = {
       name: processor.name,
-      last_block_id: 0,
+      last_block_id: await getStartingBlockId(c, processor),
       status: 'processing',
     };
 
     logger.info(`Registering a new processor ${processor.name}: (${JSON.stringify(newJob)})`);
     await saveJob(c, newJob);
   }
+}
+
+async function getStartingBlockId(c: DbConnection, processor: Processor): Promise<number> {
+  if (processor.startingBlock === undefined) {
+    return 0;
+  }
+
+  const block = await getBlockByNumber(c, processor.startingBlock);
+  if (block === undefined) {
+    logger.warn(
+      `Can't find starting block for ${processor.name}. BlockNumber: ${processor.startingBlock} is not yet synced. It will sync from the global start block`,
+    );
+    return 0;
+  }
+
+  return block.id;
 }
 
 function validateIntegrity(processors: Processor[]): void {

@@ -1,5 +1,5 @@
 import { LocalServices } from '../../types';
-import { makeNullUndefined } from '../db';
+import { makeNullUndefined, DbConnection } from '../db';
 
 export interface BlockModel {
   id: number;
@@ -23,6 +23,15 @@ export async function getBlockById(
 ): Promise<BlockModel | undefined> {
   return tx
     .oneOrNone<BlockModel>('SELECT * FROM vulcan2x.block WHERE id=$1;', id)
+    .then(makeNullUndefined);
+}
+
+export async function getBlockByNumber(
+  c: DbConnection,
+  id: number,
+): Promise<BlockModel | undefined> {
+  return c
+    .oneOrNone<BlockModel>('SELECT * FROM vulcan2x.block WHERE number=$1;', id)
     .then(makeNullUndefined);
 }
 

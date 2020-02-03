@@ -7,18 +7,33 @@ import { BlockExtractor } from '../../types';
 import { getOrCreateTx } from '../common';
 import { timer } from '../../../utils/timer';
 import { isGanache } from '../../../ethereum/getNetworkState';
+import { isString } from 'util';
 
-export function makeRawLogExtractors(_addresses: string[]): BlockExtractor[] {
-  const addresses = _addresses.map(a => a.toLowerCase());
+export interface SimpleProcessorDefinition {
+  address: string;
+  startingBlock?: number;
+}
 
-  return addresses.map(address => ({
-    name: getExtractorName(address),
-    address,
+export function makeRawLogExtractors(
+  _extractors: (string | SimpleProcessorDefinition)[],
+): BlockExtractor[] {
+  const extractors = _extractors.map(a => {
+    const address = isString(a) ? a.toLowerCase() : a.address.toLowerCase();
+    const startingBlock = isString(a) ? undefined : a.startingBlock;
+    return {
+      address,
+      startingBlock,
+    };
+  });
+
+  return extractors.map(extractor => ({
+    name: getExtractorName(extractor.address),
+    startingBlock: extractor.startingBlock,
     extract: async (services, blocks) => {
-      await extractRawLogs(services, blocks, address);
+      await extractRawLogs(services, blocks, extractor.address);
     },
     async getData(services: LocalServices, blocks: BlockModel[]): Promise<any> {
-      return await getPersistedLogs(services, [address], blocks);
+      return await getPersistedLogs(services, [extractor.address], blocks);
     },
   }));
 }
