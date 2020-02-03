@@ -50,14 +50,14 @@ async function registerProcessor(c: DbConnection, processor: Processor): Promise
 }
 
 async function getStartingBlockId(c: DbConnection, processor: Processor): Promise<number> {
-  if (processor.startingBlockNumber === undefined) {
+  if (processor.startingBlock === undefined) {
     return 0;
   }
 
-  const block = await getBlockByNumber(c, processor.startingBlockNumber);
+  const block = await getBlockByNumber(c, processor.startingBlock);
   if (block === undefined) {
     logger.warn(
-      `Can't find starting block for ${processor.name}. BlockNumber: ${processor.startingBlockNumber} not yet synced. It will sync from the global start block`,
+      `Can't find starting block for ${processor.name}. BlockNumber: ${processor.startingBlock} is not yet synced. It will sync from the global start block`,
     );
     return 0;
   }

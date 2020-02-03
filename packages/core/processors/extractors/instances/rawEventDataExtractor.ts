@@ -11,7 +11,7 @@ import { isString } from 'util';
 
 export interface SimpleProcessorDefinition {
   address: string;
-  startingBlockNumber: number;
+  startingBlock?: number;
 }
 
 export function makeRawLogExtractors(
@@ -19,16 +19,16 @@ export function makeRawLogExtractors(
 ): BlockExtractor[] {
   const extractors = _extractors.map(a => {
     const address = isString(a) ? a.toLowerCase() : a.address.toLowerCase();
-    const startingBlockNumber = isString(a) ? undefined : a.startingBlockNumber;
+    const startingBlock = isString(a) ? undefined : a.startingBlock;
     return {
       address,
-      startingBlockNumber,
+      startingBlock,
     };
   });
 
   return extractors.map(extractor => ({
     name: getExtractorName(extractor.address),
-    startingBlockNumber: extractor.startingBlockNumber,
+    startingBlock: extractor.startingBlock,
     extract: async (services, blocks) => {
       await extractRawLogs(services, blocks, extractor.address);
     },

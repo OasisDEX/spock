@@ -99,7 +99,7 @@ Object {
 
     const extractor1: BlockExtractor = {
       name: 'test-extractor',
-      startingBlockNumber: 3,
+      startingBlock: 3,
       extract: async () => {},
       getData: async () => ({}),
     };

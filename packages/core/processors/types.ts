@@ -3,7 +3,7 @@ import { BlockModel } from '../db/models/Block';
 
 export interface BlockExtractor {
   name: string;
-  startingBlockNumber?: number; // note: block number not id
+  startingBlock?: number; // note: block number not id
   extractorDependencies?: string[];
   disablePerfBoost?: boolean;
 
@@ -17,7 +17,7 @@ export interface BlockExtractor {
 
 export interface BlockTransformer {
   name: string;
-  startingBlockNumber?: number; // note: block number not id
+  startingBlock?: number; // note: block number not id
   dependencies: string[];
   transformerDependencies?: string[];
   transform(service: LocalServices, data: any[]): Promise<void>;
