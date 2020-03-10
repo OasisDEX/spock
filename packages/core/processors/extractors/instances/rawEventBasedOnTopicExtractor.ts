@@ -12,6 +12,7 @@ import { ethers } from 'ethers';
 interface AbiInfo {
   name: string;
   abi: Object;
+  startingBlock?: number;
 }
 
 export function makeRawEventBasedOnTopicExtractor(abis: AbiInfo[]): BlockExtractor[] {
@@ -21,6 +22,7 @@ export function makeRawEventBasedOnTopicExtractor(abis: AbiInfo[]): BlockExtract
 
     return {
       name: getExtractorName(abi.name),
+      startingBlock: abi.startingBlock,
       address: abi,
       extract: async (services, blocks) => {
         await extractRawLogsOnTopic(services, blocks, allTopics);
