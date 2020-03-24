@@ -15,6 +15,7 @@
     "prebuild": "rm -rf dist",
     "build": "./build.sh",
     "test": "mocha",
+    "test:e2e": "mocha --opts ./test-e2e/mocha.opts",
     "test:fix": "yarn lint:fix && yarn format:fix && yarn test && yarn typecheck"
   },
   "dependencies": {
@@ -23,13 +24,14 @@
     "lodash": "^4.17.15",
     "node-cleanup": "^2.1.2",
     "pg-promise": "^8.5.5",
+    "postgres-migrations-oasis": "^3.0.2",
     "pretty-ms": "^6.0.1",
     "ts-essentials": "^6.0.2"
   },
   "devDependencies": {
-    "consola": "^2.7.1",
     "@types/chai": "^4.2.7",
     "@types/chai-as-promised": "^7.1.2",
+    "@types/chai-subset": "^1.3.3",
     "@types/lodash": "^4.14.149",
     "@types/mocha": "^5.2.7",
     "@types/node-cleanup": "^2.1.1",
@@ -37,6 +39,8 @@
     "@typescript-eslint/parser": "^2.12.0",
     "chai": "^4.2.0",
     "chai-as-promised": "^7.1.1",
+    "chai-subset": "^1.6.0",
+    "consola": "^2.7.1",
     "eslint": "^6.8.0",
     "eslint-plugin-no-only-tests": "^2.4.0",
     "ethers": "krzkaczor/ethers.js#kk/get-logs-multiple-address-build",

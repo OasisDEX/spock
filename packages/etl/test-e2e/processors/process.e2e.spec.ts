@@ -1,10 +1,10 @@
+// import { pick } from 'lodash';
 // import { createDB } from '../../db/db';
 // import { prepareDB, testConfig, executeSQL, dumpDB, networkState } from '../../../test/common';
 // import { Services } from '../../types';
 // import { getNextBlocks, processBlocks } from '../process';
 // import { registerProcessors } from '../register';
 // import { BlockExtractor } from '../types';
-// import { pick } from 'lodash';
 // import { getInitialProcessorsState } from '../state';
 
 // describe('process > getNextBlocks', () => {

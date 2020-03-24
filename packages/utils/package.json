@@ -1,5 +1,5 @@
 {
-  "name": "package-b",
+  "name": "utils",
   "version": "0.1.0",
   "license": "MIT",
   "main": "./dist/cjs/index.js",

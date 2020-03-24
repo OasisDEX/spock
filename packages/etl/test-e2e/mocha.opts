@@ -1,0 +1,5 @@
+-r ts-node/register/transpile-only
+--extension ts
+--watch-extensions ts
+--timeout 10000
+'test-e2e/**/*.test.ts'
