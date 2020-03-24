@@ -1,4 +1,4 @@
 node_modules
-lib
+dist
 yarn-error.log
-.env.*
+.DS_Store

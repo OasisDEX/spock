@@ -1,60 +1,43 @@
 version: 2.1
-jobs:
-  test:
-    docker:
-      - image: circleci/node:10.13.0
-    working_directory: /home/circleci/app
+
+commands:
+  install_dependencies:
     steps:
-      - checkout
-
       - restore_cache:
-          key: v1-dep-{{ checksum "yarn.lock" }}
-
-      - run:
-          name: Install deps
-          command: yarn install --frozen-lockfile
-
-      - save_cache:
-          paths:
-            - ./node_modules
-            - ~/.cache
-          key: v1-dep-{{ checksum "yarn.lock" }}
-
-      - run:
-          name: Run tests
-          command: yarn test
-
-  test-e2e:
-    machine:
-      enabled: true
-      image: circleci/classic:201710-01
-      docker_layer_caching: true
-    steps:
-      - checkout
-      - restore_cache:
+          name: Restore Yarn Package Cache
           keys:
-            - v3-dependencies-{{ checksum "package.json" }}
-      - run: .circleci/install-yarn.sh
-
+            - yarn-packages-{{ checksum "yarn.lock" }}
       - run:
-          name: 'Run postgres'
-          command: |
-            docker-compose up -d
-            ./.circleci/wait-for-it.sh localhost:5432 -t 10
-            sleep 10
+          name: Install Dependencies
+          command: yarn install --frozen-lockfile
+      - save_cache:
+          name: Save Yarn Package Cache
+          key: yarn-packages-{{ checksum "yarn.lock" }}
+          paths:
+            - ~/.cache/yarn
 
-      - run: |
-          source /opt/circleci/.nvm/nvm.sh
-          yarn # @todo: reuse modules from cache
-          yarn test:e2e
+jobs:
+  lint:
+    docker:
+      - image: circleci/node:11.15
+    steps:
+      - checkout
+      - install_dependencies
+      - run: yarn lint
+
+  build_and_test:
+    docker:
+      - image: circleci/node:11.15
+    steps:
+      - checkout
+      - install_dependencies
+      - run: yarn build
+      - run: yarn typecheck
+      - run: yarn test
 
 workflows:
   version: 2
-
-  mainflow:
+  build_and_test:
     jobs:
-      - test
-
-      - test-e2e:
-          requires:
-            - test
+      - lint
+      - build_and_test

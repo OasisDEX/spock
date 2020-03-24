@@ -1,25 +1,12 @@
 {
   "compilerOptions": {
-    "target": "es2017",
-    "module": "commonjs",
-    "strict": true,
-    "experimentalDecorators": true,
-    "emitDecoratorMetadata": true,
-    "forceConsistentCasingInFileNames": true,
-    "plugins": [
-      {
-        "name": "tslint-language-service",
-        "configFile": "./node_modules/typestrict/tslint.js",
-        "alwaysShowRuleFailuresAsWarnings": true
-      }
-    ],
-    "lib": ["es2015", "esnext.asynciterable"],
-    "sourceMap": true,
     "declaration": true,
-    "outDir": "lib",
-    "resolveJsonModule": true,
-    "skipLibCheck": true
-  },
-  "include": ["packages/**/*.ts", "instances/**/*.ts"],
-  "exclude": ["node_modules", "packages/rest-api"]
+    "lib": [
+      "ES2018"
+    ],
+    "module": "CommonJS",
+    "moduleResolution": "node",
+    "strict": true,
+    "target": "ES2018"
+  }
 }

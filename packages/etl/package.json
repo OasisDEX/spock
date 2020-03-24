@@ -1,0 +1,50 @@
+{
+  "name": "package-a",
+  "version": "0.1.0",
+  "license": "MIT",
+  "main": "./dist/cjs/index.js",
+  "module": "./dist/esm/index.js",
+  "types": "./dist/esm/index.d.ts",
+  "scripts": {
+    "start": "ts-node -T ./src/index.ts",
+    "format": "prettier --config ../../.prettierrc --check \"./**/*.ts\"",
+    "format:fix": "prettier --config ../../.prettierrc --write \"./**/*.ts\"",
+    "lint": "eslint --ext .ts src test",
+    "lint:fix": "yarn lint --fix",
+    "typecheck": "tsc --noEmit",
+    "prebuild": "rm -rf dist",
+    "build": "./build.sh",
+    "test": "mocha",
+    "test:fix": "yarn lint:fix && yarn format:fix && yarn test && yarn typecheck"
+  },
+  "dependencies": {
+    "@sentry/node": "^5.15.0",
+    "convert-hrtime": "^3.0.0",
+    "lodash": "^4.17.15",
+    "node-cleanup": "^2.1.2",
+    "pg-promise": "^8.5.5",
+    "pretty-ms": "^6.0.1",
+    "ts-essentials": "^6.0.2"
+  },
+  "devDependencies": {
+    "consola": "^2.7.1",
+    "@types/chai": "^4.2.7",
+    "@types/chai-as-promised": "^7.1.2",
+    "@types/lodash": "^4.14.149",
+    "@types/mocha": "^5.2.7",
+    "@types/node-cleanup": "^2.1.1",
+    "@typescript-eslint/eslint-plugin": "^2.12.0",
+    "@typescript-eslint/parser": "^2.12.0",
+    "chai": "^4.2.0",
+    "chai-as-promised": "^7.1.1",
+    "eslint": "^6.8.0",
+    "eslint-plugin-no-only-tests": "^2.4.0",
+    "ethers": "krzkaczor/ethers.js#kk/get-logs-multiple-address-build",
+    "mocha": "^6.2.2",
+    "serialize-error": "^4.1.0",
+    "sinon": "^8.0.1",
+    "sinon-chai": "^3.3.0",
+    "ts-node": "^8.5.4",
+    "typescript": "^3.7.4"
+  }
+}

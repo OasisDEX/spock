@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+set -e
+cd "$(dirname "$0")"
+
+./node_modules/.bin/tsc \
+  -p tsconfig.build.json \
+  --outDir dist/esm \
+  --module ES6
+
+./node_modules/.bin/tsc \
+  -p tsconfig.build.json \
+  --outDir dist/cjs \
+  --declaration false
