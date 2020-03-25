@@ -721,6 +721,18 @@ doctrine@^3.0.0:
   dependencies:
     esutils "^2.0.2"
 
+dotenv-flow@^0.3.0:
+  version "0.3.0"
+  resolved "https://registry.yarnpkg.com/dotenv-flow/-/dotenv-flow-0.3.0.tgz#bd306f8c186f0fd76ece7f804c4f9db39b668328"
+  integrity sha512-va4Yytg/fIBftCOXa5Wqp4wNVTireLdszbYzGt0aITSVM5Lvdw1exBzSaN+1NUCkL6/jIuhnbDjtSl9Xac4RGA==
+  dependencies:
+    dotenv "^7.0.0"
+
+dotenv@^7.0.0:
+  version "7.0.0"
+  resolved "https://registry.yarnpkg.com/dotenv/-/dotenv-7.0.0.tgz#a2be3cd52736673206e8a85fb5210eea29628e7c"
+  integrity sha512-M3NhsLbV1i6HuGzBUH8vXrtxOk+tWmzWKDMbAVSUp3Zsjm7ywFeuwrUXhmhQyRK1q5B5GGy7hcXPbj3bnfZg2g==
+
 elliptic@6.3.3:
   version "6.3.3"
   resolved "https://registry.yarnpkg.com/elliptic/-/elliptic-6.3.3.tgz#5482d9646d54bcb89fd7d994fc9e2e9568876e3f"
