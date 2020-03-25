@@ -7,7 +7,7 @@ import { createDB } from '../src/db/db';
 import { testConfig, prepareDB, dumpDB, networkState } from './common';
 import { Services } from '../src/types';
 import { createProviders, getRandomProvider } from '../src/services';
-import { delay } from '../src/utils';
+import { delay, setSpockBreakout } from '../src/utils';
 import { expect } from 'chai';
 
 describe('Whole solution', () => {
@@ -58,6 +58,12 @@ describe('Whole solution', () => {
         parentHash: '0x002',
         timestamp: 3,
       },
+      {
+        hash: '0x004',
+        number: 4,
+        parentHash: '0x003',
+        timestamp: 4,
+      },
     ];
     let blockPointer = 0;
 
@@ -86,10 +92,7 @@ describe('Whole solution', () => {
       processorsState: {},
     };
 
-    runBlockGenerator(services).catch(() => {
-      process.exit(1);
-    });
-    await delay(4000);
+    await blockGenerator(services, 0, 4);
 
     expect(pick(await dumpDB(dbCtx.db), 'blocks')).to.be.deep.eq({
       blocks: [
@@ -117,32 +120,15 @@ describe('Whole solution', () => {
           number: 3,
           timestamp: new Date('1970-01-01T00:00:03.000Z'),
         },
+        {
+          hash: '0x004',
+          id: 6,
+          number: 4,
+          timestamp: new Date('1970-01-01T00:00:04.000Z'),
+        },
       ],
     });
+
+    await dbCtx.db.$pool.end();
   });
 });
-
-async function runBlockGenerator(service: Services): Promise<void> {
-  await new Promise<void>(async (resolve, reject) => {
-    try {
-      const provider = {
-        ...service.provider,
-        on(eventName: string): void {
-          // this means that block generator waits for new blocks so we resolve the promise to continue execution of a test file
-          if (eventName === 'block') {
-            resolve();
-          }
-        },
-      };
-
-      const services: Services = {
-        ...service,
-        provider: provider as any,
-      };
-
-      await blockGenerator(services, 0);
-    } catch (e) {
-      reject(e);
-    }
-  });
-}

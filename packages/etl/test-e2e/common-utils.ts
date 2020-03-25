@@ -1,10 +1,11 @@
-import { UserProvidedSpockConfig } from '../core/config';
-import { createDB, DB } from '../core/db/db';
-import { dumpDB, prepareDB, testConfig } from './common';
-import { mergeConfig } from '../core/utils/configUtils';
-import { etl } from '../core/etl';
-import { delay, setSpockBreakout, resetSpockBreakout } from '../core/utils';
 import { join } from 'path';
+
+import { UserProvidedSpockConfig } from '../src/config';
+import { createDB, DB } from '../src/db/db';
+import { dumpDB, prepareDB, testConfig } from './common';
+import { mergeConfig } from '../src/utils/configUtils';
+import { etl } from '../src/etl';
+import { delay, setSpockBreakout, resetSpockBreakout } from '../src/utils';
 
 export async function runIntegrationTest(externalConfig: UserProvidedSpockConfig): Promise<DB> {
   const config = mergeConfig({ ...externalConfig, statsWorker: { enabled: false } });
