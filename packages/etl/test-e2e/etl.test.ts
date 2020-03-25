@@ -44,8 +44,8 @@ export async function getLogs(
   }
 }
 
-// @todo redesing this test:
-// - use transfomer
+// @todo redesign this test:
+// - use transformer
 // - put real data to database
 
 describe('Spock ETL', () => {
