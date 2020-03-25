@@ -84,3 +84,5 @@ export function setSpockBreakout(): void {
 export function resetSpockBreakout(): void {
   (global as any).SPOCK_BREAKOUT = false;
 }
+
+export class RetryableError extends Error {}

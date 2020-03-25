@@ -1,7 +1,8 @@
-import { DB, ColumnSets, DbTransactedConnection } from './db/db';
+import pgPromise from 'pg-promise';
 import { Provider } from 'ethers/providers';
 import { StrictOmit } from 'ts-essentials';
-import pgPromise = require('pg-promise');
+
+import { DB, ColumnSets, DbTransactedConnection } from './db/db';
 import { SpockConfig } from './config';
 import { NetworkState } from './ethereum/getNetworkState';
 import { ProcessorsState } from './processors/state';
