@@ -1,12 +1,10 @@
-// import {
-//   makeRawLogExtractors,
-//   getExtractorName,
-// } from '../../../src/processors/extractors/instances/rawEventDataExtractor';
 // import { join } from 'path';
 // import { pick, omit, sortBy, flatten } from 'lodash';
-// import { BlockTransformer } from '../../../src/processors/types';
-// import { runIntegrationTest, withLocalEnv } from '../../../test/common-utils';
-// import { dumpDB } from '../../../test/common';
+// import { expect } from 'chai';
+
+// import { runIntegrationTest, withLocalEnv } from './common-utils';
+// import { dumpDB } from './common';
+// import { BlockTransformer } from '../src/processors/types';
 
 // const DAI = '0x89d24a6b4ccb1b6faa2625fe562bdd9a23260359';
 
@@ -22,22 +20,21 @@
 
 // describe('Spock ETL', () => {
 //   it('should work for past events', async () => {
-//     jest.setTimeout(1000 * 60);
-
 //     const startingBlock = 8219360;
+//     const lastBlock = startingBlock + 40;
 
 //     await withLocalEnv(join(__dirname, '../../../../'), async () => {
 //       const db = await runIntegrationTest({
 //         startingBlock,
-//         lastBlock: startingBlock + 40,
+//         lastBlock,
 //         extractors: [...makeRawLogExtractors([DAI])],
 //         transformers: [daiTransformer],
 //         migrations: {},
 //       });
 //       const dump = await dumpDB(db);
 
-//       expect(pick(dump, ['blocks', 'extracted_logs'])).toMatchSnapshot();
-//       expect(sortBy(allDaiData, ['block_id', 'log_index'])).toMatchSnapshot();
+//       // expect(pick(dump, ['blocks', 'extracted_logs'])).toMatchSnapshot();
+//       // expect(sortBy(allDaiData, ['block_id', 'log_index'])).toMatchSnapshot();
 //     });
 //   });
 // });

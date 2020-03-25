@@ -10,7 +10,7 @@ import { createProviders, getRandomProvider } from '../src/services';
 import { delay, setSpockBreakout } from '../src/utils';
 import { expect } from 'chai';
 
-describe('Whole solution', () => {
+describe('Block generator', () => {
   it('should work with reorgs', async () => {
     const dbCtx = createDB(testConfig.db);
     await prepareDB(dbCtx.db, testConfig);
