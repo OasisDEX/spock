@@ -5,7 +5,7 @@ export function getLast<T>(array: T[]): T | undefined {
 }
 
 export function delay(time: number): Promise<void> {
-  return new Promise(resolve => setTimeout(resolve, time));
+  return new Promise((resolve) => setTimeout(resolve, time));
 }
 
 export function findConsecutiveSubsets<T>(_entities: T[], key: keyof T): T[][] {

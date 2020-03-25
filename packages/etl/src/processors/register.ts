@@ -17,7 +17,7 @@ export async function registerProcessors(
 ): Promise<void> {
   validateIntegrity(processors);
 
-  await withConnection(services.db, async c => {
+  await withConnection(services.db, async (c) => {
     logger.info('De-registering all processors...');
     await excludeAllJobs(c);
 
@@ -33,7 +33,7 @@ async function registerProcessor(c: DbConnection, processor: Processor): Promise
 
   if (jobModel) {
     logger.info(
-      //prettier-ignore
+      // prettier-ignore
       `Setting processor ${processor.name} status to 'processing'. Previously: '${jobModel.status}'`,
     );
     await setJobStatus(c, jobModel, 'processing');
@@ -72,7 +72,7 @@ function validateIntegrity(processors: Processor[]): void {
 
 function checkNameUniqueness(processors: Processor[]): void {
   const uniqueNames = new Set<string>();
-  const names = processors.map(p => p.name);
+  const names = processors.map((p) => p.name);
 
   for (const name of names) {
     if (uniqueNames.has(name)) {
@@ -84,7 +84,7 @@ function checkNameUniqueness(processors: Processor[]): void {
 
 // ensures that all dependencies exist
 function checkDependencies(processors: Processor[]): void {
-  const allNames = processors.map(p => p.name);
+  const allNames = processors.map((p) => p.name);
 
   for (const processor of processors) {
     if (isExtractor(processor)) {

@@ -15,15 +15,13 @@ const DAI = '0x89d24a6b4ccb1b6faa2625fe562bdd9a23260359';
 let allDaiLogs: any[] = [];
 
 const simpleDaiLogExtractor: BlockExtractor = {
-  name: "simple-log-extractor",
+  name: 'simple-log-extractor',
   async extract(services, blocks) {
     const logs = await getLogs(services, blocks, DAI);
     allDaiLogs.push(...logs);
   },
-  async getData(services, blocks) {
-
-  }
-}
+  async getData(services, blocks) {},
+};
 
 export async function getLogs(
   services: TransactionalServices,

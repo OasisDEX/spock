@@ -22,6 +22,7 @@ export function loadExternalConfig(path: string): any {
     // if we are loading TS file transpile it on the fly
     require('ts-node').register();
   }
+  // eslint-disable-next-line
   const configModule = require(configPath);
 
   if (!configModule.default) {
@@ -35,7 +36,7 @@ export function loadExternalConfig(path: string): any {
  * Turn any relative paths in the config to absolute ones
  */
 function fixConfigPaths(configPath: string, config: any): any {
-  const newMigrations = mapValues(config.migrations, path => {
+  const newMigrations = mapValues(config.migrations, (path) => {
     if (isAbsolute(path)) {
       return path;
     } else {

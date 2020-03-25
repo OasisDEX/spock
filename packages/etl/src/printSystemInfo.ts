@@ -10,11 +10,11 @@ export function printSystemInfo(config: SpockConfig): void {
   logger.info('Config:', maskConfig(config));
 }
 
-function maskConfig(config: SpockConfig): Object {
+function maskConfig(config: SpockConfig): Record<string, any> {
   return {
     ...omit(config, 'sentry', 'onStart'),
-    extractors: (config.extractors || []).map(e => e.name),
-    transformers: (config.transformers || []).map(t => t.name),
+    extractors: (config.extractors || []).map((e) => e.name),
+    transformers: (config.transformers || []).map((t) => t.name),
     db: {
       host: config.db.host,
     },

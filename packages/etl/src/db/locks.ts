@@ -36,7 +36,7 @@ async function acquire(db: DB, id: number): Promise<DbConnection> {
     isAcquired = result.pg_try_advisory_lock;
 
     if (!isAcquired) {
-      logger.info(`Retrying...`);
+      logger.info('Retrying...');
       await delay(500);
     }
   }

@@ -239,7 +239,7 @@ describe('process', () => {
 
     await processBlocks(services, blockExtractor);
     const db = pick(await dumpDB(services.db), 'job');
-    db.job = db.job.map(e => ({
+    db.job = db.job.map((e) => ({
       ...e,
       extra_info: JSON.stringify(JSON.parse(e.extra_info).map((e: any) => pick(e, 'message'))),
     }));

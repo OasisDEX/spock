@@ -1,7 +1,7 @@
 import { captureException, flush } from '@sentry/node';
 
 export function runAndHandleErrors(fn: () => Promise<any>): void {
-  fn().catch(async e => {
+  fn().catch(async (e) => {
     console.error(e);
 
     captureException(e);

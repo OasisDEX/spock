@@ -52,7 +52,7 @@ export async function processBlocks(services: Services, processor: Processor): P
   const batchProcessing =
     !closeToTheTipOfBlockchain || (processor as any).disablePerfBoost || false;
   const blocksInBatches = !batchProcessing
-    ? blocks.map(b => [b])
+    ? blocks.map((b) => [b])
     : findConsecutiveSubsets(blocks, 'number');
   logger.debug(
     `Processing ${blocks.length} blocks with ${processor.name}. Process in batch: ${batchProcessing}`,
@@ -60,9 +60,9 @@ export async function processBlocks(services: Services, processor: Processor): P
 
   try {
     for (const blocks of blocksInBatches) {
-      logger.trace(`Extracting blocks: ${blocks.map(b => b.number).join(', ')}`);
+      logger.trace(`Extracting blocks: ${blocks.map((b) => b.number).join(', ')}`);
 
-      await services.db.tx(async tx => {
+      await services.db.tx(async (tx) => {
         const txServices: TransactionalServices = {
           ...services,
           provider: getRandomProvider(),
@@ -75,7 +75,7 @@ export async function processBlocks(services: Services, processor: Processor): P
             processor.dependencies,
             services.config.extractors,
           );
-          const data = await Promise.all(realDeps.map(dep => dep.getData(txServices, blocks)));
+          const data = await Promise.all(realDeps.map((dep) => dep.getData(txServices, blocks)));
 
           await processor.transform(txServices, data);
         }
@@ -113,7 +113,7 @@ export async function processBlocks(services: Services, processor: Processor): P
 
       captureException(e);
 
-      await withConnection(services.db, async c => {
+      await withConnection(services.db, async (c) => {
         await stopJob(c, processor.name, allErrors);
       });
       clearProcessorState(services, processor);
@@ -129,7 +129,7 @@ export async function getNextBlocks(
 ): Promise<BlockModel[]> {
   const { db, config } = services;
 
-  return withConnection(db, async c => {
+  return withConnection(db, async (c) => {
     const batchSize = config.extractorWorker.batch;
 
     const job = await getJob(c, processor.name);

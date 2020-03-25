@@ -19,7 +19,7 @@ export async function statsWorker(services: Services): Promise<void> {
     const startTime = Date.now();
     logger.info(`Sleeping for ${statsCfg.interval} sec...`);
     await delay(statsCfg.interval * 1000 * 60);
-    logger.info(`Calculating stats...`);
+    logger.info('Calculating stats...');
     const stopTime = Date.now();
 
     const stats = await getStats(services);
@@ -45,7 +45,7 @@ transformed: ${(blocksTransformedDelta / timeDeltaSec).toFixed(2)} tasks/sec
 }
 
 export async function getStats(services: Services): Promise<Stats> {
-  return await withConnection(services.db, async c => {
+  return await withConnection(services.db, async (c) => {
     const blocksSynced =
       (
         (await c.oneOrNone(`SELECT id FROM vulcan2x.block ORDER BY number DESC LIMIT 1;
@@ -58,7 +58,7 @@ export async function getStats(services: Services): Promise<Stats> {
       values(
         pick(
           allJobsByName,
-          services.config.extractors.map(e => e.name),
+          services.config.extractors.map((e) => e.name),
         ),
       ),
     );
@@ -67,7 +67,7 @@ export async function getStats(services: Services): Promise<Stats> {
       values(
         pick(
           allJobsByName,
-          services.config.transformers.map(e => e.name),
+          services.config.transformers.map((e) => e.name),
         ),
       ),
     );

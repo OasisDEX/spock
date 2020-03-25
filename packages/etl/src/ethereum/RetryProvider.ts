@@ -86,7 +86,7 @@ export class RetryProvider extends JsonRpcProvider {
 // {"code":-32000,"url":"https://mainnet.infura.io/v3/6d6c70e65c77429482df5b64a4d0c943","body":"{\"method\":\"eth_getLogs\",\"params\":[{\"blockHash\":\"0xede4a2e56f94e85cb1bf134ccfd9c992ec8b28167d8586fe9841f58192ae30f4\",\"address\":\"0x39755357759ce0d7f32dc8dc45414cca409ae24e\"}],\"id\":42,\"jsonrpc\":\"2.0\"}","responseText":"{\"jsonrpc\":\"2.0\",\"id\":42,\"error\":{\"code\":-32000,\"message\":\"unknown block\"}}"}
 
 // - INFURA random (?) error?
-//{"code":-32603,"url":"https://mainnet.infura.io/v3/6d6c70e65c77429482df5b64a4d0c943","body":"{\"method\":\"eth_getBlockByNumber\",\"params\":[\"0x76b25b\",false],\"id\":42,\"jsonrpc\":\"2.0\"}","responseText":"{\"jsonrpc\":\"2.0\",\"id\":42,\"error\":{\"code\":-32603,\"message\":\"request failed or timed out\"}}"}
+// {"code":-32603,"url":"https://mainnet.infura.io/v3/6d6c70e65c77429482df5b64a4d0c943","body":"{\"method\":\"eth_getBlockByNumber\",\"params\":[\"0x76b25b\",false],\"id\":42,\"jsonrpc\":\"2.0\"}","responseText":"{\"jsonrpc\":\"2.0\",\"id\":42,\"error\":{\"code\":-32603,\"message\":\"request failed or timed out\"}}"}
 
 // - INFURA query returned more than 1000 results
 // {"attempts":8,"method":"getLogs","params":{"filter":{"fromBlock":"0x76ebdb","toBlock":"0x76ec2a","address":"0x39755357759ce0d7f32dc8dc45414cca409ae24e"}},"error":{"code":-32005,"url":"https://mainnet.infura.io/v3/6d6c70e65c77429482df5b64a4d0c943","body":"{\"method\":\"eth_getLogs\",\"params\":[{\"fromBlock\":\"0x76ebdb\",\"toBlock\":\"0x76ec2a\",\"address\":\"0x39755357759ce0d7f32dc8dc45414cca409ae24e\"}],\"id\":42,\"jsonrpc\":\"2.0\"}","responseText":"{\"jsonrpc\":\"2.0\",\"id\":42,\"error\":{\"code\":-32005,\"message\":\"query returned more than 1000 results\"}}"}}

@@ -50,14 +50,14 @@ export async function blockGenerator(
 }
 
 async function addBlocks({ db, pg, columnSets }: Services, blocks: Block[]): Promise<BlockModel[]> {
-  const values = blocks.map(block => ({
+  const values = blocks.map((block) => ({
     number: block.number,
     hash: block.hash,
     timestamp: new Date(block.timestamp * 1000),
   }));
-  logger.info(`Adding blocks ${getRangeAsString(blocks, b => b.number)}`);
+  logger.info(`Adding blocks ${getRangeAsString(blocks, (b) => b.number)}`);
 
-  const persistedBlocks = await db.tx(async tx => {
+  const persistedBlocks = await db.tx(async (tx) => {
     const addBlocksQuery =
       pg.helpers.insert(values, columnSets['block']) + 'ON CONFLICT(hash) DO NOTHING RETURNING *';
 
@@ -74,18 +74,18 @@ async function addBlocks({ db, pg, columnSets }: Services, blocks: Block[]): Pro
 }
 
 async function getLastBlockNo({ db }: Services): Promise<number> {
-  const lastBlockNo = await withConnection(db, connection => {
+  const lastBlockNo = await withConnection(db, (connection) => {
     return connection
       .oneOrNone<{ number: number }>(
         'SELECT number FROM vulcan2x.block ORDER BY number DESC LIMIT 1;',
       )
-      .then(n => {
+      .then((n) => {
         if (n === null) {
           throw new Error('Last block couldnt be found. It should never happen');
         }
         return n;
       })
-      .then(n => n.number);
+      .then((n) => n.number);
   });
 
   logger.info(`Found last block number: ${lastBlockNo}`);
@@ -95,15 +95,15 @@ async function getLastBlockNo({ db }: Services): Promise<number> {
 
 async function removeBlock(services: Services, blockHash: string): Promise<void> {
   const { db } = services;
-  await withConnection(db, async connection => {
-    await connection.none(`DELETE FROM vulcan2x.block WHERE hash=\${hash};`, {
+  await withConnection(db, async (connection) => {
+    await connection.none('DELETE FROM vulcan2x.block WHERE hash=${hash};', {
       hash: blockHash,
     });
   });
 }
 
 export async function getBlock({ db }: Services, blockNo: number): Promise<BlockModel | undefined> {
-  return withConnection(db, connection => {
+  return withConnection(db, (connection) => {
     return connection
       .oneOrNone<BlockModel>('SELECT * FROM vulcan2x.block WHERE number=$1;', blockNo)
       .then(makeNullUndefined);
@@ -117,7 +117,7 @@ async function getRealBlocksStartingFrom({ config }: Services, blockNo: number):
   );
   const blocks = compact(
     await Promise.all(
-      [...Array(config.blockGenerator.batch).keys()].map(offset =>
+      [...Array(config.blockGenerator.batch).keys()].map((offset) =>
         provider.getBlock(blockNo + offset),
       ),
     ),

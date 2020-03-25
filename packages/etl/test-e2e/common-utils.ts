@@ -18,7 +18,7 @@ export async function runIntegrationTest(externalConfig: UserProvidedSpockConfig
   await prepareDB(dbCtx.db, config);
   resetSpockBreakout();
 
-  const etlTask = etl(config).catch(e => {
+  const etlTask = etl(config).catch((e) => {
     console.error('ETL FAILED WITH ', e);
     process.exit(1);
   });
@@ -30,7 +30,7 @@ export async function runIntegrationTest(externalConfig: UserProvidedSpockConfig
   while (!fullySynced) {
     await delay(1000);
     const jobs = (await dumpDB(dbCtx.db)).job;
-    fullySynced = jobs.filter(p => p.last_block_id >= lastBlockId).length === allJobs;
+    fullySynced = jobs.filter((p) => p.last_block_id >= lastBlockId).length === allJobs;
   }
   setSpockBreakout();
 

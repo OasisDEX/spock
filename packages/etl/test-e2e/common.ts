@@ -32,13 +32,13 @@ export const testConfig: SpockConfig = {
 } as any;
 
 export async function prepareDB(db: DB, config: SpockConfig): Promise<void> {
-  await withConnection(db, async c => {
+  await withConnection(db, async (c) => {
     const schemasWrapped: { name: string }[] = await c.many(
       'SELECT schema_name as name FROM information_schema.schemata;',
     );
     const schemasToDelete = schemasWrapped
-      .map(s => s.name)
-      .filter(n => !n.startsWith('pg_') && n !== 'information_schema');
+      .map((s) => s.name)
+      .filter((n) => !n.startsWith('pg_') && n !== 'information_schema');
 
     await c.none(`
     DROP SCHEMA IF EXISTS ${schemasToDelete.join(',')} CASCADE;
@@ -52,7 +52,7 @@ export async function prepareDB(db: DB, config: SpockConfig): Promise<void> {
 }
 
 export const dumpDB = async (db: DB) => {
-  return await withConnection(db, async c => {
+  return await withConnection(db, async (c) => {
     return {
       blocks: await c.manyOrNone(`SELECT * FROM vulcan2x.block`),
       transaction: await c.manyOrNone(`SELECT * FROM vulcan2x.transaction`),

@@ -29,7 +29,7 @@ export async function withTx<T>(
   services: Services,
   op: (tx: TransactionalServices) => Promise<T>,
 ): Promise<T> {
-  return await services.db.tx(async tx => {
+  return await services.db.tx(async (tx) => {
     const txServices: TransactionalServices = {
       ...services,
       tx,
@@ -43,7 +43,7 @@ let allProviders: RetryProvider[] = [];
 export function createProviders(config: SpockConfig): void {
   const mainProvider = new RetryProvider(config.chain.host, config.chain.retries);
   const alternativeProviders = (config.chain.alternativeHosts || []).map(
-    h => new RetryProvider(h, config.chain.retries),
+    (h) => new RetryProvider(h, config.chain.retries),
   );
 
   allProviders = [mainProvider, ...alternativeProviders];

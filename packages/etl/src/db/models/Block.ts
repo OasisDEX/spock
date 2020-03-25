@@ -39,7 +39,7 @@ export async function getBlockByIdOrDie({ tx }: LocalServices, id: number): Prom
   return tx
     .oneOrNone<BlockModel>('SELECT * FROM vulcan2x.block WHERE id=$1;', id)
     .then(makeNullUndefined)
-    .then(r => {
+    .then((r) => {
       if (!r) {
         throw new Error(`Block(id=${id}) is missing`);
       }
@@ -53,9 +53,9 @@ export async function getBlockRange(
   end: number,
 ): Promise<BlockModel[]> {
   const sql = `
-SELECT * FROM vulcan2x.block 
+SELECT * FROM vulcan2x.block
 WHERE id >= ${start} AND id <= ${end}
   `;
 
-  return await tx.manyOrNone<BlockModel>(sql);
+  return tx.manyOrNone<BlockModel>(sql);
 }
