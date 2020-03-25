@@ -23,8 +23,8 @@
     "test": "mocha",
     "test:fix": "yarn lint:fix && yarn format:fix && yarn test && yarn typecheck"
   },
-  "dependencies": {
-    "package-a": "^0.1.0"
+  "peerDependencies": {
+    "spock-etl": "^0.1.0"
   },
   "devDependencies": {
     "@types/chai": "^4.2.7",

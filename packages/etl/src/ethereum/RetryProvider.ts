@@ -3,7 +3,7 @@ import { Networkish } from 'ethers/utils';
 import { ConnectionInfo, poll } from 'ethers/utils/web';
 import { delay } from '../utils';
 import { getLogger } from '../utils/logger';
-import { RetryableError } from '../../../utils/src/extractors/common';
+import { RetryableError } from '../../../processors/src/extractors/common';
 
 const logger = getLogger('ethereum/RetryProvider');
 
