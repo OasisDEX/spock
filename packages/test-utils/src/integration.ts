@@ -14,7 +14,9 @@ import { getDefaultConfig } from 'spock-etl/dist/config';
 export async function runIntegrationTest(
   externalConfig: UserProvidedSpockConfig,
 ): Promise<Services> {
-  const services = await createTestServices({ config: mergeConfig(externalConfig) });
+  const services = await createTestServices({
+    config: mergeConfig({ ...externalConfig, statsWorker: { enabled: false } }),
+  });
 
   const etlPromise = startETL(services);
 

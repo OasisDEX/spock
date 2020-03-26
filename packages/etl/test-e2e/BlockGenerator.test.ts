@@ -3,12 +3,7 @@ import { Block } from 'ethers/providers';
 import { pick } from 'lodash';
 
 import { blockGenerator } from '../src/blockGenerator';
-import { createDB } from '../src/db/db';
-import {
-  dumpDB,
-  createTestServices,
-  destroyTestServices,
-} from 'spock-test-utils';
+import { dumpDB, createTestServices, destroyTestServices } from 'spock-test-utils';
 import { Services } from '../src/types';
 import { createProviders, getRandomProvider } from '../src/services';
 import { expect } from 'chai';
