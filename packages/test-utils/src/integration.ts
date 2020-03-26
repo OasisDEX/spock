@@ -1,11 +1,11 @@
-import { join } from 'path';
+import { UserProvidedSpockConfig } from 'spock-etl/src/config';
+import { createDB, DB } from 'spock-etl/src/db/db';
+import { mergeConfig } from 'spock-etl/src/utils/configUtils';
+import { etl } from 'spock-etl/src/etl';
+import { delay, setSpockBreakout, resetSpockBreakout } from 'spock-etl/src/utils';
 
-import { UserProvidedSpockConfig } from '../src/config';
-import { createDB, DB } from '../src/db/db';
-import { dumpDB, prepareDB, testConfig } from './common';
-import { mergeConfig } from '../src/utils/configUtils';
-import { etl } from '../src/etl';
-import { delay, setSpockBreakout, resetSpockBreakout } from '../src/utils';
+import { testConfig } from './services';
+import { prepareDB, dumpDB } from './db';
 
 export async function runIntegrationTest(externalConfig: UserProvidedSpockConfig): Promise<DB> {
   const config = mergeConfig({ ...externalConfig, statsWorker: { enabled: false } });

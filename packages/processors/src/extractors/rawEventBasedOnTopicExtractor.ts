@@ -1,13 +1,13 @@
 import { ethers } from 'ethers';
 import { min, max, groupBy, uniqBy } from 'lodash';
-import { getLast } from 'spock-etl/dist/esm/utils';
+import { getLast } from 'spock-etl/dist/utils';
 import { Log } from 'ethers/providers';
-import { TransactionalServices, LocalServices } from 'spock-etl/dist/esm/types';
-import { BlockModel } from 'spock-etl/dist/esm/db/models/Block';
-import { BlockExtractor } from 'spock-etl/dist/esm/processors/types';
+import { TransactionalServices, LocalServices } from 'spock-etl/dist/types';
+import { BlockModel } from 'spock-etl/dist/db/models/Block';
+import { BlockExtractor } from 'spock-etl/dist/processors/types';
 import { getOrCreateTx } from './common';
-import { timer } from 'spock-etl/dist/esm/utils/timer';
-import { isGanache } from 'spock-etl/dist/esm/ethereum/getNetworkState';
+import { timer } from 'spock-etl/dist/utils/timer';
+import { isGanache } from 'spock-etl/dist/ethereum/getNetworkState';
 
 interface AbiInfo {
   name: string;
@@ -16,9 +16,9 @@ interface AbiInfo {
 }
 
 export function makeRawEventBasedOnTopicExtractor(abis: AbiInfo[]): BlockExtractor[] {
-  return abis.map(abi => {
+  return abis.map((abi) => {
     const iface = new ethers.utils.Interface(abi.abi as any);
-    const allTopics = Object.values(iface.events).map(e => e.topic);
+    const allTopics = Object.values(iface.events).map((e) => e.topic);
 
     return {
       name: getExtractorName(abi.name),
@@ -43,17 +43,17 @@ export async function extractRawLogsOnTopic(
 
   const blocksByHash = groupBy(blocks, 'hash');
   const allTxs = uniqBy(
-    logs.map(l => ({ txHash: l.transactionHash!, blockHash: l.blockHash! })),
+    logs.map((l) => ({ txHash: l.transactionHash!, blockHash: l.blockHash! })),
     'txHash',
   );
   const allStoredTxs = await Promise.all(
-    allTxs.map(tx => getOrCreateTx(services, tx.txHash, blocksByHash[tx.blockHash][0])),
+    allTxs.map((tx) => getOrCreateTx(services, tx.txHash, blocksByHash[tx.blockHash][0])),
   );
   const allStoredTxsByTxHash = groupBy(allStoredTxs, 'hash');
 
   const logsToInsert = (
     await Promise.all(
-      logs.map(async log => {
+      logs.map(async (log) => {
         const _block = blocksByHash[log.blockHash!];
         if (!_block) {
           return;
@@ -70,7 +70,7 @@ export async function extractRawLogsOnTopic(
         };
       }),
     )
-  ).filter(log => !!log);
+  ).filter((log) => !!log);
 
   let insertedLogs: PersistedLog[] = [];
   if (logsToInsert.length !== 0) {
@@ -90,7 +90,7 @@ export async function getPersistedLogsByTopic(
   topics: string[],
   blocks: BlockModel[],
 ): Promise<any[]> {
-  const blocksIds = blocks.map(b => b.id);
+  const blocksIds = blocks.map((b) => b.id);
   const minId = min(blocksIds);
   const maxId = max(blocksIds);
 
@@ -99,7 +99,7 @@ export async function getPersistedLogsByTopic(
       `
   SELECT * FROM extracted.logs
   WHERE logs.block_id >= \${id_min} AND logs.block_id <= \${id_max} AND (
-    ${topics.map(t => `logs.topics LIKE '%${t}%'`).join(' OR ')}
+    ${topics.map((t) => `logs.topics LIKE '%${t}%'`).join(' OR ')}
   );
     `,
       {

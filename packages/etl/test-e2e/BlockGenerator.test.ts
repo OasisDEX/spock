@@ -4,7 +4,7 @@ import { pick } from 'lodash';
 
 import { blockGenerator } from '../src/blockGenerator';
 import { createDB } from '../src/db/db';
-import { testConfig, prepareDB, dumpDB, networkState } from './common';
+import { testConfig, prepareDB, dumpDB, networkState } from 'spock-test-utils';
 import { Services } from '../src/types';
 import { createProviders, getRandomProvider } from '../src/services';
 import { delay, setSpockBreakout } from '../src/utils';

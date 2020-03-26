@@ -1,8 +1,8 @@
 import { ethers } from 'ethers';
 
+import { createDB, withConnection, prepareDB, testConfig, networkState } from 'spock-test-utils';
+
 import { addTx, matchMissingForeignKeyError, matchUniqueKeyError } from '../../src/extractors/common';
-import { createDB, withConnection } from 'spock-etl/dist/esm/db/db';
-import { prepareDB, testConfig, networkState } from 'spock-etl/test/common';
 import { TransactionalServices } from '../../types';
 import { BlockModel } from '../../db/models/Block';
 

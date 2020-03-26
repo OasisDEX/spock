@@ -4,7 +4,7 @@ import { ethers } from 'ethers';
 import { tryParseDsNote, tryParseDsNoteVer2 } from './tryParseDsNote';
 
 import { PersistedLog } from '../extractors/rawEventDataExtractor';
-import { LocalServices } from 'spock-etl/dist/esm/types';
+import { LocalServices } from 'spock-etl/dist//types';
 
 /**
  * Decode events from raw logs using provided ABI.

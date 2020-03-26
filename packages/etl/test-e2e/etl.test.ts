@@ -2,9 +2,8 @@ import { join } from 'path';
 import { pick, omit, sortBy, flatten } from 'lodash';
 import { expect } from 'chai';
 
-import { env } from 'spock-test-utils';
+import { withLocalEnv, runIntegrationTest } from 'spock-test-utils';
 
-import { runIntegrationTest } from './common-utils';
 import { BlockExtractor } from '../src/processors/types';
 import { TransactionalServices } from '../src/types';
 import { BlockModel } from '../src/db/models/Block';
@@ -52,7 +51,7 @@ describe('Spock ETL', () => {
     const startingBlock = 8219360;
     const lastBlock = startingBlock + 40;
 
-    await env.withLocalEnv(join(__dirname, '../../../'), async () => {
+    await withLocalEnv(join(__dirname, '../../../'), async () => {
       const db = await runIntegrationTest({
         startingBlock,
         lastBlock,

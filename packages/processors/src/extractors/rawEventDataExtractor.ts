@@ -2,12 +2,12 @@ import { min, max, groupBy, uniqBy } from 'lodash';
 import { Log } from 'ethers/providers';
 import { isString } from 'util';
 
-import { getLast } from 'spock-etl/dist/esm/utils';
-import { TransactionalServices, LocalServices } from 'spock-etl/dist/esm/types';
-import { BlockModel } from 'spock-etl/dist/esm/db/models/Block';
-import { BlockExtractor } from 'spock-etl/dist/esm/processors/types';
-import { timer } from 'spock-etl/dist/esm/utils/timer';
-import { isGanache } from 'spock-etl/dist/esm/ethereum/getNetworkState';
+import { getLast } from 'spock-etl/dist//utils';
+import { TransactionalServices, LocalServices } from 'spock-etl/dist//types';
+import { BlockModel } from 'spock-etl/dist//db/models/Block';
+import { BlockExtractor } from 'spock-etl/dist//processors/types';
+import { timer } from 'spock-etl/dist//utils/timer';
+import { isGanache } from 'spock-etl/dist//ethereum/getNetworkState';
 
 import { getOrCreateTx } from './common';
 

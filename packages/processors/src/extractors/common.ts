@@ -1,7 +1,7 @@
 export const DEFAULT_ADDRESS = '0x0000000000000000000000000000000000000000';
 
 import { Transaction } from 'ethers/utils';
-import { TransactionalServices, LocalServices } from 'spock-etl/dist/esm/types';
+import { TransactionalServices, LocalServices } from 'spock-etl/dist/types';
 import { assert } from 'ts-essentials';
 
 import { BlockModel } from '../../../etl/src/db/models/Block';

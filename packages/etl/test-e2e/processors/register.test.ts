@@ -2,7 +2,7 @@ import { expect } from 'chai';
 import { pick } from 'lodash';
 
 import { createDB } from '../../src/db/db';
-import { prepareDB, testConfig, dumpDB, networkState, executeSQL } from '../common';
+import { prepareDB, testConfig, dumpDB, networkState, executeSQL } from 'spock-test-utils';
 import { Services } from '../../src/types';
 import { registerProcessors } from '../../src/processors/register';
 import { BlockExtractor } from '../../src/processors/types';
