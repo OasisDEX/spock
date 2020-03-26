@@ -19,7 +19,8 @@
     "lint:fix": "yarn lint --fix",
     "typecheck": "tsc --noEmit",
     "prebuild": "rm -rf dist",
-    "build": "./build.sh",
+    "build": "tsc -p tsconfig.build.json --outDir dist",
+    "build:watch": "yarn build --watch",
     "test": "mocha",
     "test:fix": "yarn lint:fix && yarn format:fix && yarn test && yarn typecheck"
   },
