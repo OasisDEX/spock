@@ -7,7 +7,6 @@ import { createDB } from '../src/db/db';
 import { testConfig, prepareDB, dumpDB, networkState } from 'spock-test-utils';
 import { Services } from '../src/types';
 import { createProviders, getRandomProvider } from '../src/services';
-import { delay, setSpockBreakout } from '../src/utils';
 import { expect } from 'chai';
 
 describe('Block generator', () => {

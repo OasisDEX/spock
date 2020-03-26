@@ -9,7 +9,7 @@
     "start": "ts-node -T ./src/index.ts",
     "format": "prettier --config ../../.prettierrc --ignore-path ../../.prettierignore --check \"./**/*.ts\"",
     "format:fix": "prettier --config ../../.prettierrc  --ignore-path ../../.prettierignore --write \"./**/*.ts\"",
-    "lint": "eslint --ext .ts src test",
+    "lint": "eslint --ext .ts src test test-e2e",
     "lint:fix": "yarn lint --fix",
     "typecheck": "tsc --noEmit",
     "prebuild": "rm -rf dist",

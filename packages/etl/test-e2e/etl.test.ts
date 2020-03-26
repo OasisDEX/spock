@@ -1,5 +1,4 @@
 import { join } from 'path';
-import { pick, omit, sortBy, flatten } from 'lodash';
 import { expect } from 'chai';
 
 import { withLocalEnv, runIntegrationTest } from 'spock-test-utils';
@@ -12,7 +11,7 @@ import { getLast } from '../src/utils';
 
 const DAI = '0x89d24a6b4ccb1b6faa2625fe562bdd9a23260359';
 
-let allDaiLogs: any[] = [];
+const allDaiLogs: any[] = [];
 
 const simpleDaiLogExtractor: BlockExtractor = {
   name: 'simple-log-extractor',
@@ -20,7 +19,7 @@ const simpleDaiLogExtractor: BlockExtractor = {
     const logs = await getLogs(services, blocks, DAI);
     allDaiLogs.push(...logs);
   },
-  async getData(services, blocks) {},
+  async getData(_services, _blocks) { },
 };
 
 export async function getLogs(
@@ -52,7 +51,7 @@ describe('Spock ETL', () => {
     const lastBlock = startingBlock + 40;
 
     await withLocalEnv(join(__dirname, '../../../'), async () => {
-      const db = await runIntegrationTest({
+      await runIntegrationTest({
         startingBlock,
         lastBlock,
         extractors: [simpleDaiLogExtractor],

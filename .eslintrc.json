@@ -22,19 +22,16 @@
     "@typescript-eslint/no-unused-vars": [
       "error",
       {
-        "args": "none",
+        "args": "after-used",
         "ignoreRestSiblings": true,
-        "vars": "all"
+        "vars": "all",
+        "argsIgnorePattern": "^_"
       }
     ],
     "@typescript-eslint/no-use-before-define": "off",
     "@typescript-eslint/no-useless-constructor": "error",
     "accessor-pairs": "error",
     "constructor-super": "error",
-    "curly": [
-      "error",
-      "multi-line"
-    ],
     "eqeqeq": [
       "error",
       "always",
