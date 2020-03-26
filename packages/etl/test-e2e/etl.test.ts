@@ -2,9 +2,10 @@ import { join } from 'path';
 import { pick, omit, sortBy, flatten } from 'lodash';
 import { expect } from 'chai';
 
-import { runIntegrationTest, withLocalEnv } from './common-utils';
-import { dumpDB } from './common';
-import { BlockTransformer, BlockExtractor } from '../src/processors/types';
+import { env } from 'spock-test-utils';
+
+import { runIntegrationTest } from './common-utils';
+import { BlockExtractor } from '../src/processors/types';
 import { TransactionalServices } from '../src/types';
 import { BlockModel } from '../src/db/models/Block';
 import { Log } from 'ethers/providers';
@@ -51,7 +52,7 @@ describe('Spock ETL', () => {
     const startingBlock = 8219360;
     const lastBlock = startingBlock + 40;
 
-    await withLocalEnv(join(__dirname, '../../../'), async () => {
+    await env.withLocalEnv(join(__dirname, '../../../'), async () => {
       const db = await runIntegrationTest({
         startingBlock,
         lastBlock,
@@ -59,6 +60,7 @@ describe('Spock ETL', () => {
         transformers: [],
         migrations: {},
       });
+
       expect(allDaiLogs.length).to.be.eq(52);
     });
   });
