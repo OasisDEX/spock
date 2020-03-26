@@ -4,15 +4,41 @@ import { pick } from 'lodash';
 
 import { blockGenerator } from '../src/blockGenerator';
 import { createDB } from '../src/db/db';
-import { testConfig, prepareDB, dumpDB, networkState } from 'spock-test-utils';
+import {
+  dumpDB,
+  createTestServices,
+  destroyTestServices,
+} from 'spock-test-utils';
 import { Services } from '../src/types';
 import { createProviders, getRandomProvider } from '../src/services';
 import { expect } from 'chai';
 
 describe('Block generator', () => {
+  let services: Services;
+  afterEach(async () => {
+    destroyTestServices(services);
+  });
+
   it('should work with reorgs', async () => {
-    const dbCtx = createDB(testConfig.db);
-    await prepareDB(dbCtx.db, testConfig);
+    // @todo do not use getRandomProvider
+    createProviders({
+      chain: {
+        host: 'http://localhost/not-existing',
+        name: 'mainnet',
+        retries: 0,
+      },
+    } as any);
+    const provider = getRandomProvider();
+
+    provider.getBlock = async (blockNumber: number): Promise<Block> => {
+      const block = blocks[blockPointer++];
+      if (block && block.number !== blockNumber) {
+        throw new Error('Error in fixtures!');
+      }
+      return block as any;
+    };
+
+    services = await createTestServices({ provider });
 
     const blocks: Array<Partial<ethers.providers.Block>> = [
       {
@@ -66,34 +92,9 @@ describe('Block generator', () => {
     ];
     let blockPointer = 0;
 
-    createProviders({
-      chain: {
-        host: 'http://localhost/not-existing',
-        name: 'mainnet',
-        retries: 0,
-      },
-    } as any);
-    const provider = getRandomProvider();
-
-    provider.getBlock = async (blockNumber: number): Promise<Block> => {
-      const block = blocks[blockPointer++];
-      if (block && block.number !== blockNumber) {
-        throw new Error('Error in fixtures!');
-      }
-      return block as any;
-    };
-
-    const services: Services = {
-      config: testConfig,
-      provider: provider,
-      ...dbCtx,
-      networkState,
-      processorsState: {},
-    };
-
     await blockGenerator(services, 0, 4);
 
-    expect(pick(await dumpDB(dbCtx.db), 'blocks')).to.be.deep.eq({
+    expect(pick(await dumpDB(services.db), 'blocks')).to.be.deep.eq({
       blocks: [
         {
           hash: '0x00',
@@ -127,7 +128,5 @@ describe('Block generator', () => {
         },
       ],
     });
-
-    await dbCtx.db.$pool.end();
   });
 });

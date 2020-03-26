@@ -145,8 +145,8 @@ export async function getNextBlocks(
       (await c.manyOrNone<BlockModel>(
         // prettier-ignore
         `
-        SELECT b.* 
-        FROM vulcan2x.block b 
+        SELECT b.*
+        FROM vulcan2x.block b
         ${getAllDependencies(processor)
           .map((d, i) => `JOIN vulcan2x.job j${i} ON j${i}.name='${d}' AND b.id <= j${i}.last_block_id`)
           .join('\n')}

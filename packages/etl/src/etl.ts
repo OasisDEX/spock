@@ -8,6 +8,7 @@ import { process } from './processors/process';
 import { registerProcessors } from './processors/register';
 import { statsWorker } from './stats/stats';
 import { printSystemInfo } from './printSystemInfo';
+import { Services } from './types';
 
 ethers.errors.setLogLevel('error');
 const logger = getLogger('runner');
@@ -17,19 +18,23 @@ export async function etl(config: SpockConfig): Promise<void> {
 
   printSystemInfo(config);
 
+  return startETL(services);
+}
+
+export async function startETL(services: Services): Promise<void> {
   await withLock(services.db, services.config.processDbLock, async () => {
     if (services.config.onStart) {
       logger.debug('Running onStart hook.');
       await services.config.onStart(services);
     }
 
-    await registerProcessors(services, getAllProcessors(config));
+    await registerProcessors(services, getAllProcessors(services.config));
 
     await Promise.all([
-      blockGenerator(services, config.startingBlock, config.lastBlock),
-      process(services, config.extractors),
-      process(services, config.transformers),
-      config.statsWorker.enabled ? statsWorker(services) : Promise.resolve(),
+      blockGenerator(services, services.config.startingBlock, services.config.lastBlock),
+      process(services, services.config.extractors),
+      process(services, services.config.transformers),
+      services.config.statsWorker.enabled ? statsWorker(services) : Promise.resolve(),
     ]);
   });
 }

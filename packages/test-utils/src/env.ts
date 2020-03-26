@@ -1,6 +1,6 @@
 import { join } from 'path';
 
-export async function withLocalEnv<T>(envDir: string, fn: () => Promise<T> | T): Promise<T> {
+export async function withScopedEnv<T>(envDir: string, fn: () => Promise<T> | T): Promise<T> {
   const backupEnv = { ...process.env };
 
   const chainHost = process.env['VL_CHAIN_HOST'];

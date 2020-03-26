@@ -1,45 +1,49 @@
 import { pick } from 'lodash';
 import { expect } from 'chai';
 
-import { createDB } from '../../src/db/db';
-import { prepareDB, testConfig, executeSQL, dumpDB, networkState } from 'spock-test-utils';
+import {
+  executeSQL,
+  dumpDB,
+  createTestServices,
+  destroyTestServices,
+  getTestConfig,
+} from 'spock-test-utils';
 import { Services } from '../../src/types';
 import { getNextBlocks, processBlocks } from '../../src/processors/process';
 import { registerProcessors } from '../../src/processors/register';
 import { BlockExtractor } from '../../src/processors/types';
-import { getInitialProcessorsState } from '../../src/processors/state';
 
 describe('process > getNextBlocks', () => {
-  it('should work with extractors without dependencies', async () => {
-    const dbCtx = createDB(testConfig.db);
-    await prepareDB(dbCtx.db, testConfig);
+  let services: Services;
 
+  afterEach(async () => {
+    await destroyTestServices(services);
+  });
+
+  it('should work with extractors without dependencies', async () => {
+    const blockExtractor: BlockExtractor = {
+      name: 'test-extractor',
+      extract: async () => {},
+      getData: async () => ({}),
+    };
+    services = await createTestServices({
+      config: getTestConfig({
+        extractors: [blockExtractor],
+        extractorWorker: {
+          batch: 4,
+          reorgBuffer: 10,
+        },
+      }),
+    });
+    await registerProcessors(services, [blockExtractor]);
     await executeSQL(
-      dbCtx.db,
+      services.db,
       `
       -- blocks
       INSERT INTO vulcan2x.block(number, hash, timestamp) VALUES(1, '0x01', '2019-07-02 11:18:01+00');
       INSERT INTO vulcan2x.block(number, hash, timestamp) VALUES(2, '0x02', '2019-07-02 11:18:02+00');
     `,
     );
-
-    const blockExtractor: BlockExtractor = {
-      name: 'test-extractor',
-      extract: async () => {},
-      getData: async () => ({}),
-    };
-
-    const services: Services = {
-      db: dbCtx.db,
-      pg: dbCtx.pg,
-      config: testConfig,
-      columnSets: undefined as any,
-      provider: undefined as any,
-      networkState,
-      processorsState: getInitialProcessorsState([blockExtractor]),
-    };
-
-    await registerProcessors(services, [blockExtractor]);
 
     const actual = await getNextBlocks(services, blockExtractor);
 
@@ -60,18 +64,6 @@ describe('process > getNextBlocks', () => {
   });
 
   it('should work with extractors with dependencies', async () => {
-    const dbCtx = createDB(testConfig.db);
-    await prepareDB(dbCtx.db, testConfig);
-
-    await executeSQL(
-      dbCtx.db,
-      `
-      -- blocks
-      INSERT INTO vulcan2x.block(number, hash, timestamp) VALUES(1, '0x01', '2019-07-02 11:18:01+00');
-      INSERT INTO vulcan2x.block(number, hash, timestamp) VALUES(2, '0x02', '2019-07-02 11:18:02+00');
-    `,
-    );
-
     const blockExtractor: BlockExtractor = {
       name: 'test-extractor',
       extractorDependencies: ['test-extractor-2'],
@@ -83,21 +75,22 @@ describe('process > getNextBlocks', () => {
       extract: async () => {},
       getData: async () => ({}),
     };
-
-    const services: Services = {
-      db: dbCtx.db,
-      pg: dbCtx.pg,
-      config: testConfig,
-      columnSets: undefined as any,
-      provider: undefined as any,
-      networkState,
-      processorsState: getInitialProcessorsState([blockExtractor]),
-    };
-
+    services = await createTestServices({
+      config: getTestConfig({
+        extractors: [blockExtractor, blockExtractor2],
+        extractorWorker: {
+          batch: 4,
+          reorgBuffer: 10,
+        },
+      }),
+    });
     await registerProcessors(services, [blockExtractor, blockExtractor2]);
     await executeSQL(
-      dbCtx.db,
+      services.db,
       `
+      -- blocks
+      INSERT INTO vulcan2x.block(number, hash, timestamp) VALUES(1, '0x01', '2019-07-02 11:18:01+00');
+      INSERT INTO vulcan2x.block(number, hash, timestamp) VALUES(2, '0x02', '2019-07-02 11:18:02+00');
       -- update like there was some work already done
       UPDATE vulcan2x.job SET last_block_id = 1 WHERE name='test-extractor-2';
     `,
@@ -116,42 +109,29 @@ describe('process > getNextBlocks', () => {
   });
 
   it('should run processors even with huge "gaps" (reorgs) in blocks', async () => {
-    const dbCtx = createDB(testConfig.db);
-    await prepareDB(dbCtx.db, testConfig);
-
-    await executeSQL(
-      dbCtx.db,
-      `
-      -- blocks
-      INSERT INTO vulcan2x.block(number, hash, timestamp) VALUES(1, '0x01', '2019-07-02 11:18:01+00');
-      INSERT INTO vulcan2x.block(number, hash, timestamp) VALUES(2, '0x02', '2019-07-02 11:18:02+00');
-      INSERT INTO vulcan2x.block(id,number, hash, timestamp) VALUES(100, 3, '0x03', '2019-07-02 11:18:03+00'); -- note: id difference is more than batch
-    `,
-    );
-
     const blockExtractor: BlockExtractor = {
       name: 'test-extractor',
       extract: async () => {},
       getData: async () => ({}),
     };
-
-    const services: Services = {
-      db: dbCtx.db,
-      pg: dbCtx.pg,
-      config: {
-        ...testConfig,
+    services = await createTestServices({
+      config: getTestConfig({
+        extractors: [blockExtractor],
         extractorWorker: {
-          batch: 3,
-          reorgBuffer: 10,
+          batch: 5,
         },
-      },
-      columnSets: undefined as any,
-      provider: undefined as any,
-      networkState,
-      processorsState: getInitialProcessorsState([blockExtractor]),
-    };
-
+      }),
+    });
     await registerProcessors(services, [blockExtractor]);
+    await executeSQL(
+      services.db,
+      `
+      -- blocks
+      INSERT INTO vulcan2x.block(number, hash, timestamp) VALUES(1, '0x01', '2019-07-02 11:18:01+00');
+      INSERT INTO vulcan2x.block(number, hash, timestamp) VALUES(2, '0x02', '2019-07-02 11:18:02+00');
+      INSERT INTO vulcan2x.block(id, number, hash, timestamp) VALUES(100, 3, '0x03', '2019-07-02 11:18:03+00'); -- note: id difference is more than batch
+    `,
+    );
 
     const actual = await getNextBlocks(services, blockExtractor);
 
@@ -179,20 +159,13 @@ describe('process > getNextBlocks', () => {
 });
 
 describe('process', () => {
+  let services: Services;
+
+  afterEach(async () => {
+    await destroyTestServices(services);
+  });
+
   it('should work when extractors throws errors', async () => {
-    const dbCtx = createDB(testConfig.db);
-    await prepareDB(dbCtx.db, testConfig);
-
-    await executeSQL(
-      dbCtx.db,
-      `
-      -- blocks
-      INSERT INTO vulcan2x.block(number, hash, timestamp) VALUES(1, '0x01', '2019-07-02 11:18:01+00');
-      INSERT INTO vulcan2x.block(number, hash, timestamp) VALUES(2, '0x02', '2019-07-02 11:18:02+00');
-      INSERT INTO vulcan2x.block(number, hash, timestamp) VALUES(3, '0x03', '2019-07-02 11:18:03+00');
-    `,
-    );
-
     const blockExtractor: BlockExtractor = {
       name: 'test-extractor',
       extract: async (_s, [b]) => {
@@ -203,23 +176,25 @@ describe('process', () => {
       getData: async () => ({}),
     };
 
-    const dummyProvider = {} as any;
-
-    const services: Services = {
-      db: dbCtx.db,
-      pg: dbCtx.pg,
-      config: {
-        ...testConfig,
+    services = await createTestServices({
+      config: getTestConfig({
+        extractors: [blockExtractor],
         extractorWorker: {
           batch: 4,
           reorgBuffer: 10,
         },
-      },
-      columnSets: undefined as any,
-      provider: dummyProvider,
-      networkState,
-      processorsState: getInitialProcessorsState([blockExtractor]),
-    };
+      }),
+    });
+
+    await executeSQL(
+      services.db,
+      `
+      -- blocks
+      INSERT INTO vulcan2x.block(number, hash, timestamp) VALUES(1, '0x01', '2019-07-02 11:18:01+00');
+      INSERT INTO vulcan2x.block(number, hash, timestamp) VALUES(2, '0x02', '2019-07-02 11:18:02+00');
+      INSERT INTO vulcan2x.block(number, hash, timestamp) VALUES(3, '0x03', '2019-07-02 11:18:03+00');
+    `,
+    );
 
     await registerProcessors(services, [blockExtractor]);
 
@@ -239,7 +214,7 @@ describe('process', () => {
 
     await processBlocks(services, blockExtractor);
     const db = pick(await dumpDB(services.db), 'job');
-    db.job = db.job.map((e) => ({
+    db.job = db.job.map(e => ({
       ...e,
       extra_info: JSON.stringify(JSON.parse(e.extra_info).map((e: any) => pick(e, 'message'))),
     }));

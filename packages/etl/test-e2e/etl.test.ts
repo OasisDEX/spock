@@ -1,7 +1,7 @@
 import { join } from 'path';
 import { expect } from 'chai';
 
-import { withLocalEnv, runIntegrationTest } from 'spock-test-utils';
+import { withScopedEnv, runIntegrationTest, destroyTestServices } from 'spock-test-utils';
 
 import { BlockExtractor } from '../src/processors/types';
 import { TransactionalServices } from '../src/types';
@@ -19,7 +19,7 @@ const simpleDaiLogExtractor: BlockExtractor = {
     const logs = await getLogs(services, blocks, DAI);
     allDaiLogs.push(...logs);
   },
-  async getData(_services, _blocks) { },
+  async getData(_services, _blocks) {},
 };
 
 export async function getLogs(
@@ -45,13 +45,15 @@ export async function getLogs(
 // - use transformer
 // - put real data to database
 
+const envPath = join(__dirname, '../../../');
+
 describe('Spock ETL', () => {
   it('should work for past events', async () => {
     const startingBlock = 8219360;
     const lastBlock = startingBlock + 40;
 
-    await withLocalEnv(join(__dirname, '../../../'), async () => {
-      await runIntegrationTest({
+    await withScopedEnv(envPath, async () => {
+      const services = await runIntegrationTest({
         startingBlock,
         lastBlock,
         extractors: [simpleDaiLogExtractor],
@@ -60,6 +62,8 @@ describe('Spock ETL', () => {
       });
 
       expect(allDaiLogs.length).to.be.eq(52);
+
+      destroyTestServices(services);
     });
   });
 });

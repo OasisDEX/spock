@@ -22,7 +22,7 @@ export async function prepareDB(db: DB, config: SpockConfig): Promise<void> {
   console.log('DB prepared');
 }
 
-export const dumpDB = async (db: DB) => {
+export async function dumpDB(db: DB) {
   return await withConnection(db, async (c) => {
     return {
       blocks: await c.manyOrNone(`SELECT * FROM vulcan2x.block`),
@@ -33,7 +33,7 @@ export const dumpDB = async (db: DB) => {
       job: await c.manyOrNone(`SELECT * FROM vulcan2x.job ORDER BY name;`),
     };
   });
-};
+}
 
 export async function executeSQL(db: DB, sql: string): Promise<void> {
   await db.any(sql);

@@ -1,49 +1,48 @@
 import { expect } from 'chai';
 import { pick } from 'lodash';
 
-import { createDB } from '../../src/db/db';
-import { prepareDB, testConfig, dumpDB, networkState, executeSQL } from 'spock-test-utils';
+import {
+  dumpDB,
+  executeSQL,
+  createTestServices,
+  getTestConfig,
+  destroyTestServices,
+} from 'spock-test-utils';
+
 import { Services } from '../../src/types';
 import { registerProcessors } from '../../src/processors/register';
 import { BlockExtractor } from '../../src/processors/types';
-import { getInitialProcessorsState } from '../../src/processors/state';
 
 describe('register', () => {
-  it('should register new processors', async () => {
-    const dbCtx = createDB(testConfig.db);
-    await prepareDB(dbCtx.db, testConfig);
+  let services: Services;
 
+  afterEach(async () => {
+    await destroyTestServices(services);
+  });
+
+  it('should register new processors', async () => {
     const extractor1: BlockExtractor = {
       name: 'test-extractor',
       extract: async () => {},
       getData: async () => ({}),
     };
-
     const extractor2: BlockExtractor = {
       name: 'test-extractor-2',
       extract: async () => {},
       getData: async () => ({}),
     };
-
     const extractor3: BlockExtractor = {
       name: 'test-extractor-3',
       extract: async () => {},
       getData: async () => ({}),
     };
-
-    const services: Services = {
-      db: dbCtx.db,
-      pg: dbCtx.pg,
-      config: testConfig,
-      columnSets: undefined as any,
-      provider: undefined as any,
-      networkState,
-      processorsState: getInitialProcessorsState([extractor1, extractor2]),
-    };
+    services = await createTestServices({
+      config: getTestConfig({ extractors: [extractor1, extractor2] }),
+    });
 
     await registerProcessors(services, [extractor1, extractor2]);
 
-    expect(pick(await dumpDB(dbCtx.db), 'job')).to.be.deep.eq({
+    expect(pick(await dumpDB(services.db), 'job')).to.be.deep.eq({
       job: [
         {
           extra_info: null,
@@ -64,7 +63,7 @@ describe('register', () => {
 
     await registerProcessors(services, [extractor2, extractor3]);
 
-    expect(pick(await dumpDB(dbCtx.db), 'job')).to.be.deep.eq({
+    expect(pick(await dumpDB(services.db), 'job')).to.be.deep.eq({
       job: [
         {
           extra_info: null,
@@ -92,9 +91,6 @@ describe('register', () => {
   });
 
   it('should set startingBlockNumber when applicable', async () => {
-    const dbCtx = createDB(testConfig.db);
-    await prepareDB(dbCtx.db, testConfig);
-
     const extractor1: BlockExtractor = {
       name: 'test-extractor',
       startingBlock: 3,
@@ -102,18 +98,10 @@ describe('register', () => {
       getData: async () => ({}),
     };
 
-    const services: Services = {
-      db: dbCtx.db,
-      pg: dbCtx.pg,
-      config: testConfig,
-      columnSets: undefined as any,
-      provider: undefined as any,
-      networkState,
-      processorsState: getInitialProcessorsState([extractor1]),
-    };
+    services = await createTestServices({ config: getTestConfig({ extractors: [extractor1] }) });
 
     await executeSQL(
-      dbCtx.db,
+      services.db,
       `
       -- blocks
       INSERT INTO vulcan2x.block(number, hash, timestamp) VALUES(1, '0x01', '2019-07-02 11:18:01+00');
@@ -128,7 +116,7 @@ describe('register', () => {
 
     await registerProcessors(services, [extractor1]);
 
-    expect(pick(await dumpDB(dbCtx.db), 'job')).to.be.deep.eq({
+    expect(pick(await dumpDB(services.db), 'job')).to.be.deep.eq({
       job: [
         {
           extra_info: null,
@@ -142,7 +130,7 @@ describe('register', () => {
 
     await registerProcessors(services, [extractor1]);
 
-    expect(pick(await dumpDB(dbCtx.db), 'job')).to.be.deep.eq({
+    expect(pick(await dumpDB(services.db), 'job')).to.be.deep.eq({
       job: [
         {
           extra_info: null,
