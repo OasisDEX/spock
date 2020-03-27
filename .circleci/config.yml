@@ -44,8 +44,8 @@ jobs:
       - run: yarn build
       - run: ./scripts/dev.sh -d
       - run: |
-        source /opt/circleci/.nvm/nvm.sh
-        yarn test:e2e
+          source /opt/circleci/.nvm/nvm.sh
+          yarn test:e2e
 
 workflows:
   version: 2
