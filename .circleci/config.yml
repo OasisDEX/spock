@@ -38,26 +38,21 @@ jobs:
       docker_layer_caching: true
     steps:
       - checkout
-      - run: .circleci/install-yarn.sh
       - restore_cache:
-        name: Restore Yarn Package Cache
-        keys:
-          - yarn-packages-{{ checksum "yarn.lock" }}
-    - run:
-        name: Install Dependencies
-        command: |
-          source /opt/circleci/.nvm/nvm.sh
-          yarn install --frozen-lockfile
-    - save_cache:
-        name: Save Yarn Package Cache
-        key: yarn-packages-{{ checksum "yarn.lock" }}
-        paths:
-          - ~/.cache/yarn
+          keys:
+            - yarn-packages-{{ checksum "yarn.lock" }}
+      - run: .circleci/install-yarn.sh
 
-      - run: yarn build
-      - run: ./scripts/dev.sh -d
+      - run:
+          name: 'Run postgres'
+          command: |
+            docker-compose up -d
+            ./.circleci/wait-for-it.sh localhost:5432 -t 10
+            sleep 10
       - run: |
           source /opt/circleci/.nvm/nvm.sh
+          yarn # @todo: reuse modules from cache
+          yarn build
           yarn test:e2e
 
 workflows:
