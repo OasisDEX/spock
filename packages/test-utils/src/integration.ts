@@ -1,15 +1,11 @@
-import { merge } from 'lodash';
-
 import { UserProvidedSpockConfig } from 'spock-etl/src/config';
-import { createDB, DB } from 'spock-etl/src/db/db';
 import { mergeConfig } from 'spock-etl/src/utils/configUtils';
-import { etl, startETL } from 'spock-etl/dist/etl';
-import { delay, setSpockBreakout, resetSpockBreakout } from 'spock-etl/src/utils';
+import { startETL } from 'spock-etl/dist/etl';
+import { delay, setSpockBreakout } from 'spock-etl/src/utils';
 
-import { getTestConfig, createTestServices } from './services';
-import { prepareDB, dumpDB } from './db';
+import { createTestServices } from './services';
+import { dumpDB } from './db';
 import { Services } from 'spock-etl/dist/types';
-import { getDefaultConfig } from 'spock-etl/dist/config';
 
 export async function runIntegrationTest(
   externalConfig: UserProvidedSpockConfig,

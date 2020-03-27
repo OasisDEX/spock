@@ -17,27 +17,32 @@ commands:
             - ~/.cache/yarn
 
 jobs:
-  lint:
+  test:
     docker:
       - image: circleci/node:11.15
     steps:
       - checkout
       - install_dependencies
-      - run: yarn lint
+      - run: |
+        yarn build
+        yarn lint
+        yarn format
+        yarn typecheck
+        yarn test
 
-  build_and_test:
+  test-e2e:
     docker:
       - image: circleci/node:11.15
     steps:
       - checkout
       - install_dependencies
       - run: yarn build
-      - run: yarn typecheck
-      - run: yarn test
+      - run: ./scripts/dev.sh -d
+      - run: yarn test:e2e
 
 workflows:
   version: 2
   build_and_test:
     jobs:
-      - lint
+      - test
       - build_and_test

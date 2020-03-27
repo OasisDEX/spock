@@ -6,13 +6,14 @@
     "yarn": ">=1.15.2"
   },
   "scripts": {
-    "format": "wsrun -c format",
-    "format:fix": "wsrun -c format:fix",
-    "lint": "wsrun -c lint",
-    "lint:fix": "wsrun -c lint:fix",
-    "typecheck": "wsrun -c typecheck",
-    "build": "wsrun -te -c build",
-    "test": "wsrun -c test",
+    "format": "wsrun -p spock-etl -c format && wsrun -p spock-test-utils -c format",
+    "format:fix": "wsrun -p spock-etl -c format:fix && wsrun -p spock-test-utils -c format:fix",
+    "lint": "wsrun -p spock-etl -c lint && wsrun -p spock-test-utils -c lint",
+    "lint:fix": "wsrun -p spock-etl -c lint:fix && wsrun -p spock-test-utils -c lint:fix",
+    "typecheck": "wsrun -p spock-etl -c typecheck && wsrun -p spock-test-utils -c typecheck",
+    "build": "wsrun -p spock-etl -c build && wsrun -p spock-test-utils -c build",
+    "test": "wsrun -p etl -c test && wsrun -p test -c test",
+    "test:e2e": "wsrun -sm -c test-e2e",
     "test:fix": "yarn lint:fix && yarn format:fix && yarn test && yarn typecheck"
   },
   "workspaces": [
