@@ -23,6 +23,7 @@ jobs:
     steps:
       - checkout
       - install_dependencies
+
       - run: |
           yarn build
           yarn lint
@@ -31,14 +32,20 @@ jobs:
           yarn test
 
   test-e2e:
-    docker:
-      - image: circleci/node:11.15
+    machine:
+      enabled: true
+      image: circleci/classic:201710-01
+      docker_layer_caching: true
     steps:
       - checkout
+      - run: .circleci/install-yarn.sh
       - install_dependencies
+
       - run: yarn build
       - run: ./scripts/dev.sh -d
-      - run: yarn test:e2e
+      - run: |
+        source /opt/circleci/.nvm/nvm.sh
+        yarn test:e2e
 
 workflows:
   version: 2
