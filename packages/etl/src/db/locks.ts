@@ -17,7 +17,7 @@ export async function withLock(db: DB, id: number, fn: () => Promise<any>): Prom
   } finally {
     await release(connection, id);
 
-    await connection.done();
+    connection.done();
     cleanupOnExit.uninstall();
   }
 }

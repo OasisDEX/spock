@@ -15,7 +15,7 @@ export function findConsecutiveSubsets<T>(_entities: T[], key: keyof T): T[][] {
 
   for (const e of entities) {
     const head = getLast(acc);
-    // tslint:disable-next-line
+    // eslint-disable-next-line
     if (!head || e[key] === (head[key] as any) + 1) {
       acc.push(e);
     } else {

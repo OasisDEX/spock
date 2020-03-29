@@ -10,9 +10,7 @@ import { expect } from 'chai';
 
 describe('Block generator', () => {
   let services: Services;
-  afterEach(async () => {
-    destroyTestServices(services);
-  });
+  afterEach(() => destroyTestServices(services));
 
   it('should work with reorgs', async () => {
     // @todo do not use getRandomProvider

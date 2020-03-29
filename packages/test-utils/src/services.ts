@@ -13,7 +13,7 @@ export async function createTestServices(services: Partial<Services> = {}): Prom
   const config = services.config ?? getTestConfig();
   const dbCtx = createDB(config.db);
   await prepareDB(dbCtx.db, config);
-  await createProviders(config);
+  createProviders(config);
   const provider = getRandomProvider();
   const networkState = config.chain.host ? await getNetworkState(provider) : dummyNetworkState;
 

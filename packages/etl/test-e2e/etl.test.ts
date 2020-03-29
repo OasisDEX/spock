@@ -63,7 +63,7 @@ describe('Spock ETL', () => {
 
       expect(allDaiLogs.length).to.be.eq(52);
 
-      destroyTestServices(services);
+      await destroyTestServices(services);
     });
   });
 });
