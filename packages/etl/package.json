@@ -12,9 +12,7 @@
     "lint": "eslint --ext .ts src test test-e2e",
     "lint:fix": "yarn lint --fix",
     "typecheck": "tsc --noEmit",
-    "prebuild": "rm -rf dist",
-    "build": "tsc -p tsconfig.build.json --outDir dist",
-    "build:watch": "yarn build --watch",
+    "clean": "rm -rf dist && rm -f tsconfig.build.tsbuildinfo",
     "test": "mocha",
     "test:e2e": "mocha --opts ./test-e2e/mocha.opts",
     "test:fix": "yarn lint:fix && yarn format:fix && yarn test && yarn typecheck"

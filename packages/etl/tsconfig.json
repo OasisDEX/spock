@@ -1,7 +1,8 @@
 {
   "extends": "../../tsconfig.json",
+  "include": ["src", "test", "test-e2e"],
   "compilerOptions": {
     "esModuleInterop": true,
-    "skipLibCheck": true,
+    "skipLibCheck": true
   }
 }
