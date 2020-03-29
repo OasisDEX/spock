@@ -6,15 +6,15 @@
     "yarn": ">=1.15.2"
   },
   "scripts": {
-    "format": "wsrun -p spock-etl -c format && wsrun -p spock-test-utils -c format",
-    "format:fix": "wsrun -p spock-etl -c format:fix && wsrun -p spock-test-utils -c format:fix",
-    "lint": "wsrun -p spock-etl -c lint && wsrun -p spock-test-utils -c lint",
-    "lint:fix": "wsrun -p spock-etl -c lint:fix && wsrun -p spock-test-utils -c lint:fix",
-    "typecheck": "wsrun -p spock-etl -c typecheck && wsrun -p spock-test-utils -c typecheck",
+    "format": "wsrun -sm -c format",
+    "format:fix": "wsrun -sm -c format:fix",
+    "lint": "wsrun -sm -c lint",
+    "lint:fix": "wsrun -sm -c lint:fix",
+    "typecheck": "wsrun -sm -c typecheck",
     "build": "tsc --build --verbose",
     "watch": "yarn build --watch",
     "clean": "wsrun -c clean",
-    "test": "wsrun -p etl -c test && wsrun -p test -c test",
+    "test": "wsrun -sm -c test",
     "test:e2e": "wsrun -sm -c test-e2e",
     "test:fix": "yarn lint:fix && yarn format:fix && yarn test && yarn typecheck"
   },
