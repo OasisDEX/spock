@@ -839,6 +839,11 @@ escape-string-regexp@1.0.5, escape-string-regexp@^1.0.5:
   resolved "https://registry.yarnpkg.com/escape-string-regexp/-/escape-string-regexp-1.0.5.tgz#1b61c0562190a8dff6ae3bb2cf0200ca130b86d4"
   integrity sha1-G2HAViGQqN/2rjuyzwIAyhMLhtQ=
 
+eslint-config-typestrict@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/eslint-config-typestrict/-/eslint-config-typestrict-1.0.0.tgz#fdb9876c1ea72a1fc743b964464cb0b730b60f11"
+  integrity sha512-mC3wdJwrYp9O27w4oDU9q0xKdqivSBXSltc31hk8zsiSyDgOwadSEvFPeRjS8uxl9qKUhgS+8MAcX/SJ52fWpA==
+
 eslint-plugin-no-only-tests@^2.4.0:
   version "2.4.0"
   resolved "https://registry.yarnpkg.com/eslint-plugin-no-only-tests/-/eslint-plugin-no-only-tests-2.4.0.tgz#7d565434aa7d16ccc7eea957c391d98f827332ca"
