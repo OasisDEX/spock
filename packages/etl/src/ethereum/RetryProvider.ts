@@ -1,30 +1,30 @@
-import { JsonRpcProvider } from 'ethers/providers';
-import { Networkish } from 'ethers/utils';
-import { ConnectionInfo, poll } from 'ethers/utils/web';
-import { delay, RetryableError } from '../utils';
-import { getLogger } from '../utils/logger';
+import { JsonRpcProvider } from 'ethers/providers'
+import { Networkish } from 'ethers/utils'
+import { ConnectionInfo, poll } from 'ethers/utils/web'
+import { delay, RetryableError } from '../utils'
+import { getLogger } from '../utils/logger'
 
-const logger = getLogger('ethereum/RetryProvider');
+const logger = getLogger('ethereum/RetryProvider')
 
 /**
  * Custom ethers.js provider automatically retrying any errors coming from node
  */
 export class RetryProvider extends JsonRpcProvider {
-  public maxAttempts: number;
+  public maxAttempts: number
 
   constructor(url: ConnectionInfo | string, attempts: number, network?: Networkish) {
-    super(url, network);
-    this.maxAttempts = attempts;
+    super(url, network)
+    this.maxAttempts = attempts
   }
 
   public async perform(method: string, params: any): Promise<any> {
-    let attempt = 0;
+    let attempt = 0
 
     return poll(async () => {
-      attempt++;
+      attempt++
 
       try {
-        return await super.perform(method, params);
+        return await super.perform(method, params)
       } catch (error) {
         logger.debug(
           `Got ${error.statusCode}, ${JSON.stringify({
@@ -33,25 +33,25 @@ export class RetryProvider extends JsonRpcProvider {
             params,
             error,
           })}`,
-        );
+        )
 
-        await this.handleError(attempt, error);
+        await this.handleError(attempt, error)
       }
-    });
+    })
   }
 
   private async handleError(attempt: number, error: any): Promise<void> {
     if (attempt >= this.maxAttempts) {
-      logger.debug('Got error, failing...', JSON.stringify(error));
-      throw this.transformError(error);
+      logger.debug('Got error, failing...', JSON.stringify(error))
+      throw this.transformError(error)
     } else if (error && error.statusCode) {
       // if we are hitting the api limit retry faster
-      logger.debug('Retrying 429...');
-      await delay(500);
+      logger.debug('Retrying 429...')
+      await delay(500)
     } else {
       // just retry if error is not critical
-      logger.debug('Retrying...');
-      await delay(1000);
+      logger.debug('Retrying...')
+      await delay(1000)
     }
   }
 
@@ -60,22 +60,22 @@ export class RetryProvider extends JsonRpcProvider {
    */
   private transformError(error: any): any {
     if (!error) {
-      return error;
+      return error
     }
     // ERROR: One of the blocks specified in filter (fromBlock, toBlock or blockHash) cannot be found
     if (error.code === -32000) {
-      return new RetryableError(error.message);
+      return new RetryableError(error.message)
     }
     // ERROR: rate limiting
     if (error.code === 429) {
-      return new RetryableError(error.message);
+      return new RetryableError(error.message)
     }
     // ERROR: reorg happened during processing and now when asking for logs alchemy gives weird error msg
     if (error.code === -32602) {
-      return new RetryableError(error.message);
+      return new RetryableError(error.message)
     }
 
-    return error;
+    return error
   }
 }
 

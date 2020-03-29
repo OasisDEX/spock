@@ -1,25 +1,25 @@
-import pgPromise from 'pg-promise';
-import { Provider } from 'ethers/providers';
-import { StrictOmit } from 'ts-essentials';
+import pgPromise from 'pg-promise'
+import { Provider } from 'ethers/providers'
+import { StrictOmit } from 'ts-essentials'
 
-import { DB, ColumnSets, DbTransactedConnection } from './db/db';
-import { SpockConfig } from './config';
-import { NetworkState } from './ethereum/getNetworkState';
-import { ProcessorsState } from './processors/state';
+import { DB, ColumnSets, DbTransactedConnection } from './db/db'
+import { SpockConfig } from './config'
+import { NetworkState } from './ethereum/getNetworkState'
+import { ProcessorsState } from './processors/state'
 
 export interface Services {
-  provider: Provider;
-  db: DB;
-  pg: pgPromise.IMain;
-  config: SpockConfig;
-  columnSets: ColumnSets;
-  networkState: NetworkState;
-  processorsState: ProcessorsState;
+  provider: Provider
+  db: DB
+  pg: pgPromise.IMain
+  config: SpockConfig
+  columnSets: ColumnSets
+  networkState: NetworkState
+  processorsState: ProcessorsState
 }
 
 export interface TransactionalServices extends StrictOmit<Services, 'db'> {
-  tx: DbTransactedConnection;
+  tx: DbTransactedConnection
 }
 
 // No external data sources like blockchain
-export type LocalServices = Omit<TransactionalServices, 'provider'>;
+export type LocalServices = Omit<TransactionalServices, 'provider'>

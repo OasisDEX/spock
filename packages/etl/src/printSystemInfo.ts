@@ -1,13 +1,13 @@
-import { getVersion } from './utils/getVersion';
-import { SpockConfig } from './config';
-import { getLogger } from './utils/logger';
-import { omit } from 'lodash';
+import { getVersion } from './utils/getVersion'
+import { SpockConfig } from './config'
+import { getLogger } from './utils/logger'
+import { omit } from 'lodash'
 
-const logger = getLogger('system');
+const logger = getLogger('system')
 
 export function printSystemInfo(config: SpockConfig): void {
-  logger.info(`Starting Spock ETL ver.${getVersion()}`);
-  logger.info('Config:', maskConfig(config));
+  logger.info(`Starting Spock ETL ver.${getVersion()}`)
+  logger.info('Config:', maskConfig(config))
 }
 
 function maskConfig(config: SpockConfig): Record<string, any> {
@@ -18,5 +18,5 @@ function maskConfig(config: SpockConfig): Record<string, any> {
     db: {
       host: config.db.host,
     },
-  };
+  }
 }

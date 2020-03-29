@@ -1,3 +1,3 @@
-import { DbConnection, DbTransactedConnection } from '../db';
+import { DbConnection, DbTransactedConnection } from '../db'
 
-export type Connection = DbConnection | DbTransactedConnection;
+export type Connection = DbConnection | DbTransactedConnection

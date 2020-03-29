@@ -1,42 +1,40 @@
-import { UserProvidedSpockConfig } from 'spock-etl/src/config';
-import { mergeConfig } from 'spock-etl/src/utils/configUtils';
-import { startETL } from 'spock-etl/dist/etl';
-import { delay, setSpockBreakout } from 'spock-etl/src/utils';
+import { UserProvidedSpockConfig } from 'spock-etl/src/config'
+import { mergeConfig } from 'spock-etl/src/utils/configUtils'
+import { startETL } from 'spock-etl/dist/etl'
+import { delay, setSpockBreakout } from 'spock-etl/src/utils'
 
-import { createTestServices } from './services';
-import { dumpDB } from './db';
-import { Services } from 'spock-etl/dist/types';
+import { createTestServices } from './services'
+import { dumpDB } from './db'
+import { Services } from 'spock-etl/dist/types'
 
-export async function runIntegrationTest(
-  externalConfig: UserProvidedSpockConfig,
-): Promise<Services> {
+export async function runIntegrationTest(externalConfig: UserProvidedSpockConfig): Promise<Services> {
   const services = await createTestServices({
     config: mergeConfig({ ...externalConfig, statsWorker: { enabled: false } }),
-  });
+  })
 
-  const etlPromise = startETL(services);
+  const etlPromise = startETL(services)
 
   etlPromise.catch((e) => {
-    console.error('ETL FAILED WITH', e);
-    process.exit(1);
-  });
+    console.error('ETL FAILED WITH', e)
+    process.exit(1)
+  })
 
-  await waitForAllJobs(services, etlPromise);
+  await waitForAllJobs(services, etlPromise)
 
-  return services;
+  return services
 }
 
 export async function waitForAllJobs(services: Services, etl: Promise<void>) {
-  const { config } = services;
-  const allJobs = config.extractors.length + config.transformers.length;
-  const lastBlockId = config.lastBlock! - config.startingBlock; // ids are starting from 1
-  let fullySynced = false;
+  const { config } = services
+  const allJobs = config.extractors.length + config.transformers.length
+  const lastBlockId = config.lastBlock! - config.startingBlock // ids are starting from 1
+  let fullySynced = false
   while (!fullySynced) {
-    await delay(1000);
-    const jobs = (await dumpDB(services.db)).job;
-    fullySynced = jobs.filter((p) => p.last_block_id >= lastBlockId).length === allJobs;
+    await delay(1000)
+    const jobs = (await dumpDB(services.db)).job
+    fullySynced = jobs.filter((p) => p.last_block_id >= lastBlockId).length === allJobs
   }
-  setSpockBreakout();
+  setSpockBreakout()
 
-  await etl;
+  await etl
 }

@@ -1,3 +1,3 @@
 export function getVersion(): string {
-  return (require('../../package.json') || {}).version;
+  return (require('../../package.json') || {}).version
 }

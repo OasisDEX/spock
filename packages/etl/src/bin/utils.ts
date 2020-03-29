@@ -1,15 +1,15 @@
-import { captureException, flush } from '@sentry/node';
+import { captureException, flush } from '@sentry/node'
 
 export function runAndHandleErrors(fn: () => Promise<any>): void {
   fn().catch(async (e) => {
-    console.error(e);
+    console.error(e)
 
-    captureException(e);
+    captureException(e)
     try {
       // need for sentry to send async requests
-      await flush();
+      await flush()
     } finally {
-      process.exit(1);
+      process.exit(1)
     }
-  });
+  })
 }

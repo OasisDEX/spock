@@ -1,16 +1,16 @@
-import { ethers } from 'ethers';
-import { Block } from 'ethers/providers';
-import { pick } from 'lodash';
+import { ethers } from 'ethers'
+import { Block } from 'ethers/providers'
+import { pick } from 'lodash'
 
-import { blockGenerator } from '../src/blockGenerator';
-import { dumpDB, createTestServices, destroyTestServices } from 'spock-test-utils';
-import { Services } from '../src/types';
-import { createProviders, getRandomProvider } from '../src/services';
-import { expect } from 'chai';
+import { blockGenerator } from '../src/blockGenerator'
+import { dumpDB, createTestServices, destroyTestServices } from 'spock-test-utils'
+import { Services } from '../src/types'
+import { createProviders, getRandomProvider } from '../src/services'
+import { expect } from 'chai'
 
 describe('Block generator', () => {
-  let services: Services;
-  afterEach(() => destroyTestServices(services));
+  let services: Services
+  afterEach(() => destroyTestServices(services))
 
   it('should work with reorgs', async () => {
     // @todo do not use getRandomProvider
@@ -20,18 +20,18 @@ describe('Block generator', () => {
         name: 'mainnet',
         retries: 0,
       },
-    } as any);
-    const provider = getRandomProvider();
+    } as any)
+    const provider = getRandomProvider()
 
     provider.getBlock = async (blockNumber: number): Promise<Block> => {
-      const block = blocks[blockPointer++];
+      const block = blocks[blockPointer++]
       if (block && block.number !== blockNumber) {
-        throw new Error('Error in fixtures!');
+        throw new Error('Error in fixtures!')
       }
-      return block as any;
-    };
+      return block as any
+    }
 
-    services = await createTestServices({ provider });
+    services = await createTestServices({ provider })
 
     const blocks: Array<Partial<ethers.providers.Block>> = [
       {
@@ -82,10 +82,10 @@ describe('Block generator', () => {
         parentHash: '0x003',
         timestamp: 4,
       },
-    ];
-    let blockPointer = 0;
+    ]
+    let blockPointer = 0
 
-    await blockGenerator(services, 0, 4);
+    await blockGenerator(services, 0, 4)
 
     expect(pick(await dumpDB(services.db), 'blocks')).to.be.deep.eq({
       blocks: [
@@ -120,6 +120,6 @@ describe('Block generator', () => {
           timestamp: new Date('1970-01-01T00:00:04.000Z'),
         },
       ],
-    });
-  });
-});
+    })
+  })
+})

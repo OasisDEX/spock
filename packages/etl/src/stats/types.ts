@@ -1,5 +1,5 @@
 export interface Stats {
-  blocksSynced: number;
-  blocksExtracted: number;
-  blocksTransformed: number;
+  blocksSynced: number
+  blocksExtracted: number
+  blocksTransformed: number
 }
