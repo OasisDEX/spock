@@ -11,7 +11,7 @@
     "format:fix": "prettier --config ../../.prettierrc  --ignore-path ../../.prettierignore --write \"./**/*.ts\"",
     "lint": "eslint --ext .ts src test test-e2e",
     "lint:fix": "yarn lint --fix",
-    "typecheck": "tsc --noEmit --incremental false",
+    "typecheck": "tsc --noEmit --incremental false --composite false",
     "clean": "rm -rf dist && rm -f tsconfig.build.tsbuildinfo",
     "test": "mocha",
     "test:e2e": "mocha --opts ./test-e2e/mocha.opts",
