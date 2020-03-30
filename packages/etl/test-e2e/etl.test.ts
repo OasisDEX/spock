@@ -4,10 +4,10 @@ import { expect } from 'chai'
 import { withScopedEnv, runIntegrationTest, destroyTestServices } from 'spock-test-utils'
 
 import { BlockExtractor } from '../src/processors/types'
-import { TransactionalServices } from '../src/types'
+import { TransactionalServices } from '../src/services/types'
 import { BlockModel } from '../src/db/models/Block'
 import { Log } from 'ethers/providers'
-import { getLast } from '../src/utils'
+import { getLast } from '../src/utils/arrays'
 
 const DAI = '0x89d24a6b4ccb1b6faa2625fe562bdd9a23260359'
 

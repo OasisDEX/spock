@@ -1,4 +1,4 @@
-import { Services } from '../types'
+import { Services } from '../services/types'
 import { getJob, saveJob, WritableJobModel, setJobStatus, excludeAllJobs } from '../db/models/Job'
 import { withConnection, DbConnection } from '../db/db'
 import { getLogger } from '../utils/logger'

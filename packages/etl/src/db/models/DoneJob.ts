@@ -1,5 +1,5 @@
 import { StrictOmit } from 'ts-essentials'
-import { TransactionalServices } from '../../types'
+import { TransactionalServices } from '../../services/types'
 import { makeNullUndefined } from '../db'
 
 export interface DoneJob {
@@ -24,7 +24,7 @@ export async function selectDoneJob(
   block: Pick<DoneJob, 'end_block_id' | 'name'>,
 ): Promise<DoneJob | undefined> {
   const sql = `
-  SELECT * FROM vulcan2x.done_job deb 
+  SELECT * FROM vulcan2x.done_job deb
   WHERE deb.end_block_id = ${block.end_block_id} AND deb.name='${block.name}';`
 
   return await services.tx.oneOrNone(sql).then(makeNullUndefined)
@@ -36,8 +36,8 @@ export async function updateDoneJob(
   block: Pick<DoneJob, 'end_block_id'>,
 ): Promise<void> {
   const sql = `
-  UPDATE vulcan2x.done_job 
-  SET end_block_id=${block.end_block_id} 
+  UPDATE vulcan2x.done_job
+  SET end_block_id=${block.end_block_id}
   WHERE id=${id};`
 
   await services.tx.none(sql)

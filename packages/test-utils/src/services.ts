@@ -2,10 +2,10 @@ import { DeepPartial } from 'ts-essentials'
 import { merge } from 'lodash'
 
 import { prepareDB } from './db'
-import { SpockConfig, getDefaultConfig, getAllProcessors } from 'spock-etl/dist/config'
-import { Services } from 'spock-etl/dist/types'
+import { SpockConfig, getDefaultConfig, getAllProcessors } from 'spock-etl/dist/services/config'
+import { Services } from 'spock-etl/dist/services/types'
 import { createDB } from 'spock-etl/dist/db/db'
-import { getRandomProvider, createProviders } from 'spock-etl/dist/services'
+import { createProvider } from 'spock-etl/dist/services/services'
 import { NetworkState, getNetworkState } from 'spock-etl/dist/ethereum/getNetworkState'
 import { getInitialProcessorsState } from 'spock-etl/dist/processors/state'
 
@@ -13,8 +13,7 @@ export async function createTestServices(services: Partial<Services> = {}): Prom
   const config = services.config ?? getTestConfig()
   const dbCtx = createDB(config.db)
   await prepareDB(dbCtx.db, config)
-  createProviders(config)
-  const provider = getRandomProvider()
+  const provider = createProvider(config)
   const networkState = config.chain.host ? await getNetworkState(provider) : dummyNetworkState
 
   return {

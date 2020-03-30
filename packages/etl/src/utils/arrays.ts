@@ -4,10 +4,6 @@ export function getLast<T>(array: T[]): T | undefined {
   return array[array.length - 1]
 }
 
-export function delay(time: number): Promise<void> {
-  return new Promise((resolve) => setTimeout(resolve, time))
-}
-
 export function findConsecutiveSubsets<T>(_entities: T[], key: keyof T): T[][] {
   const entities = sortBy(_entities, key)
   const subsets: T[][] = []
@@ -42,6 +38,11 @@ export function splitArrayInHalf<T>(array: T[]): [T[], T[]] {
   return [firstHalf, secondHalf]
 }
 
+export interface Range<T> {
+  first: T
+  last: T
+}
+
 export function getRangeAsString<T>(array: T[], getValue: (v: T) => any): string {
   if (array.length === 0) {
     return '<...> (empty)'
@@ -50,11 +51,6 @@ export function getRangeAsString<T>(array: T[], getValue: (v: T) => any): string
   const last = getLast(array)!
 
   return `<${getValue(first)}...${getValue(last)}> (${array.length})`
-}
-
-interface Range<T> {
-  first: T
-  last: T
 }
 
 export function getRange<T, O>(array: T[], getValue: (v: T) => O): Range<O> | undefined {
@@ -69,20 +65,3 @@ export function getRange<T, O>(array: T[], getValue: (v: T) => O): Range<O> | un
     last,
   }
 }
-
-/**
- * These are helpers to stop spock during tests from the test code.
- */
-export function getSpockBreakout(): boolean {
-  return (global as any).SPOCK_BREAKOUT === true
-}
-
-export function setSpockBreakout(): void {
-  ;(global as any).SPOCK_BREAKOUT = true
-}
-
-export function resetSpockBreakout(): void {
-  ;(global as any).SPOCK_BREAKOUT = false
-}
-
-export class RetryableError extends Error {}

@@ -1,13 +1,13 @@
 #!/usr/bin/env node
 
-import { setupSentry } from './sentry'
+import { setupSentry } from '../utils/sentry'
 import { captureException, flush } from '@sentry/node'
 
 const command = process.argv[2]
 setupSentry()
 
 try {
-  require(`./bin/${command}.js`)
+  require(`./${command}.js`)
 } catch (e) {
   console.log(`Cant find command ${command}`)
   console.error(e)

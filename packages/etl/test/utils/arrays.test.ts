@@ -1,6 +1,6 @@
 import { expect } from 'chai'
 
-import { findConsecutiveSubsets } from '../src/utils'
+import { findConsecutiveSubsets } from '../../src/utils/arrays'
 
 describe('findConsecutiveSubsets', () => {
   it('should work', () => {

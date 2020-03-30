@@ -5,6 +5,6 @@ module.exports = {
   extension: ['ts'],
   watchExtensions: ['ts'],
   spec: ['test-e2e/**/*.test.ts'],
-  slow: 500,
+  slow: 1000,
   timeout: 10000,
 }

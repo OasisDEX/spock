@@ -1,4 +1,4 @@
-import { LocalServices } from '../../types'
+import { LocalServices } from '../../services/types'
 import { makeNullUndefined, DbConnection } from '../db'
 
 export interface BlockModel {

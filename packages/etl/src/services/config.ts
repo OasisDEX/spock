@@ -1,6 +1,6 @@
 import { Dictionary, DeepPartial } from 'ts-essentials'
-import { Env, getRequiredString, getRequiredNumber } from './utils/configUtils'
-import { BlockExtractor, BlockTransformer, Processor } from './processors/types'
+import { Env, getRequiredString, getRequiredNumber } from './configUtils'
+import { BlockExtractor, BlockTransformer, Processor } from '../processors/types'
 import { Services } from './types'
 
 export interface SpockConfig {
@@ -34,7 +34,6 @@ export interface SpockConfig {
     host: string
     name: string
     retries: number
-    alternativeHosts?: string[]
   }
   db: {
     database: string

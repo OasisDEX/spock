@@ -3,7 +3,7 @@ import { pick } from 'lodash'
 
 import { dumpDB, executeSQL, createTestServices, getTestConfig, destroyTestServices } from 'spock-test-utils'
 
-import { Services } from '../../src/types'
+import { Services } from '../../src/services/types'
 import { registerProcessors } from '../../src/processors/register'
 import { BlockExtractor } from '../../src/processors/types'
 

@@ -1,14 +1,14 @@
 import * as ethers from 'ethers'
 import { getLogger } from './utils/logger'
 import { withLock } from './db/locks'
-import { SpockConfig, getAllProcessors } from './config'
-import { createServices } from './services'
-import { blockGenerator } from './blockGenerator'
+import { SpockConfig, getAllProcessors } from './services/config'
+import { createServices } from './services/services'
+import { blockGenerator } from './blockGenerator/blockGenerator'
 import { process } from './processors/process'
 import { registerProcessors } from './processors/register'
 import { statsWorker } from './stats/stats'
-import { printSystemInfo } from './printSystemInfo'
-import { Services } from './types'
+import { printSystemInfo } from './utils/printSystemInfo'
+import { Services } from './services/types'
 
 ethers.errors.setLogLevel('error')
 const logger = getLogger('runner')

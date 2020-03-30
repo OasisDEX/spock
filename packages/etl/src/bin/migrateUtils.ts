@@ -1,7 +1,7 @@
 import { join } from 'path'
 import { migrate as migrateDB } from 'postgres-migrations-oasis'
 
-import { SpockConfig } from '../config'
+import { SpockConfig } from '../services/config'
 import { getLogger } from '../utils/logger'
 
 const logger = getLogger('migration')

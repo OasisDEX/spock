@@ -1,5 +1,6 @@
-import { Services } from '../types'
-import { delay, getSpockBreakout } from '../utils'
+import { Services } from '../services/types'
+import { delay } from '../utils/promises'
+import { getSpockBreakout } from '../utils/breakout'
 import { getLogger } from '../utils/logger'
 import { Stats } from './types'
 import { JobModel, getAllJobs } from '../db/models/Job'

@@ -1,7 +1,7 @@
 import { isAbsolute, join, extname, dirname } from 'path'
 import { Dictionary } from 'ts-essentials'
 
-import { SpockConfig, getDefaultConfig, UserProvidedSpockConfig } from '../config'
+import { SpockConfig, getDefaultConfig, UserProvidedSpockConfig } from './config'
 import { mapValues, get, merge } from 'lodash'
 
 export function loadConfig(): SpockConfig {

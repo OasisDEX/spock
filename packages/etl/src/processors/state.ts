@@ -1,6 +1,6 @@
 import { Dictionary } from 'ts-essentials'
 import { Processor } from './types'
-import { Services } from '../types'
+import { Services } from '../services/types'
 import serializeError from 'serialize-error'
 
 export interface ProcessorState {

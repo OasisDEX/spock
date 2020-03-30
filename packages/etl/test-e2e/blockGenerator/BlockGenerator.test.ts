@@ -2,10 +2,10 @@ import { ethers } from 'ethers'
 import { Block } from 'ethers/providers'
 import { pick } from 'lodash'
 
-import { blockGenerator } from '../src/blockGenerator'
+import { blockGenerator } from '../../src/blockGenerator/blockGenerator'
 import { dumpDB, createTestServices, destroyTestServices } from 'spock-test-utils'
-import { Services } from '../src/types'
-import { createProviders, getRandomProvider } from '../src/services'
+import { Services } from '../../src/services/types'
+import { createProvider } from '../../src/services/services'
 import { expect } from 'chai'
 
 describe('Block generator', () => {
@@ -13,15 +13,13 @@ describe('Block generator', () => {
   afterEach(() => destroyTestServices(services))
 
   it('should work with reorgs', async () => {
-    // @todo do not use getRandomProvider
-    createProviders({
+    const provider = createProvider({
       chain: {
         host: 'http://localhost/not-existing',
         name: 'mainnet',
         retries: 0,
       },
     } as any)
-    const provider = getRandomProvider()
 
     provider.getBlock = async (blockNumber: number): Promise<Block> => {
       const block = blocks[blockPointer++]

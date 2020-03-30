@@ -1,6 +1,5 @@
-import { getVersion } from './utils/getVersion'
-import { SpockConfig } from './config'
-import { getLogger } from './utils/logger'
+import { SpockConfig } from '../services/config'
+import { getLogger } from './logger'
 import { omit } from 'lodash'
 
 const logger = getLogger('system')
@@ -19,4 +18,8 @@ function maskConfig(config: SpockConfig): Record<string, any> {
       host: config.db.host,
     },
   }
+}
+
+export function getVersion(): string {
+  return (require('../../package.json') || {}).version
 }

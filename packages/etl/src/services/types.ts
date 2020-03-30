@@ -2,10 +2,10 @@ import pgPromise from 'pg-promise'
 import { Provider } from 'ethers/providers'
 import { StrictOmit } from 'ts-essentials'
 
-import { DB, ColumnSets, DbTransactedConnection } from './db/db'
+import { DB, ColumnSets, DbTransactedConnection } from '../db/db'
 import { SpockConfig } from './config'
-import { NetworkState } from './ethereum/getNetworkState'
-import { ProcessorsState } from './processors/state'
+import { NetworkState } from '../ethereum/getNetworkState'
+import { ProcessorsState } from '../processors/state'
 
 export interface Services {
   provider: Provider

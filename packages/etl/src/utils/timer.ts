@@ -3,7 +3,7 @@ import { Dictionary } from 'ts-essentials'
 import { entries } from 'lodash'
 import prettyMs from 'pretty-ms'
 import hrTimeToMs from 'convert-hrtime'
-import { isProd } from '../config'
+import { isProd } from '../services/config'
 
 const logger = getLogger('Timer')
 

@@ -1,12 +1,13 @@
-import { Block } from 'ethers/providers'
-import { withConnection, makeNullUndefined } from './db/db'
-import { compact } from 'lodash'
-import { getLast, getRangeAsString, getSpockBreakout } from './utils'
-import { getLogger } from './utils/logger'
-import { Services } from './types'
-import { BlockModel } from './db/models/Block'
-import { getRandomProvider } from './services'
 import { assert } from 'ts-essentials'
+import { Block } from 'ethers/providers'
+import { compact } from 'lodash'
+
+import { withConnection, makeNullUndefined } from '../db/db'
+import { getLast, getRangeAsString } from '../utils/arrays'
+import { getSpockBreakout } from '../utils/breakout'
+import { getLogger } from '../utils/logger'
+import { Services } from '../services/types'
+import { BlockModel } from '../db/models/Block'
 
 const logger = getLogger('block-generator')
 
@@ -103,8 +104,7 @@ export async function getBlock({ db }: Services, blockNo: number): Promise<Block
   })
 }
 
-async function getRealBlocksStartingFrom({ config }: Services, blockNo: number): Promise<Block[]> {
-  const provider = getRandomProvider()
+async function getRealBlocksStartingFrom({ config, provider }: Services, blockNo: number): Promise<Block[]> {
   logger.info(`Looking for ${config.blockGenerator.batch} external blocks starting from: ${blockNo}`)
   const blocks = compact(
     await Promise.all(

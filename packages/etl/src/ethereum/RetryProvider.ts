@@ -1,7 +1,8 @@
 import { JsonRpcProvider } from 'ethers/providers'
 import { Networkish } from 'ethers/utils'
 import { ConnectionInfo, poll } from 'ethers/utils/web'
-import { delay, RetryableError } from '../utils'
+import { delay } from '../utils/promises'
+import { RetryableError } from '../utils/errors'
 import { getLogger } from '../utils/logger'
 
 const logger = getLogger('ethereum/RetryProvider')

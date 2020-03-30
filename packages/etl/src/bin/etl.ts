@@ -1,5 +1,5 @@
 import { etl } from '../etl'
-import { loadConfig } from '../utils/configUtils'
+import { loadConfig } from '../services/configUtils'
 import { runAndHandleErrors } from './utils'
 
 export async function main(): Promise<void> {

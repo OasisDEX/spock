@@ -1,5 +1,5 @@
 import { DB, withConnection } from 'spock-etl/dist/db/db'
-import { SpockConfig } from 'spock-etl/dist/config'
+import { SpockConfig } from 'spock-etl/dist/services/config'
 import { migrateFromConfig } from 'spock-etl/dist/bin/migrateUtils'
 
 export async function prepareDB(db: DB, config: SpockConfig): Promise<void> {

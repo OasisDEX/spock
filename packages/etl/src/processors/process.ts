@@ -1,14 +1,16 @@
-import { withConnection } from '../db/db'
-import { delay, getLast, findConsecutiveSubsets, getSpockBreakout } from '../utils'
-import { getLogger } from '../utils/logger'
-import { Services, TransactionalServices } from '../types'
 import { get, sortBy, groupBy } from 'lodash'
+import { captureException } from '@sentry/node'
+
+import { withConnection } from '../db/db'
+import { getLast, findConsecutiveSubsets } from '../utils/arrays'
+import { getSpockBreakout } from '../utils/breakout'
+import { delay } from '../utils/promises'
+import { getLogger } from '../utils/logger'
+import { Services, TransactionalServices } from '../services/types'
 import { BlockModel } from '../db/models/Block'
 import { getJob, stopJob } from '../db/models/Job'
 import { Processor, isExtractor, BlockExtractor } from './types'
-import { getRandomProvider } from '../services'
 import { clearProcessorState, addProcessorError, getProcessorErrors } from './state'
-import { captureException } from '@sentry/node'
 
 const logger = getLogger('extractor/index')
 
@@ -60,7 +62,6 @@ export async function processBlocks(services: Services, processor: Processor): P
       await services.db.tx(async (tx) => {
         const txServices: TransactionalServices = {
           ...services,
-          provider: getRandomProvider(),
           tx,
         }
         if (isExtractor(processor)) {
