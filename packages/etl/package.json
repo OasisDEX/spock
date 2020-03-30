@@ -13,8 +13,8 @@
     "lint:fix": "yarn lint --fix",
     "typecheck": "tsc --noEmit --incremental false --composite false",
     "clean": "rm -rf dist && rm -f tsconfig.build.tsbuildinfo",
-    "test": "mocha",
-    "test:e2e": "mocha --opts ./test-e2e/mocha.opts",
+    "test": "mocha --config ./test/.mocharc.js",
+    "test:e2e": "mocha --config ./test-e2e/.mocharc.js",
     "test:fix": "yarn lint:fix && yarn format:fix && yarn test && yarn typecheck"
   },
   "dependencies": {

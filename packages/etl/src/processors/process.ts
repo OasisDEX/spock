@@ -88,7 +88,6 @@ export async function processBlocks(services: Services, processor: Processor): P
       `WARN[]: Error occured while processing: ${blocks[0].number} - ${blocks[0].number + blocks.length} with ${processor.name}`,
       e,
     )
-    console.warn('WARN:', e)
 
     addProcessorError(services, processor, e)
 

@@ -19,7 +19,6 @@ export async function prepareDB(db: DB, config: SpockConfig): Promise<void> {
   })
 
   await migrateFromConfig(config)
-  console.log('DB prepared')
 }
 
 export async function dumpDB(db: DB) {
