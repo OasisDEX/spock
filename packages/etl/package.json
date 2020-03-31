@@ -13,7 +13,7 @@
     "lint:fix": "yarn lint --fix",
     "typecheck": "tsc --noEmit --incremental false --composite false",
     "clean": "rm -rf dist && rm -f tsconfig.build.tsbuildinfo",
-    "test": "mocha --config ./test/.mocharc.js",
+    "test": "mocha --config ../../.mocharc.js",
     "test:e2e": "mocha --config ./test-e2e/.mocharc.js",
     "test:fix": "yarn lint:fix && yarn format:fix && yarn test && yarn typecheck"
   },
