@@ -2,7 +2,7 @@ import { ethers } from 'ethers'
 import { Block } from 'ethers/providers'
 import { pick } from 'lodash'
 
-import { blockGenerator } from '../../src/blockGenerator/blockGenerator'
+import { BlockGenerator } from '../../src/blockGenerator/blockGenerator'
 import { dumpDB, createTestServices, destroyTestServices } from 'spock-test-utils'
 import { Services } from '../../src/services/types'
 import { createProvider } from '../../src/services/services'
@@ -83,7 +83,10 @@ describe('Block generator', () => {
     ]
     let blockPointer = 0
 
-    await blockGenerator(services, 0, 4)
+    const blockGenerator = new BlockGenerator(services)
+    await blockGenerator.init()
+    await blockGenerator.run(0, 4)
+    await blockGenerator.deinit()
 
     expect(pick(await dumpDB(services.db), 'blocks')).to.be.deep.eq({
       blocks: [

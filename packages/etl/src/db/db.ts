@@ -1,15 +1,16 @@
 import pg from 'pg-promise'
 import { getLogger } from '../utils/logger'
+import { IConnectionParameters } from 'pg-promise/typescript/pg-subset'
 
 const logger = getLogger('db')
 
 export type DB = pg.IDatabase<{}>
-export type DbConnection = pg.IConnected<{}>
+export type DbConnection = pg.IConnected<{}, any>
 export type DbTransactedConnection = pg.ITask<{}>
 export type ColumnSets = ReturnType<typeof getColumnSets>
 export type Connection = DbConnection | DbTransactedConnection
 
-export function createDB(config: pg.TConfig): { db: DB; pg: pg.IMain; columnSets: ColumnSets } {
+export function createDB(config: IConnectionParameters): { db: DB; pg: pg.IMain; columnSets: ColumnSets } {
   const PgClient = pg({
     receive: (_data, res, e) => {
       // avoid clutter in output
@@ -54,11 +55,11 @@ export function makeNullUndefined<T>(value: T | null): T | undefined {
 
 export function getColumnSets(pg: pg.IMain) {
   return {
-    block: new pg.helpers.ColumnSet(['number', 'hash', 'timestamp'], {
-      table: new pg.helpers.TableName('block', 'vulcan2x'),
-    }),
-    extracted_logs: new pg.helpers.ColumnSet(['block_id', 'tx_id', 'log_index', 'address', 'data', 'topics'], {
-      table: new pg.helpers.TableName('logs', 'extracted'),
-    }),
+    // block: new pg.helpers.ColumnSet(['number', 'hash', 'timestamp'], {
+    //   table: new pg.helpers.TableName('block', 'vulcan2x'),
+    // }),
+    // extracted_logs: new pg.helpers.ColumnSet(['block_id', 'tx_id', 'log_index', 'address', 'data', 'topics'], {
+    //   table: new pg.helpers.TableName('logs', 'extracted'),
+    // }),
   }
 }

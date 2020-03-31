@@ -3,7 +3,7 @@ import { getLogger } from './utils/logger'
 import { withLock } from './db/locks'
 import { SpockConfig, getAllProcessors } from './services/config'
 import { createServices } from './services/services'
-import { blockGenerator } from './blockGenerator/blockGenerator'
+import { BlockGenerator } from './blockGenerator/blockGenerator'
 import { process } from './processors/process'
 import { registerProcessors } from './processors/register'
 import { statsWorker } from './stats/stats'
@@ -30,11 +30,16 @@ export async function startETL(services: Services): Promise<void> {
 
     await registerProcessors(services, getAllProcessors(services.config))
 
+    const blockGenerator = new BlockGenerator(services)
+    await blockGenerator.init()
+
     await Promise.all([
-      blockGenerator(services, services.config.startingBlock, services.config.lastBlock),
+      blockGenerator.run(services.config.startingBlock, services.config.lastBlock),
       process(services, services.config.extractors),
       process(services, services.config.transformers),
       services.config.statsWorker.enabled ? statsWorker(services) : Promise.resolve(),
     ])
+
+    await blockGenerator.deinit()
   })
 }

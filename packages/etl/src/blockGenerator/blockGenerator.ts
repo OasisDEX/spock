@@ -2,106 +2,76 @@ import { assert } from 'ts-essentials'
 import { Block } from 'ethers/providers'
 import { compact } from 'lodash'
 
-import { withConnection, makeNullUndefined } from '../db/db'
-import { getLast, getRangeAsString } from '../utils/arrays'
+import { DbConnection } from '../db/db'
+import { getLast } from '../utils/arrays'
 import { getSpockBreakout } from '../utils/breakout'
 import { getLogger } from '../utils/logger'
 import { Services } from '../services/types'
-import { BlockModel } from '../db/models/Block'
+import {
+  BlockModel,
+  getLastBlockNumber,
+  getBlockByNumber,
+  removeBlockByHash,
+  WritableBlockModel,
+  insertBlocksBatch,
+} from '../db/models/Block'
 
 const logger = getLogger('block-generator')
 
-export async function blockGenerator(services: Services, fromBlockNo: number, toBlockNo?: number): Promise<void> {
-  let currentBlockNo: number
+export class BlockGenerator {
+  constructor(private readonly services: Services) {}
+  private connection!: DbConnection
 
-  const isFromBlockMissing = !(await getBlock(services, fromBlockNo))
-  if (isFromBlockMissing) {
-    logger.warn(`Initial block is missing. Starting from ${fromBlockNo}`)
-    const blocks = await getRealBlocksStartingFrom(services, fromBlockNo)
-    await addBlocks(services, blocks)
+  async init() {
+    this.connection = await this.services.db.connect()
   }
 
-  currentBlockNo = (await getLastBlockNo(services)) + 1
+  async deinit() {
+    this.connection.done()
+  }
 
-  while (toBlockNo ? currentBlockNo < toBlockNo : true && !getSpockBreakout()) {
-    logger.info('Waiting for block:', currentBlockNo)
-
-    const blocks = await getRealBlocksStartingFrom(services, currentBlockNo)
-    const previousBlock = await getBlock(services, currentBlockNo - 1)
-
-    assert(previousBlock, 'previousBlock should be defined')
-
-    if (!verifyBlocksConsistency(previousBlock, blocks)) {
-      currentBlockNo = currentBlockNo - 1
-      logger.warn(`Backtracking to: ${currentBlockNo}`)
-
-      await removeBlock(services, previousBlock.hash)
-
-      continue
+  public async run(fromBlockNo: number, toBlockNo?: number): Promise<void> {
+    const isFromBlockMissing = !(await getBlockByNumber(this.connection, fromBlockNo))
+    if (isFromBlockMissing) {
+      logger.warn(`Initial block is missing. Starting from ${fromBlockNo}`)
+      const blocks = await getRealBlocksStartingFrom(this.services, fromBlockNo)
+      await insertBlocksBatch(this.connection, this.services.pg, blocks.map(block2BlockModel))
     }
-    logger.info(`Adding ${blocks.length} new blocks.`)
-    await addBlocks(services, blocks)
 
-    currentBlockNo = getLast(blocks)!.number + 1
+    const lastBlockNumber = await getLastBlockNumber(this.connection)
+    assert(lastBlockNumber, `Last block couldn't be found. It should never happen at this point`)
+
+    let currentBlockNo = lastBlockNumber + 1
+
+    while (toBlockNo ? currentBlockNo < toBlockNo : true && !getSpockBreakout()) {
+      logger.info('Waiting for block:', currentBlockNo)
+
+      const blocks = await getRealBlocksStartingFrom(this.services, currentBlockNo)
+      const previousBlock = await getBlockByNumber(this.connection, currentBlockNo - 1)
+      assert(previousBlock, 'previousBlock should be defined')
+
+      if (!verifyBlocksConsistency(previousBlock, blocks)) {
+        currentBlockNo = currentBlockNo - 1
+        logger.warn(`Backtracking to: ${currentBlockNo}`)
+
+        await removeBlockByHash(this.connection, previousBlock.hash)
+
+        continue
+      }
+      logger.info(`Adding ${blocks.length} new blocks.`)
+      await insertBlocksBatch(this.connection, this.services.pg, blocks.map(block2BlockModel))
+
+      currentBlockNo = getLast(blocks)!.number + 1
+    }
   }
 }
 
-async function addBlocks({ db, pg, columnSets }: Services, blocks: Block[]): Promise<BlockModel[]> {
-  const values = blocks.map((block) => ({
+function block2BlockModel(block: Block): WritableBlockModel {
+  return {
     number: block.number,
     hash: block.hash,
     timestamp: new Date(block.timestamp * 1000),
-  }))
-  logger.info(`Adding blocks ${getRangeAsString(blocks, (b) => b.number)}`)
-
-  const persistedBlocks = await db.tx(async (tx) => {
-    const addBlocksQuery = pg.helpers.insert(values, columnSets['block']) + 'ON CONFLICT(hash) DO NOTHING RETURNING *'
-
-    const persistedBlocks = await tx.manyOrNone(addBlocksQuery)
-
-    if (!persistedBlocks || persistedBlocks.length === 0) {
-      return []
-    }
-
-    return persistedBlocks
-  })
-
-  return persistedBlocks || []
-}
-
-async function getLastBlockNo({ db }: Services): Promise<number> {
-  const lastBlockNo = await withConnection(db, (connection) => {
-    return connection
-      .oneOrNone<{ number: number }>('SELECT number FROM vulcan2x.block ORDER BY number DESC LIMIT 1;')
-      .then((n) => {
-        if (n === null) {
-          throw new Error('Last block couldnt be found. It should never happen')
-        }
-        return n
-      })
-      .then((n) => n.number)
-  })
-
-  logger.info(`Found last block number: ${lastBlockNo}`)
-
-  return lastBlockNo
-}
-
-async function removeBlock(services: Services, blockHash: string): Promise<void> {
-  const { db } = services
-  await withConnection(db, async (connection) => {
-    await connection.none('DELETE FROM vulcan2x.block WHERE hash=${hash};', {
-      hash: blockHash,
-    })
-  })
-}
-
-export async function getBlock({ db }: Services, blockNo: number): Promise<BlockModel | undefined> {
-  return withConnection(db, (connection) => {
-    return connection
-      .oneOrNone<BlockModel>('SELECT * FROM vulcan2x.block WHERE number=$1;', blockNo)
-      .then(makeNullUndefined)
-  })
+  }
 }
 
 async function getRealBlocksStartingFrom({ config, provider }: Services, blockNo: number): Promise<Block[]> {
