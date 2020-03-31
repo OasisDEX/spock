@@ -7,6 +7,7 @@ export type DB = pg.IDatabase<{}>
 export type DbConnection = pg.IConnected<{}>
 export type DbTransactedConnection = pg.ITask<{}>
 export type ColumnSets = ReturnType<typeof getColumnSets>
+export type Connection = DbConnection | DbTransactedConnection
 
 export function createDB(config: pg.TConfig): { db: DB; pg: pg.IMain; columnSets: ColumnSets } {
   const PgClient = pg({
@@ -61,5 +62,3 @@ export function getColumnSets(pg: pg.IMain) {
     }),
   }
 }
-
-export type Connection = DbConnection | DbTransactedConnection
