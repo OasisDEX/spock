@@ -1,5 +1,4 @@
-import { makeNullUndefined, DbConnection } from '../db'
-import { Connection } from './common'
+import { makeNullUndefined, Connection } from '../db'
 
 export interface JobModel {
   id: number
@@ -42,7 +41,7 @@ export async function getAllJobs(c: Connection): Promise<JobModel[]> {
 
 export async function setJobStatus(c: Connection, job: JobModel, newStatus: JobStatus): Promise<void> {
   const sql = `
-    UPDATE vulcan2x.job 
+    UPDATE vulcan2x.job
     SET status=\${newStatus}, extra_info=NULL
     WHERE name=\${jobName}
   `
@@ -52,7 +51,7 @@ export async function setJobStatus(c: Connection, job: JobModel, newStatus: JobS
 
 export async function stopJob(c: Connection, jobName: string, extraInfo: string): Promise<void> {
   const sql = `
-    UPDATE vulcan2x.job 
+    UPDATE vulcan2x.job
     SET status='stopped', extra_info=\${extraInfo}
     WHERE name=\${jobName}
   `
@@ -60,9 +59,9 @@ export async function stopJob(c: Connection, jobName: string, extraInfo: string)
   await c.none(sql, { extraInfo, jobName })
 }
 
-export async function excludeAllJobs(c: DbConnection): Promise<void> {
+export async function excludeAllJobs(c: Connection): Promise<void> {
   const sql = `
-    UPDATE vulcan2x.job 
+    UPDATE vulcan2x.job
     SET status='not-ready';
   `
 

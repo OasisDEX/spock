@@ -1,5 +1,4 @@
-import { LocalServices } from '../../services/types'
-import { makeNullUndefined, DbConnection } from '../db'
+import { makeNullUndefined, DbConnection, Connection } from '../db'
 
 export interface BlockModel {
   id: number
@@ -8,20 +7,20 @@ export interface BlockModel {
   timestamp: string
 }
 
-export async function getBlock({ tx }: LocalServices, blockHash: string): Promise<BlockModel | undefined> {
-  return tx.oneOrNone<BlockModel>('SELECT * FROM vulcan2x.block WHERE hash=$1;', blockHash).then(makeNullUndefined)
+export async function getBlock(c: Connection, blockHash: string): Promise<BlockModel | undefined> {
+  return c.oneOrNone<BlockModel>('SELECT * FROM vulcan2x.block WHERE hash=$1;', blockHash).then(makeNullUndefined)
 }
 
-export async function getBlockById({ tx }: LocalServices, id: number): Promise<BlockModel | undefined> {
-  return tx.oneOrNone<BlockModel>('SELECT * FROM vulcan2x.block WHERE id=$1;', id).then(makeNullUndefined)
+export async function getBlockById(c: Connection, id: number): Promise<BlockModel | undefined> {
+  return c.oneOrNone<BlockModel>('SELECT * FROM vulcan2x.block WHERE id=$1;', id).then(makeNullUndefined)
 }
 
 export async function getBlockByNumber(c: DbConnection, id: number): Promise<BlockModel | undefined> {
   return c.oneOrNone<BlockModel>('SELECT * FROM vulcan2x.block WHERE number=$1;', id).then(makeNullUndefined)
 }
 
-export async function getBlockByIdOrDie({ tx }: LocalServices, id: number): Promise<BlockModel> {
-  return tx
+export async function getBlockByIdOrDie(c: Connection, id: number): Promise<BlockModel> {
+  return c
     .oneOrNone<BlockModel>('SELECT * FROM vulcan2x.block WHERE id=$1;', id)
     .then(makeNullUndefined)
     .then((r) => {
@@ -32,11 +31,11 @@ export async function getBlockByIdOrDie({ tx }: LocalServices, id: number): Prom
     })
 }
 
-export async function getBlockRange({ tx }: LocalServices, start: number, end: number): Promise<BlockModel[]> {
+export async function getBlockRange(c: Connection, start: number, end: number): Promise<BlockModel[]> {
   const sql = `
 SELECT * FROM vulcan2x.block
 WHERE id >= ${start} AND id <= ${end}
   `
 
-  return tx.manyOrNone<BlockModel>(sql)
+  return c.manyOrNone<BlockModel>(sql)
 }

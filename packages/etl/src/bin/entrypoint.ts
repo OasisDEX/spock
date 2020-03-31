@@ -14,6 +14,5 @@ try {
 
   captureException(e)
   // need for sentry to send async requests
-  // tslint:disable-next-line
   flush().finally(() => process.exit(1))
 }

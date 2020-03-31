@@ -51,7 +51,6 @@ export function makeNullUndefined<T>(value: T | null): T | undefined {
   return value
 }
 
-// tslint:disable-next-line
 export function getColumnSets(pg: pg.IMain) {
   return {
     block: new pg.helpers.ColumnSet(['number', 'hash', 'timestamp'], {
@@ -62,3 +61,5 @@ export function getColumnSets(pg: pg.IMain) {
     }),
   }
 }
+
+export type Connection = DbConnection | DbTransactedConnection
