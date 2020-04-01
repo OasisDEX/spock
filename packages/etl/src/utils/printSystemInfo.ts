@@ -12,8 +12,10 @@ export function printSystemInfo(config: SpockConfig): void {
 function maskConfig(config: SpockConfig): Record<string, any> {
   return {
     ...omit(config, 'sentry', 'onStart'),
+    // printout simplified extractors/transformers config
     extractors: (config.extractors || []).map((e) => e.name),
     transformers: (config.transformers || []).map((t) => t.name),
+    // avoid printing out password
     db: {
       host: config.db.host,
     },
