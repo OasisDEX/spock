@@ -153,6 +153,11 @@ function verifyBlocksConsistency(previousBlock: BlockModel, newBlocks: Block[]):
 
   for (const block of newBlocks) {
     if (parentHash !== block.parentHash) {
+      logger.warn(
+        `Detected inconsistent block: ${parentHash} !== ${
+          block.parentHash
+        }. Full block info: ${JSON.stringify(block)}`,
+      );
       return false;
     }
     parentHash = block.hash;
