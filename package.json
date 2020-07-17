@@ -64,7 +64,7 @@
     "ethers": "krzkaczor/ethers.js#kk/get-logs-multiple-address-build",
     "express": "^4.16.4",
     "helmet": "^3.16.0",
-    "lodash": "^4.17.11",
+    "lodash": "^4.17.19",
     "node-cleanup": "^2.1.2",
     "pg-promise": "^8.5.5",
     "postgraphile": "^4.3.3",
