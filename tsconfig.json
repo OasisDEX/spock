@@ -1,9 +1,7 @@
 {
   "compilerOptions": {
     "declaration": true,
-    "lib": [
-      "ES2018"
-    ],
+    "lib": ["ES2018"],
     "module": "CommonJS",
     "moduleResolution": "node",
     "strict": true,
@@ -14,6 +12,7 @@
   },
   "files": [],
   "references": [
+    { "path": "./packages/api/tsconfig.build.json" },
     { "path": "./packages/etl/tsconfig.build.json" },
     { "path": "./packages/test-utils/tsconfig.build.json" }
   ]
