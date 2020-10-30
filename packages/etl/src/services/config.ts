@@ -1,62 +1,93 @@
 import { Dictionary, DeepPartial } from 'ts-essentials'
+import * as z from 'zod'
 import { Env, getRequiredString, getRequiredNumber } from './configUtils'
-import { BlockExtractor, BlockTransformer, Processor } from '../processors/types'
-import { Services } from './types'
+import { Processor } from '../processors/types'
 
-export interface SpockConfig {
-  startingBlock: number
-  lastBlock?: number
-  extractors: BlockExtractor[]
-  transformers: BlockTransformer[]
-  migrations: Dictionary<string>
-  onStart?: (services: Services) => Promise<void>
+const extractorSchema = z.object({
+  name: z.string(),
+  startingBlock: z.number().optional(),
+  extractorDependencies: z.array(z.string()).optional(),
+  disablePerfBoost: z.boolean().optional(),
+  extract: z.function(),
+  getData: z.function(),
+})
 
-  // unique number that will be used to acquire lock on database
-  processDbLock: number
-  blockGenerator: {
-    batch: number
-  }
-  extractorWorker: {
-    batch: number
-    reorgBuffer: number
-  }
-  transformerWorker: {
-    batch: number
-  }
-  processorsWorker: {
-    retriesOnErrors: number
-  }
-  statsWorker: {
-    enabled: boolean
-    interval: number // in minutes
-  }
-  chain: {
-    host: string
-    name: string
-    retries: number
-  }
-  db: {
-    database: string
-    user: string
-    password: string
-    host: string
-    port: number
+const transformerSchema = z.object({
+  name: z.string(),
+  startingBlock: z.number().optional(),
+  dependencies: z.string(),
+  transformerDependencies: z.array(z.string()).optional(),
+  transform: z.function(),
+})
 
-    // potentially any setting supported by pg-promise
-    [any: string]: any
-  }
-  sentry?: {
-    dsn: string
-    environment: string
-  }
-}
+const blockGeneratorSchema = z.object({
+  batch: z.number(),
+})
+
+const extractorWorkerSchema = z.object({
+  batch: z.number(),
+  reorgBuffer: z.number(),
+})
+
+const transformerWorkerSchema = z.object({
+  batch: z.number(),
+})
+
+const processorsWorkerSchema = z.object({
+  retriesOnErrors: z.number(),
+})
+
+const statsWorkerSchema = z.object({
+  enabled: z.boolean(),
+  interval: z.number(), // in minutes
+})
+
+export const spockConfigSchema = z.object({
+  startingBlock: z.number(),
+  lastBlock: z.number().optional(),
+  extractors: z.array(extractorSchema),
+  transformers: z.array(transformerSchema),
+  migrations: z.any(),
+  onStart: z.function().optional(),
+
+  processDbLock: z.number(),
+  blockGenerator: blockGeneratorSchema,
+  extractorWorker: extractorWorkerSchema,
+  transformerWorker: transformerWorkerSchema,
+  processorsWorker: processorsWorkerSchema,
+  statsWorker: statsWorkerSchema,
+
+  chain: z.object({
+    host: z.string(),
+    name: z.string(),
+    retries: z.number(),
+  }),
+  db: z.union([
+    z.object({
+      database: z.string(),
+      user: z.string(),
+      password: z.string(),
+      host: z.string(),
+      port: z.number(),
+    }),
+    z.record(z.string()),
+  ]),
+  sentry: z
+    .object({
+      dsn: z.string(),
+      environment: z.string(),
+    })
+    .optional(),
+})
+
+export type SpockConfig = z.infer<typeof spockConfigSchema>
 
 // Config type that should be used as an input for spock. It can have any additional fields (hence & Dictionary<any>)
 export type UserProvidedSpockConfig = DeepPartial<SpockConfig> &
   Pick<SpockConfig, 'startingBlock' | 'lastBlock' | 'extractors' | 'transformers' | 'migrations'> &
   Dictionary<any>
 
-export const getDefaultConfig = (env: Env) => {
+export function getDefaultConfig(env: Env): DeepPartial<SpockConfig> {
   return {
     processDbLock: 0x1337, // unique number that will be used to acquire lock on database
     blockGenerator: {
@@ -96,5 +127,5 @@ export function isProd(): boolean {
 }
 
 export function getAllProcessors(config: SpockConfig): Processor[] {
-  return [...config.extractors, ...config.transformers]
+  return [...config.extractors, ...config.transformers] as any
 }
