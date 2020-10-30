@@ -1,35 +1,16 @@
-import { isAbsolute, join, extname, dirname } from 'path'
+import { isAbsolute, join, dirname } from 'path'
 import { Dictionary } from 'ts-essentials'
 
-import { SpockConfig, getDefaultConfig, UserProvidedSpockConfig } from './config'
-import { mapValues, get, merge } from 'lodash'
+import { SpockConfig, getDefaultConfig } from './config'
+import { mapValues, merge } from 'lodash'
+import { loadExternalModule } from '../utils/modules'
 
-export function loadConfig(): SpockConfig {
-  const rawPath = process.argv[3]
-  if (!rawPath) {
-    throw new Error('You need to provide config as a first argument!')
-  }
+export function loadConfig(externalConfigPath: string): SpockConfig {
+  const externalCfg = fixConfigPaths(externalConfigPath, loadExternalModule(externalConfigPath))
 
-  const externalConfig = loadExternalConfig(rawPath)
+  const defaultCfg = getDefaultConfig(process.env)
 
-  return mergeConfig(externalConfig)
-}
-
-export function loadExternalConfig(path: string): any {
-  const configPath = parseConfigPath(path)
-
-  if (extname(configPath) === '.ts') {
-    // if we are loading TS file transpile it on the fly
-    require('ts-node').register()
-  }
-  // eslint-disable-next-line
-  const configModule = require(configPath)
-
-  if (!configModule.default) {
-    throw new Error('Couldnt find default export!')
-  }
-
-  return fixConfigPaths(path, configModule.default)
+  return merge({}, defaultCfg, externalCfg) as any
 }
 
 /**
@@ -44,32 +25,9 @@ function fixConfigPaths(configPath: string, config: any): any {
     }
   })
 
-  const whitelistedQueriesDir = get(config, 'api.whitelisting.whitelistedQueriesDir')
-  const newWhitelistedQueriesDir = whitelistedQueriesDir && join(dirname(configPath), whitelistedQueriesDir)
-
   config.migrations = newMigrations
-  if (!config.api) {
-    config.api = {}
-  }
-  if (!config.api.whitelisting) {
-    config.api.whitelisting = {}
-  }
-  config.api.whitelisting.whitelistedQueriesDir = newWhitelistedQueriesDir
 
   return config
-}
-
-export function mergeConfig(externalCfg: UserProvidedSpockConfig): SpockConfig {
-  const defaultCfg = getDefaultConfig(process.env)
-
-  return merge({}, defaultCfg, externalCfg) as any
-}
-
-export function parseConfigPath(rawPath: string): string {
-  if (isAbsolute(rawPath)) {
-    return rawPath
-  }
-  return join(process.cwd(), rawPath)
 }
 
 export function getRequiredString(env: Env, name: string): string {

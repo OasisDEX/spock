@@ -1,5 +1,5 @@
-import { UserProvidedSpockConfig } from '@spock/etl/dist/services/config'
-import { mergeConfig } from '@spock/etl/dist/services/configUtils'
+import { UserProvidedSpockConfig, getDefaultConfig } from '@spock/etl/dist/services/config'
+import { merge } from 'lodash'
 import { startETL } from '@spock/etl/dist/etl'
 import { delay } from '@spock/etl/dist/utils/promises'
 import { setSpockBreakout } from '@spock/etl/dist/utils/breakout'
@@ -10,7 +10,7 @@ import { Services } from '@spock/etl/dist/services/types'
 
 export async function runIntegrationTest(externalConfig: UserProvidedSpockConfig): Promise<Services> {
   const services = await createTestServices({
-    config: mergeConfig({ ...externalConfig, statsWorker: { enabled: false } }),
+    config: merge({}, getDefaultConfig(process.env), { ...externalConfig, statsWorker: { enabled: false } }) as any,
   })
 
   const etlPromise = startETL(services)

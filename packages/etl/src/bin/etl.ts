@@ -3,7 +3,12 @@ import { loadConfig } from '../services/configUtils'
 import { runAndHandleErrors } from './utils'
 
 export async function main(): Promise<void> {
-  const config = loadConfig()
+  const configPath = process.argv[3]
+  if (!configPath) {
+    throw new Error('You need to provide config as a first argument!')
+  }
+
+  const config = loadConfig(configPath)
 
   await etl(config)
 }

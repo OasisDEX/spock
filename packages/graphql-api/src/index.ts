@@ -3,7 +3,7 @@ import compression from 'compression'
 import bodyParser from 'body-parser'
 import helmet from 'helmet'
 import { join } from 'path'
-import { getApiConfig, ApiConfig } from './config'
+import { getConfig, ApiConfig } from './config'
 import { getLogger } from '@spock/etl/dist/utils/logger'
 import { whitelisting } from './middlewares/whitelisting'
 import { caching } from './middlewares/caching'
@@ -74,5 +74,5 @@ const rawPath = process.argv[3]
 if (!rawPath) {
   throw new Error('You need to provide config as a first argument!')
 }
-const config = getApiConfig(process.env, rawPath)
+const config = getConfig(process.env, rawPath)
 startAPI(config)

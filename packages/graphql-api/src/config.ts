@@ -1,5 +1,7 @@
-import { getRequiredString, getRequiredNumber, Env, loadExternalConfig } from '@spock/etl/dist/services/configUtils'
-import { merge } from 'lodash'
+import { getRequiredString, getRequiredNumber, Env } from '@spock/etl/dist/services/configUtils'
+import { loadExternalModule } from '@spock/etl/dist/utils/modules'
+import { merge, get } from 'lodash'
+import { dirname, join } from 'path'
 
 export interface ApiConfig {
   api: {
@@ -24,8 +26,8 @@ export interface ApiConfig {
   }
 }
 
-export function getApiConfig(env: Env, configPath: string): ApiConfig {
-  const externalConfig = loadExternalConfig(configPath)
+export function getConfig(env: Env, configPath: string): ApiConfig {
+  const externalConfig = fixConfigPaths(configPath, loadExternalModule(configPath))
 
   const defaultCfg: ApiConfig = {
     db: {
@@ -49,4 +51,22 @@ export function getApiConfig(env: Env, configPath: string): ApiConfig {
   }
 
   return merge({}, defaultCfg, externalConfig)
+}
+
+/**
+ * Turn any relative paths in the config to absolute ones
+ */
+function fixConfigPaths(configPath: string, config: any): any {
+  const whitelistedQueriesDir = get(config, 'api.whitelisting.whitelistedQueriesDir')
+  const newWhitelistedQueriesDir = whitelistedQueriesDir && join(dirname(configPath), whitelistedQueriesDir)
+
+  if (!config.api) {
+    config.api = {}
+  }
+  if (!config.api.whitelisting) {
+    config.api.whitelisting = {}
+  }
+  config.api.whitelisting.whitelistedQueriesDir = newWhitelistedQueriesDir
+
+  return config
 }
