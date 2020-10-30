@@ -1,4 +1,4 @@
-import { getRequiredString, getRequiredNumber, Env, loadExternalConfig } from 'spock-etl/dist/services/configUtils'
+import { getRequiredString, getRequiredNumber, Env, loadExternalConfig } from '@spock/etl/dist/services/configUtils'
 import { merge } from 'lodash'
 
 export interface ApiConfig {

@@ -1,7 +1,7 @@
 import * as fs from 'fs'
 import { fromPairs } from 'lodash'
 import { Dictionary } from 'ts-essentials'
-import { getLogger } from 'spock-etl/dist/utils/logger'
+import { getLogger } from '@spock/etl/dist/utils/logger'
 import { Request, NextFunction, Response, response, RequestHandler } from 'express'
 
 const logger = getLogger('whitelisting')

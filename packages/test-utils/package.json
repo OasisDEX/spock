@@ -1,5 +1,6 @@
 {
-  "name": "spock-test-utils",
+  "name": "@spock/test-utils",
+  "private":"true",
   "version": "0.1.0",
   "license": "MIT",
   "main": "./dist/index.js",
@@ -23,7 +24,7 @@
     "test:fix": "yarn lint:fix && yarn format:fix && yarn test && yarn typecheck"
   },
   "peerDependencies": {
-    "spock-etl": "^0.1.0"
+    "@spock/etl": "^0.1.0"
   },
   "devDependencies": {
     "@types/chai": "^4.2.7",

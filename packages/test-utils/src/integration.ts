@@ -1,12 +1,12 @@
-import { UserProvidedSpockConfig } from 'spock-etl/dist/services/config'
-import { mergeConfig } from 'spock-etl/dist/services/configUtils'
-import { startETL } from 'spock-etl/dist/etl'
-import { delay } from 'spock-etl/dist/utils/promises'
-import { setSpockBreakout } from 'spock-etl/dist/utils/breakout'
+import { UserProvidedSpockConfig } from '@spock/etl/dist/services/config'
+import { mergeConfig } from '@spock/etl/dist/services/configUtils'
+import { startETL } from '@spock/etl/dist/etl'
+import { delay } from '@spock/etl/dist/utils/promises'
+import { setSpockBreakout } from '@spock/etl/dist/utils/breakout'
 
 import { createTestServices } from './services'
 import { dumpDB } from './db'
-import { Services } from 'spock-etl/dist/services/types'
+import { Services } from '@spock/etl/dist/services/types'
 
 export async function runIntegrationTest(externalConfig: UserProvidedSpockConfig): Promise<Services> {
   const services = await createTestServices({

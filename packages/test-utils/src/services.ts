@@ -2,12 +2,12 @@ import { DeepPartial } from 'ts-essentials'
 import { merge } from 'lodash'
 
 import { prepareDB } from './db'
-import { SpockConfig, getDefaultConfig, getAllProcessors } from 'spock-etl/dist/services/config'
-import { Services } from 'spock-etl/dist/services/types'
-import { createDB } from 'spock-etl/dist/db/db'
-import { createProvider } from 'spock-etl/dist/services/services'
-import { NetworkState, getNetworkState } from 'spock-etl/dist/ethereum/getNetworkState'
-import { getInitialProcessorsState } from 'spock-etl/dist/processors/state'
+import { SpockConfig, getDefaultConfig, getAllProcessors } from '@spock/etl/dist/services/config'
+import { Services } from '@spock/etl/dist/services/types'
+import { createDB } from '@spock/etl/dist/db/db'
+import { createProvider } from '@spock/etl/dist/services/services'
+import { NetworkState, getNetworkState } from '@spock/etl/dist/ethereum/getNetworkState'
+import { getInitialProcessorsState } from '@spock/etl/dist/processors/state'
 
 export async function createTestServices(services: Partial<Services> = {}): Promise<Services> {
   const config = services.config ?? getTestConfig()

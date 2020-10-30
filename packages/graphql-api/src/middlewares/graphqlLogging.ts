@@ -1,5 +1,5 @@
 import { RequestHandler } from 'express'
-import { getLogger } from 'spock-etl/dist/utils/logger'
+import { getLogger } from '@spock/etl/dist/utils/logger'
 
 const logger = getLogger('graphQL-logger')
 

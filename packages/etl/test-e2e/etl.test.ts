@@ -1,7 +1,7 @@
 import { join } from 'path'
 import { expect } from 'chai'
 
-import { withScopedEnv, runIntegrationTest, destroyTestServices } from 'spock-test-utils'
+import { withScopedEnv, runIntegrationTest, destroyTestServices } from '@spock/test-utils'
 
 import { BlockExtractor } from '../src/processors/types'
 import { TransactionalServices } from '../src/services/types'
