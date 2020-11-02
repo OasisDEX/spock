@@ -3,21 +3,23 @@ import * as z from 'zod'
 import { Env, getRequiredString, getRequiredNumber } from './configUtils'
 import { Processor } from '../processors/types'
 
+const AnyFunc: z.Schema<(...args: any[]) => any> = z.any().refine((o) => o instanceof Function)
+
 const extractorSchema = z.object({
   name: z.string(),
   startingBlock: z.number().optional(),
   extractorDependencies: z.array(z.string()).optional(),
   disablePerfBoost: z.boolean().optional(),
-  extract: z.function(),
-  getData: z.function(),
+  extract: AnyFunc,
+  getData: AnyFunc,
 })
 
 const transformerSchema = z.object({
   name: z.string(),
   startingBlock: z.number().optional(),
-  dependencies: z.string(),
+  dependencies: z.array(z.string()),
   transformerDependencies: z.array(z.string()).optional(),
-  transform: z.function(),
+  transform: AnyFunc,
 })
 
 const blockGeneratorSchema = z.object({
@@ -48,7 +50,7 @@ export const spockConfigSchema = z.object({
   extractors: z.array(extractorSchema),
   transformers: z.array(transformerSchema),
   migrations: z.any(),
-  onStart: z.function().optional(),
+  onStart: AnyFunc,
 
   processDbLock: z.number(),
   blockGenerator: blockGeneratorSchema,
@@ -81,6 +83,7 @@ export const spockConfigSchema = z.object({
 })
 
 export type SpockConfig = z.infer<typeof spockConfigSchema>
+type t1 = SpockConfig['extractors'][number]
 
 // Config type that should be used as an input for spock. It can have any additional fields (hence & Dictionary<any>)
 export type UserProvidedSpockConfig = DeepPartial<SpockConfig> &

@@ -26,7 +26,7 @@
     "postgres-migrations-oasis": "^3.0.2",
     "pretty-ms": "^6.0.1",
     "ts-essentials": "^6.0.2",
-    "zod": "^1.11.10"
+    "zod": "^2.0.0-beta.16"
   },
   "devDependencies": {
     "@types/chai": "^4.2.7",
