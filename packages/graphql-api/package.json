@@ -1,10 +1,13 @@
 {
   "name": "@spock/graphql-api",
   "version": "0.1.0",
-  "license": "MIT",
+  "license": "AGPL-3.0-or-later",
   "main": "./dist/index.js",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
+  "files": [
+    "dist/**"
+  ],
   "scripts": {
     "start": "ts-node -T ./src/index.ts",
     "format": "prettier --config ../../.prettierrc --ignore-path ../../.prettierignore --check \"./**/*.ts\"",

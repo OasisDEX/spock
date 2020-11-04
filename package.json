@@ -1,7 +1,7 @@
 {
-  "name": "monorepo-base",
+  "name": "spock-monorepo",
   "private": true,
-  "license": "MIT",
+  "license": "AGPL-3.0-or-later",
   "engines": {
     "yarn": ">=1.15.2"
   },

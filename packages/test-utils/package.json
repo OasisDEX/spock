@@ -2,14 +2,12 @@
   "name": "@spock/test-utils",
   "private":"true",
   "version": "0.1.0",
-  "license": "MIT",
+  "license": "AGPL-3.0-or-later",
   "main": "./dist/index.js",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "files": [
-    "**/dist",
-    "README.md",
-    "LICENSE"
+    "dist/**"
   ],
   "scripts": {
     "prepublishOnly": "yarn lint && yarn test && yarn build",

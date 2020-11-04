@@ -1,7 +1,10 @@
 {
   "name": "@spock/etl",
   "version": "0.1.0",
-  "license": "MIT",
+  "license": "AGPL-3.0-or-later",
+  "files": [
+    "dist/**"
+  ],
   "scripts": {
     "start": "ts-node -T ./src/index.ts",
     "format": "prettier --config ../../.prettierrc --ignore-path ../../.prettierignore --check \"./**/*.ts\"",
