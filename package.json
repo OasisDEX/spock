@@ -12,7 +12,7 @@
     "lint:fix": "wsrun -sm -c lint:fix",
     "typecheck": "wsrun -sm -c typecheck",
     "build": "tsc --build --verbose",
-    "watch": "yarn build --watch",
+    "build:watch": "yarn build --watch",
     "clean": "wsrun -c clean",
     "test": "wsrun -sm -c test",
     "test:e2e": "wsrun -sm -c test:e2e",

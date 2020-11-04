@@ -21,7 +21,7 @@ export async function migrateFromConfig(config: SpockConfig): Promise<void> {
 async function migrate(dbConfig: SpockConfig['db'], name: string, dirPath: string): Promise<void> {
   logger.info(`Migrating ${name}...`)
   try {
-    await migrateDB({ ...dbConfig as any, tableName: `migrations_${name}` }, dirPath)
+    await migrateDB({ ...(dbConfig as any), tableName: `migrations_${name}` }, dirPath)
     logger.info(`Migration for ${name} completed`)
   } catch (e) {
     logger.error(`Error while migrating ${name}`)

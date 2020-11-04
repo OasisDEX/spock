@@ -12,8 +12,8 @@
   },
   "files": [],
   "references": [
-    { "path": "./packages/test-utils/tsconfig.build.json" },
     { "path": "./packages/etl/tsconfig.build.json" },
+    { "path": "./packages/test-utils/tsconfig.build.json" },
     { "path": "./packages/graphql-api/tsconfig.build.json" }
   ]
 }

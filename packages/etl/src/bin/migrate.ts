@@ -1,11 +1,16 @@
-// import { loadConfig } from '../utils/configUtils';
-// import { migrateFromConfig } from './migrateUtils';
-// import { runAndHandleErrors } from './utils';
+import { runAndHandleErrors } from './utils'
+import { loadConfig } from '../services/configUtils'
+import { migrateFromConfig } from './migrateUtils'
 
-// export async function main(): Promise<void> {
-//   const config = loadConfig();
+export async function main(): Promise<void> {
+  const configPath = process.argv[2]
+  if (!configPath) {
+    throw new Error('You need to provide config as a first argument!')
+  }
 
-//   await migrateFromConfig(config);
-// }
+  const config = loadConfig(configPath)
 
-// runAndHandleErrors(main);
+  await migrateFromConfig(config)
+}
+
+runAndHandleErrors(main)

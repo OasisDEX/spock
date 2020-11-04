@@ -44,46 +44,47 @@ const statsWorkerSchema = z.object({
   interval: z.number(), // in minutes
 })
 
-export const spockConfigSchema = z.object({
-  startingBlock: z.number(),
-  lastBlock: z.number().optional(),
-  extractors: z.array(extractorSchema),
-  transformers: z.array(transformerSchema),
-  migrations: z.any(),
-  onStart: AnyFunc,
+export const spockConfigSchema = z
+  .object({
+    startingBlock: z.number(),
+    lastBlock: z.number().optional(),
+    extractors: z.array(extractorSchema),
+    transformers: z.array(transformerSchema),
+    migrations: z.any(),
+    onStart: AnyFunc,
 
-  processDbLock: z.number(),
-  blockGenerator: blockGeneratorSchema,
-  extractorWorker: extractorWorkerSchema,
-  transformerWorker: transformerWorkerSchema,
-  processorsWorker: processorsWorkerSchema,
-  statsWorker: statsWorkerSchema,
+    processDbLock: z.number(),
+    blockGenerator: blockGeneratorSchema,
+    extractorWorker: extractorWorkerSchema,
+    transformerWorker: transformerWorkerSchema,
+    processorsWorker: processorsWorkerSchema,
+    statsWorker: statsWorkerSchema,
 
-  chain: z.object({
-    host: z.string(),
-    name: z.string(),
-    retries: z.number(),
-  }),
-  db: z.union([
-    z.object({
-      database: z.string(),
-      user: z.string(),
-      password: z.string(),
+    chain: z.object({
       host: z.string(),
-      port: z.number(),
+      name: z.string(),
+      retries: z.number(),
     }),
-    z.record(z.string()),
-  ]),
-  sentry: z
-    .object({
-      dsn: z.string(),
-      environment: z.string(),
-    })
-    .optional(),
-})
+    db: z.union([
+      z.object({
+        database: z.string(),
+        user: z.string(),
+        password: z.string(),
+        host: z.string(),
+        port: z.number(),
+      }),
+      z.record(z.string()),
+    ]),
+    sentry: z
+      .object({
+        dsn: z.string(),
+        environment: z.string(),
+      })
+      .optional(),
+  })
+  .nonstrict()
 
 export type SpockConfig = z.infer<typeof spockConfigSchema>
-type t1 = SpockConfig['extractors'][number]
 
 // Config type that should be used as an input for spock. It can have any additional fields (hence & Dictionary<any>)
 export type UserProvidedSpockConfig = DeepPartial<SpockConfig> &

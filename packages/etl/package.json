@@ -2,9 +2,6 @@
   "name": "@spock/etl",
   "version": "0.1.0",
   "license": "MIT",
-  "main": "./dist/index.js",
-  "module": "./dist/index.js",
-  "types": "./dist/index.d.ts",
   "scripts": {
     "start": "ts-node -T ./src/index.ts",
     "format": "prettier --config ../../.prettierrc --ignore-path ../../.prettierignore --check \"./**/*.ts\"",
