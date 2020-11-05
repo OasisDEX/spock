@@ -4,11 +4,11 @@ import bodyParser from 'body-parser'
 import helmet from 'helmet'
 import { join } from 'path'
 import { getConfig, ApiConfig } from './config'
-import { getLogger } from '@spock/etl/dist/utils/logger'
+import { getLogger } from '@oasisdex/spock-etl/dist/utils/logger'
 import { whitelisting } from './middlewares/whitelisting'
 import { caching } from './middlewares/caching'
 import { graphqlLogging } from './middlewares/graphqlLogging'
-import { printSystemInfo } from '@spock/etl/dist/utils/printSystemInfo'
+import { printSystemInfo } from '@oasisdex/spock-etl/dist/utils/printSystemInfo'
 
 const ejs = require('ejs')
 const { postgraphile } = require('postgraphile')

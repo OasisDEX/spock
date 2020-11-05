@@ -1,5 +1,5 @@
 import { middleware as cacheMiddleware, Options as CacheOptions } from 'apicache'
-import { getLogger } from '@spock/etl/dist/utils/logger'
+import { getLogger } from '@oasisdex/spock-etl/dist/utils/logger'
 import { ApiConfig } from '../config'
 import { RequestHandler } from 'express-serve-static-core'
 

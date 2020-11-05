@@ -1,5 +1,5 @@
 {
-  "name": "@spock/test-utils",
+  "name": "@oasisdex/spock-test-utils",
   "private":"true",
   "version": "0.1.0",
   "license": "AGPL-3.0-or-later",
@@ -22,7 +22,7 @@
     "test:fix": "yarn lint:fix && yarn format:fix && yarn test && yarn typecheck"
   },
   "peerDependencies": {
-    "@spock/etl": "^0.1.0"
+    "@oasisdex/spock-etl": "^0.1.0"
   },
   "devDependencies": {
     "@types/chai": "^4.2.7",

@@ -3,7 +3,7 @@ import { Block } from 'ethers/providers'
 import { pick } from 'lodash'
 
 import { BlockGenerator } from '../../src/blockGenerator/blockGenerator'
-import { dumpDB, createTestServices, destroyTestServices } from '@spock/test-utils'
+import { dumpDB, createTestServices, destroyTestServices } from '@oasisdex/spock-test-utils'
 import { Services } from '../../src/services/types'
 import { createProvider } from '../../src/services/services'
 import { expect } from 'chai'

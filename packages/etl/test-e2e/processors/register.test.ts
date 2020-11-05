@@ -1,7 +1,7 @@
 import { expect } from 'chai'
 import { pick } from 'lodash'
 
-import { dumpDB, executeSQL, createTestServices, getTestConfig, destroyTestServices } from '@spock/test-utils'
+import { dumpDB, executeSQL, createTestServices, getTestConfig, destroyTestServices } from '@oasisdex/spock-test-utils'
 
 import { Services } from '../../src/services/types'
 import { registerProcessors } from '../../src/processors/register'
