@@ -8,6 +8,12 @@ import { loadExternalModule } from '../utils/modules'
 export function loadConfig(externalConfigPath: string): SpockConfig {
   const externalCfg = fixConfigPaths(externalConfigPath, loadExternalModule(externalConfigPath))
 
+  const mergedConfig =  mergeConfig(externalCfg)
+
+  return mergedConfig;
+}
+
+export function mergeConfig(externalCfg: any): SpockConfig {
   const defaultCfg = getDefaultConfig(process.env)
 
   const finalConfig = merge({}, defaultCfg, externalCfg) as any
