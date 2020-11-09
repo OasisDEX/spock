@@ -69,3 +69,8 @@ export function getTestConfig(customConfig: DeepPartial<SpockConfig> = {}): Spoc
     customConfig,
   ) as any
 }
+
+export const networkState: NetworkState = {
+  latestEthereumBlockOnStart: 1,
+  networkName: { name: 'test', chainId: 1337, ensAddress: '0x0' },
+}

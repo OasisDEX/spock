@@ -55,11 +55,11 @@ export function makeNullUndefined<T>(value: T | null): T | undefined {
 
 export function getColumnSets(pg: pg.IMain) {
   return {
-    // block: new pg.helpers.ColumnSet(['number', 'hash', 'timestamp'], {
-    //   table: new pg.helpers.TableName('block', 'vulcan2x'),
-    // }),
-    // extracted_logs: new pg.helpers.ColumnSet(['block_id', 'tx_id', 'log_index', 'address', 'data', 'topics'], {
-    //   table: new pg.helpers.TableName('logs', 'extracted'),
-    // }),
+    block: new pg.helpers.ColumnSet(['number', 'hash', 'timestamp'], {
+      table: new pg.helpers.TableName({ table: 'block', schema: 'vulcan2x' }),
+    }),
+    extracted_logs: new pg.helpers.ColumnSet(['block_id', 'tx_id', 'log_index', 'address', 'data', 'topics'], {
+      table: new pg.helpers.TableName({ table: 'logs', schema: 'extracted' }),
+    }),
   }
 }

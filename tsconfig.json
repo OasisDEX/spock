@@ -15,6 +15,7 @@
     { "path": "./packages/etl/tsconfig.build.json" },
     { "path": "./packages/test-utils/tsconfig.build.json" },
     { "path": "./packages/graphql-api/tsconfig.build.json" },
+    { "path": "./packages/utils/tsconfig.build.json" },
     { "path": "./packages/validation/tsconfig.build.json" }
   ]
 }
