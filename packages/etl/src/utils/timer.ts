@@ -1,9 +1,10 @@
-import { getLogger } from './logger'
-import { Dictionary } from 'ts-essentials'
+import hrTimeToMs from 'convert-hrtime'
 import { entries } from 'lodash'
 import prettyMs from 'pretty-ms'
-import hrTimeToMs from 'convert-hrtime'
+import { Dictionary } from 'ts-essentials'
+
 import { isProd } from '../services/config'
+import { getLogger } from './logger'
 
 const logger = getLogger('Timer')
 

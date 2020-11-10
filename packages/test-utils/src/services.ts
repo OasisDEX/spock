@@ -1,13 +1,13 @@
-import { DeepPartial } from 'ts-essentials'
+import { createDB } from '@oasisdex/spock-etl/dist/db/db'
+import { getNetworkState, NetworkState } from '@oasisdex/spock-etl/dist/ethereum/getNetworkState'
+import { getInitialProcessorsState } from '@oasisdex/spock-etl/dist/processors/state'
+import { getAllProcessors, getDefaultConfig, SpockConfig } from '@oasisdex/spock-etl/dist/services/config'
+import { createProvider } from '@oasisdex/spock-etl/dist/services/services'
+import { Services } from '@oasisdex/spock-etl/dist/services/types'
 import { merge } from 'lodash'
+import { DeepPartial } from 'ts-essentials'
 
 import { prepareDB } from './db'
-import { SpockConfig, getDefaultConfig, getAllProcessors } from '@oasisdex/spock-etl/dist/services/config'
-import { Services } from '@oasisdex/spock-etl/dist/services/types'
-import { createDB } from '@oasisdex/spock-etl/dist/db/db'
-import { createProvider } from '@oasisdex/spock-etl/dist/services/services'
-import { NetworkState, getNetworkState } from '@oasisdex/spock-etl/dist/ethereum/getNetworkState'
-import { getInitialProcessorsState } from '@oasisdex/spock-etl/dist/processors/state'
 
 export async function createTestServices(services: Partial<Services> = {}): Promise<Services> {
   const config = services.config ?? getTestConfig()

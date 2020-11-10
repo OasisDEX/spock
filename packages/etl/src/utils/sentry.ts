@@ -1,7 +1,7 @@
 import * as Sentry from '@sentry/node'
 
-import { getLogger } from './logger'
 import { getRequiredString } from '../services/configUtils'
+import { getLogger } from './logger'
 
 const logger = getLogger('sentry')
 

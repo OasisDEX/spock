@@ -1,6 +1,6 @@
-import { getRequiredString, getRequiredNumber, Env } from '@oasisdex/spock-etl/dist/services/configUtils'
+import { Env, getRequiredNumber, getRequiredString } from '@oasisdex/spock-etl/dist/services/configUtils'
 import { loadExternalModule } from '@oasisdex/spock-etl/dist/utils/modules'
-import { merge, get } from 'lodash'
+import { get, merge } from 'lodash'
 import { dirname, join } from 'path'
 
 export interface ApiConfig {

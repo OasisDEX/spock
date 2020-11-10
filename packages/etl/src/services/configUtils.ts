@@ -1,9 +1,9 @@
-import { isAbsolute, join, dirname } from 'path'
+import { mapValues, merge } from 'lodash'
+import { dirname, isAbsolute, join } from 'path'
 import { Dictionary } from 'ts-essentials'
 
-import { SpockConfig, getDefaultConfig, spockConfigSchema } from './config'
-import { mapValues, merge } from 'lodash'
 import { loadExternalModule } from '../utils/modules'
+import { getDefaultConfig, SpockConfig, spockConfigSchema } from './config'
 
 export function loadConfig(externalConfigPath: string): SpockConfig {
   const externalCfg = fixConfigPaths(externalConfigPath, loadExternalModule(externalConfigPath))

@@ -1,20 +1,20 @@
-import { assert } from 'ts-essentials'
 import { Block } from 'ethers/providers'
 import { compact } from 'lodash'
+import { assert } from 'ts-essentials'
 
 import { DbConnection } from '../db/db'
+import {
+  BlockModel,
+  getBlockByNumber,
+  getLastBlockNumber,
+  insertBlocksBatch,
+  removeBlockByHash,
+  WritableBlockModel,
+} from '../db/models/Block'
+import { Services } from '../services/types'
 import { getLast } from '../utils/arrays'
 import { getSpockBreakout } from '../utils/breakout'
 import { getLogger } from '../utils/logger'
-import { Services } from '../services/types'
-import {
-  BlockModel,
-  getLastBlockNumber,
-  getBlockByNumber,
-  removeBlockByHash,
-  WritableBlockModel,
-  insertBlocksBatch,
-} from '../db/models/Block'
 
 const logger = getLogger('block-generator')
 
@@ -43,6 +43,7 @@ export class BlockGenerator {
 
     let currentBlockNo = lastBlockNumber + 1
 
+    // eslint-disable-next-line
     while (toBlockNo ? currentBlockNo < toBlockNo : true && !getSpockBreakout()) {
       logger.info('Waiting for block:', currentBlockNo)
 

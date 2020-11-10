@@ -1,5 +1,5 @@
-import { TransactionalServices, LocalServices } from '../services/types'
 import { BlockModel } from '../db/models/Block'
+import { LocalServices, TransactionalServices } from '../services/types'
 
 export interface BlockExtractor {
   name: string

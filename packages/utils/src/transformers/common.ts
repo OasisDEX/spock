@@ -1,10 +1,10 @@
-import { Dictionary, ValueOf } from 'ts-essentials'
-import { zip } from 'lodash'
+import { LocalServices } from '@oasisdex/spock-etl/dist/services/types'
 import { ethers } from 'ethers'
-import { tryParseDsNote, tryParseDsNoteVer2 } from './tryParseDsNote'
+import { zip } from 'lodash'
+import { Dictionary, ValueOf } from 'ts-essentials'
 
 import { PersistedLog } from '../extractors/rawEventDataExtractor'
-import { LocalServices } from '@oasisdex/spock-etl/dist/services/types'
+import { tryParseDsNote, tryParseDsNoteVer2 } from './tryParseDsNote'
 
 /**
  * Decode events from raw logs using provided ABI.

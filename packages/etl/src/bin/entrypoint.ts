@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 
-import { setupSentry } from '../utils/sentry'
 import { captureException, flush } from '@sentry/node'
+
+import { setupSentry } from '../utils/sentry'
 
 const command = process.argv[2]
 setupSentry()

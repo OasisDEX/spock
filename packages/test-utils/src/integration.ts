@@ -1,17 +1,20 @@
-import { UserProvidedSpockConfig, getDefaultConfig } from '@oasisdex/spock-etl/dist/services/config'
-import { merge } from 'lodash'
 import { startETL } from '@oasisdex/spock-etl/dist/etl'
-import { delay } from '@oasisdex/spock-etl/dist/utils/promises'
-import { setSpockBreakout } from '@oasisdex/spock-etl/dist/utils/breakout'
-
-import { createTestServices } from './services'
-import { dumpDB } from './db'
+import { getDefaultConfig, UserProvidedSpockConfig } from '@oasisdex/spock-etl/dist/services/config'
 import { Services } from '@oasisdex/spock-etl/dist/services/types'
+import { setSpockBreakout } from '@oasisdex/spock-etl/dist/utils/breakout'
+import { delay } from '@oasisdex/spock-etl/dist/utils/promises'
+import { merge } from 'lodash'
+
+import { dumpDB, prepareDB } from './db'
+import { createTestServices } from './services'
 
 export async function runIntegrationTest(externalConfig: UserProvidedSpockConfig): Promise<Services> {
+  const config = merge({}, getDefaultConfig(process.env), { ...externalConfig, statsWorker: { enabled: false } }) as any
   const services = await createTestServices({
-    config: merge({}, getDefaultConfig(process.env), { ...externalConfig, statsWorker: { enabled: false } }) as any,
+    config,
   })
+
+  await prepareDB(services.db, config)
 
   const etlPromise = startETL(services)
 
@@ -35,7 +38,7 @@ export async function waitForAllJobs(services: Services, etl: Promise<void>) {
     fullySynced = jobs.filter((p) => p.last_block_id >= lastBlockId).length === allJobs
     const erroredJobs = jobs.filter((p) => p.status === 'stopped')
     if (erroredJobs.length > 0) {
-      throw new Error(`Failed jobs detected ${erroredJobs}`)
+      throw new Error(`Failed jobs detected ${JSON.stringify(erroredJobs)}`)
     }
   }
   setSpockBreakout()

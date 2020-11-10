@@ -1,6 +1,6 @@
-import { runAndHandleErrors } from './utils'
 import { loadConfig } from '../services/configUtils'
 import { migrateFromConfig } from './migrateUtils'
+import { runAndHandleErrors } from './utils'
 
 export async function main(): Promise<void> {
   const configPath = process.argv[2]

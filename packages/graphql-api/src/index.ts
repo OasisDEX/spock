@@ -1,14 +1,14 @@
-import express from 'express'
-import compression from 'compression'
+import { getLogger } from '@oasisdex/spock-etl/dist/utils/logger'
+import { printSystemInfo } from '@oasisdex/spock-etl/dist/utils/printSystemInfo'
 import bodyParser from 'body-parser'
+import compression from 'compression'
+import express from 'express'
 import helmet from 'helmet'
 import { join } from 'path'
-import { getConfig, ApiConfig } from './config'
-import { getLogger } from '@oasisdex/spock-etl/dist/utils/logger'
-import { whitelisting } from './middlewares/whitelisting'
-import { caching } from './middlewares/caching'
+
+import { ApiConfig, getConfig } from './config'
 import { graphqlLogging } from './middlewares/graphqlLogging'
-import { printSystemInfo } from '@oasisdex/spock-etl/dist/utils/printSystemInfo'
+import { whitelisting } from './middlewares/whitelisting'
 
 const ejs = require('ejs')
 const { postgraphile } = require('postgraphile')
@@ -57,7 +57,8 @@ export function startAPI(config: ApiConfig): void {
   app.use(graphqlConfig.graphqlRoute, graphqlLogging)
 
   if (config.api.responseCaching.enabled) {
-    app.use(caching(config))
+    logger.error('Caching is not supported anymore.')
+    process.exit(1)
   } else {
     logger.info('Running without cache')
   }

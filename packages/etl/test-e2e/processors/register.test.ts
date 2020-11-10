@@ -1,11 +1,10 @@
+import { createTestServices, destroyTestServices, dumpDB, executeSQL, getTestConfig } from '@oasisdex/spock-test-utils'
 import { expect } from 'chai'
 import { pick } from 'lodash'
 
-import { dumpDB, executeSQL, createTestServices, getTestConfig, destroyTestServices } from '@oasisdex/spock-test-utils'
-
-import { Services } from '../../src/services/types'
 import { registerProcessors } from '../../src/processors/register'
 import { BlockExtractor } from '../../src/processors/types'
+import { Services } from '../../src/services/types'
 
 describe('register', () => {
   let services: Services

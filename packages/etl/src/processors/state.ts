@@ -1,7 +1,8 @@
-import { Dictionary } from 'ts-essentials'
-import { Processor } from './types'
-import { Services } from '../services/types'
 import serializeError from 'serialize-error'
+import { Dictionary } from 'ts-essentials'
+
+import { Services } from '../services/types'
+import { Processor } from './types'
 
 export interface ProcessorState {
   errors: any[]

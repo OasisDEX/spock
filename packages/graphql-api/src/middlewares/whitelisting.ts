@@ -1,8 +1,8 @@
+import { getLogger } from '@oasisdex/spock-etl/dist/utils/logger'
+import { NextFunction, Request, RequestHandler, Response, response } from 'express'
 import * as fs from 'fs'
 import { fromPairs } from 'lodash'
 import { Dictionary } from 'ts-essentials'
-import { getLogger } from '@oasisdex/spock-etl/dist/utils/logger'
-import { Request, NextFunction, Response, response, RequestHandler } from 'express'
 
 const logger = getLogger('whitelisting')
 

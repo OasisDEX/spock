@@ -1,7 +1,8 @@
-import { Dictionary, DeepPartial } from 'ts-essentials'
+import { DeepPartial, Dictionary } from 'ts-essentials'
 import * as z from 'zod'
-import { Env, getRequiredString, getRequiredNumber } from './configUtils'
+
 import { Processor } from '../processors/types'
+import { Env, getRequiredNumber, getRequiredString } from './configUtils'
 
 const AnyFunc: z.Schema<(...args: any[]) => any> = z.any().refine((o) => o instanceof Function)
 

@@ -1,12 +1,13 @@
+import { flatten, groupBy, pick, values } from 'lodash'
+
+import { withConnection } from '../db/db'
+import { getAllJobs, JobModel } from '../db/models/Job'
 import { Services } from '../services/types'
-import { delay } from '../utils/promises'
 import { getSpockBreakout } from '../utils/breakout'
 import { getLogger } from '../utils/logger'
-import { Stats } from './types'
-import { JobModel, getAllJobs } from '../db/models/Job'
-import { withConnection } from '../db/db'
-import { pick, groupBy, values, flatten } from 'lodash'
+import { delay } from '../utils/promises'
 import { printTimersSummary } from '../utils/timer'
+import { Stats } from './types'
 
 const logger = getLogger('stats')
 

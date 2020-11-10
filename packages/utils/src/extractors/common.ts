@@ -1,9 +1,9 @@
 export const DEFAULT_ADDRESS = '0x0000000000000000000000000000000000000000'
 
-import { Transaction } from 'ethers/utils'
-import { TransactionalServices, LocalServices } from '@oasisdex/spock-etl/dist/services/types'
-import { BlockModel } from '@oasisdex/spock-etl/dist/db/models/Block'
 import { makeNullUndefined } from '@oasisdex/spock-etl/dist/db/db'
+import { BlockModel } from '@oasisdex/spock-etl/dist/db/models/Block'
+import { LocalServices, TransactionalServices } from '@oasisdex/spock-etl/dist/services/types'
+import { Transaction } from 'ethers/utils'
 import { assert } from 'ts-essentials'
 
 export async function getOrCreateTx(

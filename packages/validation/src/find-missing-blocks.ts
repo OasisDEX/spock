@@ -2,12 +2,12 @@
  * Script to automatically compare data stored in vulcan2x vs google big query public dataset.
  */
 import { BigQuery } from '@google-cloud/bigquery'
-import { createServices } from '@oasisdex/spock-etl/dist/services/services'
-
-import { getLastBlockBQ, countBQ, countV2, findObservedAddresses } from './common'
 import { withConnection } from '@oasisdex/spock-etl/dist/db/db'
-import { Services } from '@oasisdex/spock-etl/dist/services/types'
 import { SpockConfig } from '@oasisdex/spock-etl/dist/services/config'
+import { createServices } from '@oasisdex/spock-etl/dist/services/services'
+import { Services } from '@oasisdex/spock-etl/dist/services/types'
+
+import { countBQ, countV2, findObservedAddresses, getLastBlockBQ } from './common'
 
 export async function findMissingBlocks(config: SpockConfig): Promise<void> {
   console.log(`Running...`)

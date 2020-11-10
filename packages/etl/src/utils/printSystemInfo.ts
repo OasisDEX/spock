@@ -1,6 +1,7 @@
+import { omit } from 'lodash'
+
 import { SpockConfig } from '../services/config'
 import { getLogger } from './logger'
-import { omit } from 'lodash'
 
 const logger = getLogger('system')
 

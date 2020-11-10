@@ -1,7 +1,8 @@
-import { DB, DbConnection } from './db'
+import cleanupOnExit from 'node-cleanup'
+
 import { getLogger } from '../utils/logger'
 import { delay } from '../utils/promises'
-import cleanupOnExit from 'node-cleanup'
+import { DB, DbConnection } from './db'
 
 const logger = getLogger('db/utils')
 

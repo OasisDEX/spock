@@ -1,10 +1,11 @@
-import { Services } from '../services/types'
-import { getJob, saveJob, WritableJobModel, setJobStatus, excludeAllJobs } from '../db/models/Job'
-import { withConnection, DbConnection } from '../db/db'
-import { getLogger } from '../utils/logger'
-import { Processor, isExtractor } from './types'
 import { difference } from 'lodash'
+
+import { DbConnection, withConnection } from '../db/db'
 import { getBlockByNumber } from '../db/models/Block'
+import { excludeAllJobs, getJob, saveJob, setJobStatus, WritableJobModel } from '../db/models/Job'
+import { Services } from '../services/types'
+import { getLogger } from '../utils/logger'
+import { isExtractor, Processor } from './types'
 
 const logger = getLogger('register')
 

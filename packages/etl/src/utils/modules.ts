@@ -1,4 +1,4 @@
-import { isAbsolute, join, extname } from 'path'
+import { extname, isAbsolute, join } from 'path'
 
 /**
  * Loads external module. Transpiles it if needed.

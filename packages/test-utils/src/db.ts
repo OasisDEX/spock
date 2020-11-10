@@ -1,6 +1,6 @@
+import { migrateFromConfig } from '@oasisdex/spock-etl/dist/bin/migrateUtils'
 import { DB, withConnection } from '@oasisdex/spock-etl/dist/db/db'
 import { SpockConfig } from '@oasisdex/spock-etl/dist/services/config'
-import { migrateFromConfig } from '@oasisdex/spock-etl/dist/bin/migrateUtils'
 
 export async function prepareDB(db: DB, config: SpockConfig): Promise<void> {
   await withConnection(db, async (c) => {

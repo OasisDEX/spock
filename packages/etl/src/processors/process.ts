@@ -1,16 +1,16 @@
-import { get, sortBy, groupBy } from 'lodash'
 import { captureException } from '@sentry/node'
+import { get, groupBy, sortBy } from 'lodash'
 
 import { withConnection } from '../db/db'
-import { getLast, findConsecutiveSubsets } from '../utils/arrays'
-import { getSpockBreakout } from '../utils/breakout'
-import { delay } from '../utils/promises'
-import { getLogger } from '../utils/logger'
-import { Services, TransactionalServices } from '../services/types'
 import { BlockModel } from '../db/models/Block'
 import { getJob, stopJob } from '../db/models/Job'
-import { Processor, isExtractor, BlockExtractor } from './types'
-import { clearProcessorState, addProcessorError, getProcessorErrors } from './state'
+import { Services, TransactionalServices } from '../services/types'
+import { findConsecutiveSubsets, getLast } from '../utils/arrays'
+import { getSpockBreakout } from '../utils/breakout'
+import { getLogger } from '../utils/logger'
+import { delay } from '../utils/promises'
+import { addProcessorError, clearProcessorState, getProcessorErrors } from './state'
+import { BlockExtractor, isExtractor, Processor } from './types'
 
 const logger = getLogger('extractor/index')
 

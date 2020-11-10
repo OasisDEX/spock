@@ -1,13 +1,14 @@
-import { getLast } from '@oasisdex/spock-etl/dist/utils/arrays'
-import { min, max, groupBy, uniqBy } from 'lodash'
-import { Log } from 'ethers/providers'
-import { TransactionalServices, LocalServices } from '@oasisdex/spock-etl/dist/services/types'
 import { BlockModel } from '@oasisdex/spock-etl/dist/db/models/Block'
-import { BlockExtractor } from '@oasisdex/spock-etl/dist/processors/types'
-import { getOrCreateTx } from './common'
-import { timer } from '@oasisdex/spock-etl/dist/utils/timer'
 import { isGanache } from '@oasisdex/spock-etl/dist/ethereum/getNetworkState'
+import { BlockExtractor } from '@oasisdex/spock-etl/dist/processors/types'
+import { LocalServices, TransactionalServices } from '@oasisdex/spock-etl/dist/services/types'
+import { getLast } from '@oasisdex/spock-etl/dist/utils/arrays'
+import { timer } from '@oasisdex/spock-etl/dist/utils/timer'
+import { Log } from 'ethers/providers'
+import { groupBy, max, min, uniqBy } from 'lodash'
 import { isString } from 'util'
+
+import { getOrCreateTx } from './common'
 
 export interface SimpleProcessorDefinition {
   address: string

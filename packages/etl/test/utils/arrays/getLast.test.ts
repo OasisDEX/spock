@@ -1,5 +1,6 @@
-import { getLast } from '../../../src/utils/arrays'
 import { expect } from 'chai'
+
+import { getLast } from '../../../src/utils/arrays'
 
 describe('getLast', () => {
   it('works with empty array', () => {

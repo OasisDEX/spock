@@ -1,4 +1,4 @@
-import { makeNullUndefined, Connection } from '../db'
+import { Connection, makeNullUndefined } from '../db'
 
 export interface JobModel {
   id: number

@@ -1,12 +1,12 @@
+import { createTestServices, destroyTestServices, dumpDB } from '@oasisdex/spock-test-utils'
+import { expect } from 'chai'
 import { ethers } from 'ethers'
 import { Block } from 'ethers/providers'
 import { pick } from 'lodash'
 
 import { BlockGenerator } from '../../src/blockGenerator/blockGenerator'
-import { dumpDB, createTestServices, destroyTestServices } from '@oasisdex/spock-test-utils'
-import { Services } from '../../src/services/types'
 import { createProvider } from '../../src/services/services'
-import { expect } from 'chai'
+import { Services } from '../../src/services/types'
 
 describe('Block generator', () => {
   let services: Services

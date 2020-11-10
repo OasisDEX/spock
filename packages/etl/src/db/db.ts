@@ -1,6 +1,7 @@
 import pg from 'pg-promise'
-import { getLogger } from '../utils/logger'
 import { IConnectionParameters } from 'pg-promise/typescript/pg-subset'
+
+import { getLogger } from '../utils/logger'
 
 const logger = getLogger('db')
 
