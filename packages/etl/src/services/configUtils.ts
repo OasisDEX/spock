@@ -8,9 +8,9 @@ import { loadExternalModule } from '../utils/modules'
 export function loadConfig(externalConfigPath: string): SpockConfig {
   const externalCfg = fixConfigPaths(externalConfigPath, loadExternalModule(externalConfigPath))
 
-  const mergedConfig =  mergeConfig(externalCfg)
+  const mergedConfig = mergeConfig(externalCfg)
 
-  return mergedConfig;
+  return mergedConfig
 }
 
 export function mergeConfig(externalCfg: any): SpockConfig {
