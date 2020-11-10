@@ -5,10 +5,10 @@ cd "$(dirname "$0")"
 source ~/.bashrc
 
 # setup node version
-nvm install 10
-nvm use 10
+nvm install 14.2
+nvm use 14.2
 
-nvm alias default 10
+nvm alias default 14.2
 
 npm install --global yarn
 
