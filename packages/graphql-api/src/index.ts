@@ -7,6 +7,7 @@ import helmet from 'helmet'
 import { join } from 'path'
 
 import { ApiConfig, getConfig } from './config'
+import { caching } from './middlewares/caching'
 import { graphqlLogging } from './middlewares/graphqlLogging'
 import { whitelisting } from './middlewares/whitelisting'
 
@@ -57,8 +58,7 @@ export function startAPI(config: ApiConfig): void {
   app.use(graphqlConfig.graphqlRoute, graphqlLogging)
 
   if (config.api.responseCaching.enabled) {
-    logger.error('Caching is not supported anymore.')
-    process.exit(1)
+    app.use(caching(config))
   } else {
     logger.info('Running without cache')
   }
