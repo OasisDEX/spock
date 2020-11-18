@@ -1,6 +1,6 @@
 {
   "name": "@oasisdex/spock-graphql-api",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "license": "AGPL-3.0-or-later",
   "main": "./dist/index.js",
   "module": "./dist/index.js",
