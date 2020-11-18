@@ -71,7 +71,7 @@ export function startAPI(config: ApiConfig): void {
   })
 }
 
-const rawPath = process.argv[3]
+const rawPath = process.argv[2]
 if (!rawPath) {
   throw new Error('You need to provide config as a first argument!')
 }
