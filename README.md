@@ -77,7 +77,7 @@ are simply not reliable / consistent. Based on our tests:
 
 - Alchemy works
 - Infura DOESN'T WORK. Sometimes it can randomly return empty sets for getLogs calls
-- Self hosted nodes should work (not tested yet) but keep in mind that vulcan can generate quite a
+- Self hosted nodes should work (not tested yet) but keep in mind that spock can generate quite a
   lot of network calls (around 500k daily)
 
 ## Development
