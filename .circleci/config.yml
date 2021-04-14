@@ -1,28 +1,35 @@
 version: 2.1
+
+commands:
+  install_dependencies:
+    steps:
+      - restore_cache:
+          name: Restore Yarn Package Cache
+          keys:
+            - yarn-packages-{{ checksum "yarn.lock" }}
+      - run:
+          name: Install Dependencies
+          command: yarn install --frozen-lockfile
+      - save_cache:
+          name: Save Yarn Package Cache
+          key: yarn-packages-{{ checksum "yarn.lock" }}
+          paths:
+            - ~/.cache/yarn
+
 jobs:
   test:
     docker:
-      - image: circleci/node:10.13.0
-    working_directory: /home/circleci/app
+      - image: circleci/node:11.15
     steps:
       - checkout
+      - install_dependencies
 
-      - restore_cache:
-          key: v1-dep-{{ checksum "yarn.lock" }}
-
-      - run:
-          name: Install deps
-          command: yarn install --frozen-lockfile
-
-      - save_cache:
-          paths:
-            - ./node_modules
-            - ~/.cache
-          key: v1-dep-{{ checksum "yarn.lock" }}
-
-      - run:
-          name: Run tests
-          command: yarn test
+      - run: |
+          yarn build
+          yarn lint
+          yarn format
+          yarn typecheck
+          yarn test
 
   test-e2e:
     machine:
@@ -33,28 +40,25 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-            - v3-dependencies-{{ checksum "package.json" }}
+            - yarn-packages-{{ checksum "yarn.lock" }}
       - run: .circleci/install-yarn.sh
 
       - run:
           name: 'Run postgres'
           command: |
+            cd ./scripts
             docker-compose up -d
-            ./.circleci/wait-for-it.sh localhost:5432 -t 10
+            ../.circleci/wait-for-it.sh localhost:5432 -t 10
             sleep 10
-
       - run: |
           source /opt/circleci/.nvm/nvm.sh
           yarn # @todo: reuse modules from cache
+          yarn build
           yarn test:e2e
 
 workflows:
   version: 2
-
-  mainflow:
+  build_and_test:
     jobs:
       - test
-
-      - test-e2e:
-          requires:
-            - test
+      - test-e2e

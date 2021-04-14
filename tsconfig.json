@@ -1,25 +1,21 @@
 {
   "compilerOptions": {
-    "target": "es2017",
-    "module": "commonjs",
-    "strict": true,
-    "experimentalDecorators": true,
-    "emitDecoratorMetadata": true,
-    "forceConsistentCasingInFileNames": true,
-    "plugins": [
-      {
-        "name": "tslint-language-service",
-        "configFile": "./node_modules/typestrict/tslint.js",
-        "alwaysShowRuleFailuresAsWarnings": true
-      }
-    ],
-    "lib": ["es2015", "esnext.asynciterable"],
-    "sourceMap": true,
     "declaration": true,
-    "outDir": "lib",
-    "resolveJsonModule": true,
-    "skipLibCheck": true
+    "lib": ["ES2018"],
+    "module": "CommonJS",
+    "moduleResolution": "node",
+    "strict": true,
+    "target": "ES2018",
+    "composite": true,
+    "incremental": true,
+    "sourceMap": true
   },
-  "include": ["packages/**/*.ts", "instances/**/*.ts"],
-  "exclude": ["node_modules", "packages/rest-api"]
+  "files": [],
+  "references": [
+    { "path": "./packages/etl/tsconfig.build.json" },
+    { "path": "./packages/test-utils/tsconfig.build.json" },
+    { "path": "./packages/graphql-api/tsconfig.build.json" },
+    { "path": "./packages/utils/tsconfig.build.json" },
+    { "path": "./packages/validation/tsconfig.build.json" }
+  ]
 }

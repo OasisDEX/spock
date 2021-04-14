@@ -1,5 +1,4 @@
 node_modules
 .vscode
 package.json
-lib
-packages/rest-api
+**/dist/**
