@@ -20,7 +20,7 @@
     "test": "true"
   },
   "dependencies": {
-    "lodash": "^4.17.15",
+    "lodash": "^4.17.21",
     "ts-essentials": "^6.0.2",
     "express": "^4.16.4",
     "helmet": "^3.16.0",
