@@ -125,19 +125,17 @@ export async function getNextBlocks(services: Services, processor: Processor): P
       return []
     }
 
+    const query  = `
+      SELECT b.* FROM vulcan2x.block b
+        WHERE id<= (SELECT MIN(last_block_id) FROM vulcan2x.job  WHERE name in(
+          ${getAllDependencies(processor).map(dependency => `'${dependency}'`).join(',')}
+        ) ) AND b.id > ${job.last_block_id} ORDER BY id
+      LIMIT ${batchSize};`
+
     const nextBlocks =
       (await c.manyOrNone<BlockModel>(
         // prettier-ignore
-        `
-        SELECT b.*
-        FROM vulcan2x.block b
-        ${getAllDependencies(processor)
-          .map((d, i) => `JOIN vulcan2x.job j${i} ON j${i}.name='${d}' AND b.id <= j${i}.last_block_id`)
-          .join('\n')}
-        WHERE b.id > ${job.last_block_id}
-        ORDER BY id
-        LIMIT ${batchSize};
-      `,
+        query,
       )) || []
 
     return sortBy(nextBlocks, 'id')
