@@ -125,13 +125,19 @@ export async function getNextBlocks(services: Services, processor: Processor): P
       return []
     }
 
-    const query = `
+    const dependencies = getAllDependencies(processor)
+
+    const query =
+      dependencies.length === 0
+        ? `
+    SELECT b.* FROM vulcan2x.block b
+      WHERE b.id > ${job.last_block_id} ORDER BY id
+      LIMIT ${batchSize};`
+        : `
       SELECT b.* FROM vulcan2x.block b
         WHERE id<= (SELECT MIN(last_block_id) FROM vulcan2x.job  WHERE name in(
-          ${getAllDependencies(processor)
-            .map((dependency) => `'${dependency}'`)
-            .join(',')}
-        ) ) AND b.id > ${job.last_block_id} ORDER BY id
+          ${dependencies.map((dependency) => `'${dependency}'`).join(',')}
+        )) AND b.id > ${job.last_block_id} ORDER BY id
       LIMIT ${batchSize};`
 
     const nextBlocks =
