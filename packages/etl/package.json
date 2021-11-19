@@ -22,7 +22,7 @@
   "dependencies": {
     "@sentry/node": "^5.15.0",
     "convert-hrtime": "^3.0.0",
-    "lodash": "^4.17.15",
+    "lodash": "^4.17.21",
     "node-cleanup": "^2.1.2",
     "pg-promise": "^10.4.4",
     "postgres-migrations-oasis": "^3.0.2",
