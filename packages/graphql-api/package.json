@@ -22,7 +22,7 @@
   "dependencies": {
     "lodash": "^4.17.15",
     "ts-essentials": "^6.0.2",
-    "express": "^4.16.4",
+    "express": "^4.17.3",
     "helmet": "^3.16.0",
     "apicache": "^1.4.0",
     "compression": "^1.7.4",
