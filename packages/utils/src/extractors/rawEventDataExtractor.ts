@@ -68,7 +68,13 @@ export async function extractRawLogs(
           return
         }
         const block = _block[0]
-        const storedTx = allStoredTxsByTxHash[log.transactionHash!][0]
+
+        const storedTxArray = allStoredTxsByTxHash[log.transactionHash!]
+        if (!storedTxArray) {
+          return
+        }
+        
+        const storedTx = storedTxArray[0]
 
         return {
           ...log,
